@@ -20,7 +20,7 @@ public class UserDBManager {
 	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame";
 	
 	// These details below are to be changed to your username and password for your mysql database
-	private static final String USERNAME="admin", PASSWORD="OPG2021My$QLpass";
+	private static final String USERNAME="admin", PASSWORD="password";
 	
 	public static final int[] MAX_UI_LENGTHS = new int[] {36, 20, 64, 64};
 	
