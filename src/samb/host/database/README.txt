@@ -1,8 +1,7 @@
 Here should be a file called
-LoginCredentials.java
+**LoginCredentials.java**
 
-containing {{{
-
+```java
 package samb.host.database;
 
 public class LoginCredentials {
@@ -11,8 +10,6 @@ public class LoginCredentials {
 	public static final String password = "password";
 
 }
+```
 
-
-}}}
-
-where username and password are your credentials to your mysql server
+where *username* and *password* are your credentials to your mysql server.
