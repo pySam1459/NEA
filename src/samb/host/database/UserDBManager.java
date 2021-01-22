@@ -19,9 +19,6 @@ public class UserDBManager {
 	private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame";
 	
-	// These details below are to be changed to your username and password for your mysql database
-	private static final String USERNAME="admin", PASSWORD="OPG2021My$QLpass";
-	
 	public static final int[] MAX_UI_LENGTHS = new int[] {36, 20, 64, 64};
 	
 	private static Connection conn;
@@ -47,7 +44,7 @@ public class UserDBManager {
 		// This method creates the connection to the database using the credentials specified.
 		// Realistically the Admin credentials shouldn't be hard-coded, but this program isn't meant to be used commercially, so it doesn't particularly matter
 		
-		conn = DriverManager.getConnection(connectionURL, USERNAME, PASSWORD);
+		conn = DriverManager.getConnection(connectionURL, LoginCredentials.username, LoginCredentials.password);
 		
 	}
 	

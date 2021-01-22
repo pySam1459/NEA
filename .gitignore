@@ -1,4 +1,5 @@
 /bin/
 /.project
-/.settings
+/.settings/
 /.classpath
+/src/samba/host/database/LoginCredentials.java
