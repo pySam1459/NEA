@@ -307,9 +307,10 @@ public class Host extends BaseProcessor implements Runnable {
 		UserInfo ui = UserDBManager.getUIFromName(args[2]);
 		if(ui != null) {
 			UserStats us = StatsDBManager.getUS(ui.id);
-			System.out.printf("%s {\n  ID: %s\n  Email: %s\n  Elo: %d\n  # Games: %d\n  # Games Won: %d"
+			boolean online = um.isOnline(ui.id);
+			System.out.printf("%s {\n  ID: %s\n  Online: %s\n  Email: %s\n  Elo: %d\n  # Games: %d\n  # Games Won: %d"
 					+ "\n  # Games Lost: %d\n  # Balls Potted: %d\n  Highest Elo: %d\n  HighestEloVictory: %d\n}\n", 
-					ui.username, ui.id, ui.email, us.elo, us.noGames, us.noGamesWon, us.noGamesLost, us.noBallsPotted, us.highestElo, us.highestEloVictory);
+					ui.username, ui.id, online, ui.email, us.elo, us.noGames, us.noGamesWon, us.noGamesLost, us.noBallsPotted, us.highestElo, us.highestEloVictory);
 			
 		} else {
 			System.out.printf("Unknown User '%s'\n", args[2]);
