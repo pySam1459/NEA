@@ -47,7 +47,7 @@ The Host Command Line is made from different command groups, and their commands 
 	* exit
 	* quit
 
-To execute a command, run '%group% %command% %arg1% %arg2% ...'
+To execute a command, run '$group $command $arg1 $arg2 ...'
 Example: server start 1234
 This example is used to start the host server, which is **required** before clients can send packets to the host.
 
@@ -68,7 +68,7 @@ There also maybe an issue with the *mysql-connector.jar* (in the lib directory),
 
 #### Game
 Currently, to start a not functioning game between 2 users, use the command
-	'game start %User 1% %User 2%'
+	'game start $User 1 $User 2'
 	
 If the 2 users are online, then a game will start.
 
@@ -82,4 +82,3 @@ When a client logins/signups up, it sends a packet to the host, which authorizes
   
 Both the Host and Clients handle a received packet in their *main* class with a handle method,
   which uses a switch statement on the packet's header (*custom enum*) to decide the packet's use.
-
