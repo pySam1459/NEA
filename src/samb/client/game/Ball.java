@@ -101,7 +101,6 @@ public class Ball extends Circle {
 		g.setColor(Color.BLACK);
 		g.drawOval((int)(x-r)+off, (int)(y-r)+off, (int)(r*2), (int)(r*2));
 
-		
 	}
 
 }

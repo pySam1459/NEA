@@ -20,11 +20,13 @@ public class Game extends GameInfo {
 		super(id, UserDBManager.getUI(u1), UserDBManager.getUI(u2));
 
 		this.balls = Func.createDefaultBalls(tDim, Circle.DEFAULT_BALL_RADIUS);
+		this.turn = u1;
 		
 	}
 	
 	public void update(Packet p) {
 		this.balls = p.gameInfo.balls;
+		this.turn = p.gameInfo.turn;
 		
 	}
 	

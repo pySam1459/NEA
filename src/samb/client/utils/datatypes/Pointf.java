@@ -18,5 +18,11 @@ public class Pointf {
 		return new Pointf(this.x * m, this.y * m);
 		
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("Pointf{x=%f, y=%f}", this.x, this.y);
+		
+	}
 
 }

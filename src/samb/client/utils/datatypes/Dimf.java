@@ -14,5 +14,11 @@ public class Dimf {
 		this.height = h;
 		
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("Dimf{width=%f, height=%f}", this.width, this.height);
+		
+	}
 
 }

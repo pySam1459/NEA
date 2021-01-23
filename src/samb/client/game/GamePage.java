@@ -24,7 +24,7 @@ public class GamePage extends Page {
 		super("GamePage");
 		this.client = client;
 		
-		this.table = new Table(this);
+		this.table = new Table(client, this);
 		add("table", table);
 		
 	}
@@ -39,10 +39,8 @@ public class GamePage extends Page {
 	public void startGame(GameInfo gi) {
 		// This method starts a new game
 		setGameInfo(gi);
-		table.spectating = !(gi.u1.id.equals(client.udata.id) || gi.u2.id.equals(client.udata.id));
-		if(!table.spectating) {
-			table.turn = gi.u1.id.equals(client.udata.id);
-		}
+		table.setUseCase(gi, client.udata.id);
+
 	}
 	
 	public void updateTable(Packet p) {
@@ -53,6 +51,7 @@ public class GamePage extends Page {
 	
 	public void setGameInfo(GameInfo gi) {
 		this.info = gi;
+		this.info.opp = gi.u2.id.equals(client.udata.id) ? gi.u1.id : gi.u2.id;
 		table.update(gi);
 		
 	}

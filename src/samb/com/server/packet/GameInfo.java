@@ -18,6 +18,9 @@ public class GameInfo implements Serializable {
 	public Dimension tDim = new Dimension(2048, 1024);
 	public List<Circle> balls; // List of balls (as circle objects)
 	
+	public boolean practising = false;
+	public String turn, opp;
+	
 	public GameInfo(String id, UserInfo u1, UserInfo u2) {
 		this.id = id;
 		this.u1 = u1;

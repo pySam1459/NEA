@@ -13,6 +13,7 @@ import java.util.List;
 
 import samb.client.game.Ball;
 import samb.client.utils.Consts;
+import samb.client.utils.datatypes.Pointf;
 
 public class Func {
 	/* This class is a contains useful functions which can be called statically from either the host or client program */
@@ -64,7 +65,7 @@ public class Func {
 		// 0-white, 1-red, 2-yellow, 3-black
 		int[] cols = new int[] {1, 1, 2, 2, 3, 1, 1, 2, 1, 2, 2, 2, 1, 2, 1}; // Order of balls
 		
-		arr.add(new Circle(dim.width/4-r*2+4, dim.height/2, 0, 0, r, 0));
+		arr.add(new Circle(dim.width/4, dim.height/2, 0, 0, r, 0));
 		
 		double x = 3*dim.width/4 - r*6;
 		double y;
@@ -120,6 +121,14 @@ public class Func {
 		
 	}
 	
+	public static double[] getVelocity(double angle, double power) {
+		double constant = 0.1;
+		return new double[] {
+				-power * Math.cos(angle) * constant,
+				-power * Math.sin(angle) * constant
+		};
+	}
+	
 	public static double getDis(double x1, double y1, double x2, double y2) {
 		// Returns the distance between 2 points
 		return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
@@ -129,6 +138,18 @@ public class Func {
 	public static boolean ball2(Ball b1, Ball b2) {
 		// Stands for ball squared, checks if 2 balls (circles) overlap
 		return getDis(b1.x, b1.y, b2.x, b2.y) <= b1.r + b2.r;
+	}
+	
+	public static double[] getProjection(double angle, double radius, Pointf origin) {
+		return new double[] {
+				origin.x + radius * Math.cos(angle),
+				origin.y + radius * Math.sin(angle)
+		};
+	}
+	
+	public static double magnitude(double vx, double vy) {
+		return Math.sqrt(vx*vx + vy*vy);
+		
 	}
 	
 }
