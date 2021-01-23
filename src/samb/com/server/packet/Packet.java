@@ -3,6 +3,9 @@ package samb.com.server.packet;
 import java.io.Serializable;
 
 import samb.com.database.UserStats;
+import samb.com.server.info.GameInfo;
+import samb.com.server.info.LoginInfo;
+import samb.com.server.info.UpdateInfo;
 
 public class Packet implements Serializable {
 	/* The Packet Class is critical to the programs ability to communicate across the Internet
@@ -18,6 +21,7 @@ public class Packet implements Serializable {
 	public String id;      // Each player has a unique id, which can be used to identify each player in a database / HashMap / or other data holding structures.
 	public LoginInfo loginInfo;
 	public GameInfo gameInfo;
+	public UpdateInfo updateInfo;
 	public UserStats userStats;
 	
 	public Packet(Header header) {

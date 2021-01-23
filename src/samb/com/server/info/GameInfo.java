@@ -1,4 +1,4 @@
-package samb.com.server.packet;
+package samb.com.server.info;
 
 import java.awt.Dimension;
 import java.io.Serializable;

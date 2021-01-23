@@ -1,6 +1,6 @@
 package samb.host.game;
 
-import samb.com.server.packet.GameInfo;
+import samb.com.server.info.GameInfo;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Circle;

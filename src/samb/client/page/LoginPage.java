@@ -14,9 +14,9 @@ import samb.client.page.widget.TextBox;
 import samb.client.page.widget.animations.BoxFocusAnimation;
 import samb.client.utils.Consts;
 import samb.client.utils.ImageLoader;
+import samb.com.server.info.LoginInfo;
 import samb.com.server.packet.Error;
 import samb.com.server.packet.Header;
-import samb.com.server.packet.LoginInfo;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Func;
 

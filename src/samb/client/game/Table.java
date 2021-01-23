@@ -15,7 +15,8 @@ import samb.client.page.widget.Widget;
 import samb.client.utils.ImageLoader;
 import samb.client.utils.datatypes.Dimf;
 import samb.client.utils.datatypes.Pointf;
-import samb.com.server.packet.GameInfo;
+import samb.com.server.info.GameInfo;
+import samb.com.server.info.UpdateInfo;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Circle;
@@ -39,14 +40,11 @@ public class Table extends Widget {
 	public boolean turn = false;
 	private boolean allowAim = true;
 	
-	private boolean showCue = false;
-	private double cueAngle = 0.0, cueStartDist = 0.0;
-	private boolean cueSet = false;
-	private double cuePower = 0;
+	private Cue cue;
 	private Ball cueBall;
 	
 	private List<Ball> balls;
-	private GameInfo updateGI;
+	private UpdateInfo updateInfo;
 	
 	private Client client;
 	private GamePage gp;
@@ -56,6 +54,7 @@ public class Table extends Widget {
 		this.client = client;
 		this.gp = gp;
 		
+		this.cue = new Cue();
 		this.balls = new ArrayList<>();
 		
 	}
@@ -82,7 +81,7 @@ public class Table extends Widget {
 			
 		} else if(gi.u1.id.equals(id) || gi.u2.id.equals(id)) {
 			tuc = TableUseCase.playing;
-			turn = gi.u1.id.equals(id);
+			turn = gi.turn.equals(id);
 			
 		} else {
 			tuc = TableUseCase.spectating;
@@ -106,36 +105,31 @@ public class Table extends Widget {
 	}
 	
 	private void tickUpdate() {
-		if(updateGI != null) {
-			this.balls = new ArrayList<>();
-			this.turn = client.udata.id.equals(updateGI.turn);
-			Ball b;
-			for(Circle c: updateGI.balls) {
-				b = new Ball(c, this.balls);
-				balls.add(b);
-				
-				if(c.col == 0) {
-					cueBall = b;
-				}
-			}
-			updateGI = null;
+		if(updateInfo != null) {
+			this.turn = client.udata.id.equals(updateInfo.turn);
+			
+			cueBall.vx = updateInfo.vx;
+			cueBall.vy = updateInfo.vy;
+			
+			updateInfo = null;
+
 		}
 	}
 	
 	private void aim() {
 		// TODO might consider showing cue to spectators/other player
 		if(tuc == TableUseCase.playing || tuc == TableUseCase.practicing) {
-			showCue = (tuc == TableUseCase.practicing || turn) && allowAim;
+			cue.show = (tuc == TableUseCase.practicing || turn) && allowAim;
 			
-			if(showCue) {
-				if(!cueSet) {
+			if(cue.show) {
+				if(!cue.set) {
 					Pointf xy = getMouseOnTable();
-					cueAngle = getAngle(new Pointf(cueBall.x, cueBall.y), xy);
+					cue.angle = getAngle(new Pointf(cueBall.x, cueBall.y), xy);
 	
 					// If the user wants this angle
 					if(Client.mouse.left && Client.mouse.forleft < 2) {
-						cueSet = true;
-						cueStartDist = Func.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
+						cue.set = true;
+						cue.startDist = Func.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
 					}
 					
 				} else if(Client.mouse.left) {
@@ -143,15 +137,14 @@ public class Table extends Widget {
 					double angle = getAngle(new Pointf(cueBall.x, cueBall.y), xy);
 					double distance = Func.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
 					
-					cuePower = cueStartDist - distance;
+					cue.power = cue.startDist - distance;
 					
-				} else if(!Client.mouse.left && cuePower > 2.5) {
+				} else if(!Client.mouse.left && cue.power > 2.5) {
 					shoot();
 					
 				} else {
-					cuePower = 0.0;
-					cueStartDist = 0.0;
-					cueSet = false;
+					cue.halfReset();
+
 				}
 			}
 		}
@@ -180,22 +173,19 @@ public class Table extends Widget {
 	}
 	
 	private void shoot() {
-		double[] vel = Func.getVelocity(cueAngle, cuePower);
-		cueBall.vx = vel[0];
-		cueBall.vy = vel[1];
-		
+		double[] vel = Func.getVelocity(cue.angle, cue.power);
 		turn = tuc != TableUseCase.playing;
 		
-		Packet p = getUpdate();
+		Packet p = createUpdate(vel);
 		client.server.send(p);
 		
 		allowAim = false;
+		cue.reset();
 		
 	}
 	
 	private void checkNewAim() {
-		if(turn && tuc != TableUseCase.spectating && !allowAim) {
-			System.out.println("checking");
+		if(turn && tuc != TableUseCase.spectating) {
 			boolean newAim = true;
 			double threshold = 1;
 			for(Ball b: balls) {
@@ -208,7 +198,6 @@ public class Table extends Widget {
 				}
 			} if(newAim) {
 				allowAim = true;
-				System.out.println(client.udata.info.username);
 				
 			} else {
 				allowAim = false;
@@ -217,17 +206,38 @@ public class Table extends Widget {
 		}
 	}
 	
+	public void rack(GameInfo gi) {
+		this.balls = new ArrayList<>();
+		Ball b;
+		for(Circle c: gi.balls) {
+			b = new Ball(c, this.balls);
+			balls.add(b);
+			
+			if(c.col == 0) {
+				cueBall = b;
+			}
+		}
+	}
 	
-	public void update(GameInfo gi) {
-		this.updateGI = gi;
+	public void update(UpdateInfo upinfo) {
+		this.updateInfo = upinfo;
 		
 	}
 	
-	public Packet getUpdate() {
+	public Packet createUpdate(double[] vel) {
+		Packet p = new Packet(Header.updateGame);
+		p.updateInfo = new UpdateInfo(turn ? gp.info.id : gp.info.opp);
+		p.updateInfo.vx = vel[0];
+		p.updateInfo.vy = vel[1];
+		
+		return p;
+	}
+	
+	public Packet createFullUpdate() {
 		Packet p = new Packet(Header.updateGame);
 		p.gameInfo = gp.info;
 		p.gameInfo.balls = getCircles();
-		p.gameInfo.turn = turn ? gp.info.id : gp.info.id;
+		p.gameInfo.turn = turn ? gp.info.id : gp.info.opp;
 		
 		return p;
 	}
@@ -237,6 +247,7 @@ public class Table extends Widget {
 		for(Ball b: balls) {
 			circles.add(b);
 		}
+		
 		return circles;
 	}
 	
@@ -282,7 +293,7 @@ public class Table extends Widget {
 	}
 	
 	private void renderCue(Graphics2D g) {
-		if(showCue) {
+		if(cue.show) {
 			double projectionLength = 384;
 			double cueLength = 256;
 			double offset = Ball.DEFAULT_BALL_RADIUS*1.5;
@@ -293,16 +304,16 @@ public class Table extends Widget {
 			cueft.y += rect[1];
 			
 			
-			double[] start = Func.getProjection(cueAngle, cuePower + offset, cueft);
-			double[] end = Func.getProjection(cueAngle, cuePower + projectionLength + offset, cueft);
+			double[] start = Func.getProjection(cue.angle, cue.power + offset, cueft);
+			double[] end = Func.getProjection(cue.angle, cue.power + projectionLength + offset, cueft);
 			
 			g.setStroke(new BasicStroke(thickness));
 			g.setColor(Color.GRAY);
 			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);
 			
 			
-			start = Func.getProjection(cueAngle, cuePower + offset, cueft);
-			end = Func.getProjection(cueAngle, cuePower + cueLength + offset, cueft);
+			start = Func.getProjection(cue.angle, cue.power + offset, cueft);
+			end = Func.getProjection(cue.angle, cue.power + cueLength + offset, cueft);
 			
 			g.setColor(Color.YELLOW);
 			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);

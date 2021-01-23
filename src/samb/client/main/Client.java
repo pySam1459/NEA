@@ -59,7 +59,7 @@ public class Client extends BaseProcessor implements Runnable {
 		
 		Client.mouse.update();
 		Window.updateBackground();
-		super.process();
+		super.process(); // BaseProcessor handles received packets
 	}
 	
 	private void render() {

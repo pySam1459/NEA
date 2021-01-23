@@ -8,7 +8,7 @@ import samb.client.main.Client;
 import samb.client.main.Window;
 import samb.client.page.Page;
 import samb.client.utils.ImageLoader;
-import samb.com.server.packet.GameInfo;
+import samb.com.server.info.GameInfo;
 import samb.com.server.packet.Packet;
 
 public class GamePage extends Page {
@@ -39,25 +39,25 @@ public class GamePage extends Page {
 	public void startGame(GameInfo gi) {
 		// This method starts a new game
 		setGameInfo(gi);
+		table.rack(gi);
 		table.setUseCase(gi, client.udata.id);
-
+		
 	}
 	
 	public void updateTable(Packet p) {
 		// This method updates the table, (when an opponent has hit the cue ball)
-		table.update(p.gameInfo);
+		table.update(p.updateInfo);
 		
 	}
 	
 	public void setGameInfo(GameInfo gi) {
 		this.info = gi;
 		this.info.opp = gi.u2.id.equals(client.udata.id) ? gi.u1.id : gi.u2.id;
-		table.update(gi);
 		
 	}
 	
 	public Packet getUpdate() {
-		return table.getUpdate();
+		return table.createFullUpdate();
 	}
 	
 	
