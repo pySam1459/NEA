@@ -196,13 +196,9 @@ public class Table extends Widget {
 					b.vx = 0.0;
 					b.vy = 0.0;
 				}
-			} if(newAim) {
-				allowAim = true;
-				
-			} else {
-				allowAim = false;
-				
-			}
+			} 
+			allowAim = newAim;
+			
 		}
 	}
 	
