@@ -76,10 +76,11 @@ public class Ball extends Circle {
 		this.vx *= TABLE_FRICTION;
 		this.vy *= TABLE_FRICTION;
 		
-		if(Func.magnitude(vx, vy) > 0.2) {
+		double threshold = 1;
+		if(Func.magnitude(vx, vy) > threshold) {
 			this.moving = true;
 			
-		} else if(moving) {
+		} else {
 			vx = 0.0;
 			vy = 0.0;
 			moving = false;

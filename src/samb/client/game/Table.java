@@ -187,14 +187,10 @@ public class Table extends Widget {
 	private void checkNewAim() {
 		if(turn && tuc != TableUseCase.spectating) {
 			boolean newAim = true;
-			double threshold = 1;
 			for(Ball b: balls) {
-				if(Func.magnitude(b.vx, b.vy) > threshold) {
+				if(b.moving) {
 					newAim = false;
-
-				} else {
-					b.vx = 0.0;
-					b.vy = 0.0;
+					
 				}
 			} 
 			allowAim = newAim;

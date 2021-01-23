@@ -101,7 +101,7 @@ public class Func {
 			
 			moveApart(b1, b2);
 			b1.collidedWith.add(b2);
-			b2.collidedWith.add(b1);
+			//b2.collidedWith.add(b1);
 			
 		}
 	}
