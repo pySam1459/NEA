@@ -90,10 +90,9 @@ public class Func {
 		
 		if(ball2(b1, b2) && !b1.collidedWith.contains(b2)) {
 			double di = getDis(b1.x, b1.y, b2.x, b2.y);
-			//double di = Math.sqrt(Math.pow(b1.x - b2.x, 2) + Math.pow(b1.y - b2.y, 2));
 			double nex = (b2.x - b1.x) / di;
 			double ney = (b2.y - b1.y) / di;
-			double p = 2 * (b1.vx * nex + b1.vy * ney - b2.vx * nex - b2.vy * ney) / 2;
+			double p = (b1.vx * nex + b1.vy * ney - b2.vx * nex - b2.vy * ney);
 			
 			b1.vx = (b1.vx - p * nex) * Ball.BALL_FRICTION;
 			b1.vy = (b1.vy - p * ney) * Ball.BALL_FRICTION;

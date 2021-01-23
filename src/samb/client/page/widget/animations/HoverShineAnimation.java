@@ -23,7 +23,6 @@ public class HoverShineAnimation extends WidgetAnimation {
 		super(rect);
 
 		this.progmax = xoff * 100 / rect[2] + 100;
-		System.out.println(progmax);
 	}
 
 	@Override
