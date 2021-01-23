@@ -26,7 +26,7 @@ The Host requires a login, which currently is:
 * admin
 * password
 
-The Host Command Line is made from different command groups, and their commands [arguments]:
+The Host Command Line is made from different command groups, and their commands [arguments]
 * server
 	* start [PORT]
 	* stop

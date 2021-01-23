@@ -20,9 +20,7 @@ public class Ball extends Circle {
 	//public static final double TABLE_FRICTION = 1, BALL_FRICTION = 1;
 	public static final double TABLE_FRICTION = 0.9946, BALL_FRICTION = 0.9946;
 	
-	public double nx, ny;
 	public List<Ball> collidedWith = new ArrayList<>();
-	
 	public boolean moving = false;
 	
 	private List<Ball> all;
@@ -42,25 +40,25 @@ public class Ball extends Circle {
 	}
 	
 	public void move() {
-		nx = this.x + this.vx;
-		ny = this.y + this.vy;
-
+		this.x += this.vx;
+		this.y += this.vy;
+		
 	}
 	
 	private void collisionBounds() {
-		if(nx-r <= 0) {
-			this.nx = r;
+		if(x-r <= 0) {
+			this.x = r;
 			this.vx *= -1;
-		} if(ny-r <= 0) {
-			this.ny = r;
+		} if(y-r <= 0) {
+			this.y = r;
 			this.vy *= -1;
 		}
 		
-		if(nx+r > Table.tdim.width) {
-			this.nx = Table.tdim.width-r;
+		if(x+r > Table.tdim.width) {
+			this.x = Table.tdim.width-r;
 			this.vx *= -1;
-		} if(ny+r > Table.tdim.height) {
-			this.ny = Table.tdim.height-r;
+		} if(y+r > Table.tdim.height) {
+			this.y = Table.tdim.height-r;
 			this.vy *= -1;
 		}
 	}
@@ -75,13 +73,10 @@ public class Ball extends Circle {
 	}
 	
 	public void update() {
-		this.x = nx;
-		this.y = ny;
-		
 		this.vx *= TABLE_FRICTION;
 		this.vy *= TABLE_FRICTION;
 		
-		if(Math.sqrt(vx*vx + vy*vy) > 0.2) {
+		if(Func.magnitude(vx, vy) > 0.2) {
 			this.moving = true;
 			
 		} else if(moving) {

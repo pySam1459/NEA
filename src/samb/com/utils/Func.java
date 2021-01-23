@@ -90,9 +90,10 @@ public class Func {
 		
 		if(ball2(b1, b2) && !b1.collidedWith.contains(b2)) {
 			double di = getDis(b1.x, b1.y, b2.x, b2.y);
+			//double di = Math.sqrt(Math.pow(b1.x - b2.x, 2) + Math.pow(b1.y - b2.y, 2));
 			double nex = (b2.x - b1.x) / di;
 			double ney = (b2.y - b1.y) / di;
-			double p = (b1.vx * nex + b1.vy * ney - b2.vx * nex - b2.vy * ney);
+			double p = 2 * (b1.vx * nex + b1.vy * ney - b2.vx * nex - b2.vy * ney) / 2;
 			
 			b1.vx = (b1.vx - p * nex) * Ball.BALL_FRICTION;
 			b1.vy = (b1.vy - p * ney) * Ball.BALL_FRICTION;
@@ -114,10 +115,10 @@ public class Func {
 		double my = (b1.y + b2.y) / 2;
 		double d = getDis(b1.x, b1.y, b2.x, b2.y);
 		
-		b1.nx = mx + (b1.r+2) * (b1.x - b2.x) / d;
-		b1.ny = my + (b1.r+2) * (b1.y - b2.y) / d;
-		b2.nx = mx + (b2.r+2) * (b2.x - b1.x) / d;
-		b2.ny = my + (b2.r+2) * (b2.y - b1.y) / d;
+		b1.x = mx + b1.r * (b1.x - b2.x) / d;
+		b1.y = my + b1.r * (b1.y - b2.y) / d;
+		b2.x = mx + b2.r * (b2.x - b1.x) / d;
+		b2.y = my + b2.r * (b2.y - b1.y) / d;
 		
 	}
 	
