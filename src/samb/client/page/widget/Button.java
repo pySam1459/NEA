@@ -19,6 +19,11 @@ public class Button extends Widget {
 	 * 
 	 * */
 	
+	public Color BACKGROUND_COLOR = new Color(24, 231, 204, 64);
+	public final Color SHADOW_COLOUR = new Color(0, 128, 132, 164);
+	public final Color HOLD_COLOR = new Color(48, 244, 232, 156);
+	public final Color FONT_COLOR = new Color(217, 241, 237, 225);
+	
 	public boolean hover=false, held=false;
 	private List<ButtonListener> bls;
 	
@@ -26,12 +31,6 @@ public class Button extends Widget {
 	private Dimension tiDim;
 	
 	private BufferedImage background_image;
-	
-	public Color BACKGROUND_COLOR = new Color(24, 231, 204, 64);
-	public Color SHADOW_COLOUR = new Color(0, 128, 132, 164);
-	public Color HOLD_COLOR = new Color(48, 244, 232, 156);
-	public Color FONT_COLOR = new Color(217, 241, 237, 225);
-
 	
 	public Button(int[] rect, String text, BufferedImage img) {
 		super(rect);

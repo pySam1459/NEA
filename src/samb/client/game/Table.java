@@ -60,7 +60,7 @@ public class Table extends Widget {
 	}
 	
 	private static int[] calculateRect(int maxWidth) {
-		int buffer = 24;
+		int buffer = 48;
 		// {gw, gh} is the width and height of the rendered table
 		int gw = maxWidth - buffer*2;
 		int gh = gw * imgDim.height / imgDim.width;
