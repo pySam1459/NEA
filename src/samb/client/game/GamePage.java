@@ -60,6 +60,11 @@ public class GamePage extends Page {
 		return table.createFullUpdate();
 	}
 	
+	public void spectate(GameInfo gi) {
+		startGame(gi); // Might have to change if required
+		
+	}
+	
 	
 	// Rendering
 	@Override

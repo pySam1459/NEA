@@ -69,6 +69,7 @@ public class GameManager {
 	
 	public void addSpectate(String spec, GameInfo gi) {
 		// Once a player has replied, the spectate can watch the match
+		// Check if gi != null
 		updators.get(gi.id).add(spec);
 		
 		Packet p = new Packet(Header.spectate);

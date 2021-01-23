@@ -335,6 +335,10 @@ public class Host extends BaseProcessor implements Runnable {
 			stopGame(args);
 			break;
 			
+		case "spectate":
+			specGame(args);
+			break;
+			
 		default:
 			System.out.printf("Invalid Command '%s'\n", args[1]);
 		}
@@ -357,6 +361,8 @@ public class Host extends BaseProcessor implements Runnable {
 				gm.newGame(u1.id, u2.id);
 				System.out.printf("A game has started between %s and %s!\n", u1.username, u2.username);
 			}
+		} else {
+			System.out.println("Invalid Arguements");
 		}
 	}
 	
@@ -372,6 +378,30 @@ public class Host extends BaseProcessor implements Runnable {
 				UserInfo u2 = gm.stopGame(u);
 				System.out.printf("The game between %s and %s has stopped!\n", u.username, u2.username);
 			}
+		} else {
+			System.out.println("Invalid Arguements");
+		}
+	}
+	
+	private void specGame(String[] args) {
+		if(args.length >= 4) {
+			UserInfo u1 = UserDBManager.getUIFromName(args[2]);
+			UserInfo u2 = UserDBManager.getUIFromName(args[3]);
+			
+			if(u1 == null) {
+				System.out.printf("User '%s' does not exist!\n", args[2]);
+			} else if(u2 == null) {
+				System.out.printf("User '%s' does not exist!\n", args[3]);
+			} else if(!um.isOnline(u1.id)) {
+				System.out.printf("User '%s' is not Online!\n", u1.username);
+			} else if(!um.isOnline(u2.id)) {
+				System.out.printf("User '%s' is not Online!\n", u2.username);
+			} else {
+				gm.queueSpectate(u2.id, u1.id);
+				System.out.printf("%s is now spectating %s!\n", u1.username, u2.username);
+			}
+		} else {
+			System.out.println("Invalid Arguments");
 		}
 	}
 	

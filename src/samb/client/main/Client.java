@@ -140,13 +140,21 @@ public class Client extends BaseProcessor implements Runnable {
 				
 			} else {
 				gp = (GamePage) pm.get();
-				p = gp.getUpdate();
+				p.gameInfo = gp.getUpdate().gameInfo;
 			}
 			server.send(p);
 			break;
 			
 		case stopGame:
 			pm.changePage(new MenuPage(this));
+			break;
+		
+		case spectate:
+			if(!pm.get().id.equals("GamePage")) {
+				pm.changePage(new GamePage(this));
+			}
+			gp = (GamePage) pm.get();
+			gp.spectate(p.gameInfo);
 			break;
 			
 			

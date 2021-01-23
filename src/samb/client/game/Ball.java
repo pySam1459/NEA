@@ -1,6 +1,5 @@
 package samb.client.game;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ public class Ball extends Circle {
 	private static final long serialVersionUID = -6433658309710972703L;
 	public static final Color[] colours = new Color[] {new Color(231, 223, 193), new Color(254, 63, 32), new Color(255, 170, 0), new Color(17, 18, 20)};
 	//public static final double TABLE_FRICTION = 1, BALL_FRICTION = 1;
-	public static final double TABLE_FRICTION = 0.9946, BALL_FRICTION = 0.9;
+	public static final double TABLE_FRICTION = 0.992, BALL_FRICTION = 0.8, SPEED_THRESHOLD = 0.5;
 	
 	public List<Ball> collidedWith = new ArrayList<>();
 	public boolean moving = false;
@@ -76,8 +75,7 @@ public class Ball extends Circle {
 		this.vx *= TABLE_FRICTION;
 		this.vy *= TABLE_FRICTION;
 		
-		double threshold = 1;
-		if(Func.magnitude(vx, vy) > threshold) {
+		if(Func.magnitude(vx, vy) > Ball.SPEED_THRESHOLD) {
 			this.moving = true;
 			
 		} else {
