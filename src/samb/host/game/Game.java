@@ -1,7 +1,6 @@
 package samb.host.game;
 
 import samb.com.server.info.GameInfo;
-import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Circle;
 import samb.com.utils.Func;
@@ -25,17 +24,13 @@ public class Game extends GameInfo {
 	}
 	
 	public void update(Packet p) {
-		this.balls = p.gameInfo.balls;
-		this.turn = p.gameInfo.turn;
+		if(p.gameInfo == null) {
+			this.turn = p.updateInfo.turn;
+			
+		} else {
+			this.balls = p.gameInfo.balls;
 		
-	}
-	
-	public Packet createUpdatePacket() {
-		Packet p = new Packet(Header.updateGame);
-		p.gameInfo = this;
-		
-		return p;
-		
+		}
 	}
 	
 }

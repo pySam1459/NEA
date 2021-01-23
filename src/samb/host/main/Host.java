@@ -453,6 +453,13 @@ public class Host extends BaseProcessor implements Runnable {
 			p.userStats = StatsDBManager.getUS(p.id);
 			server.sendTo(p, packet.getAddress(), packet.getPort());
 			break;
+			
+		case getUpdateGame:
+			if(um.isOnline(p.spec)) {
+				gm.addSpectate(p.spec, p.gameInfo);
+				
+			}
+			break;
 		
 		default:
 			System.out.printf("Unknown Header '%s'\n", p.header.toString());

@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import samb.com.database.UserInfo;
+import samb.com.server.info.GameInfo;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.host.main.Host;
@@ -47,23 +48,31 @@ public class GameManager {
 		updators.get(id).add(u1);
 		updators.get(id).add(u2);
 		
-		Packet p = g.createUpdatePacket();
-		p.header = Header.newGame;
+		Packet p = new Packet(Header.newGame);
+		p.gameInfo = g;
 		
 		host.um.get(u1).send(p);
 		host.um.get(u2).send(p);
 		
 	}
 	
-	public void spectate(String uToSpec, String spec) {
-		// This method notes that user uToSpec is spectating the match containing the player spec
+	public void queueSpectate(String uToSpec, String spec) {
+		// Since the game state must be requested from a player, the spectator must wait for them to reply
+		host.um.get(spec).waiting = true;
 		
-		String gid = parts.get(uToSpec);
-		Game g = games.get(gid);
-		updators.get(gid).add(spec);
+		Packet p = new Packet(Header.getUpdateGame);
+		p.spec = spec;
 		
-		Packet p = g.createUpdatePacket();
-		p.header = Header.spectate;
+		host.um.get(uToSpec).send(p);
+		
+	}
+	
+	public void addSpectate(String spec, GameInfo gi) {
+		// Once a player has replied, the spectate can watch the match
+		updators.get(gi.id).add(spec);
+		
+		Packet p = new Packet(Header.spectate);
+		p.gameInfo = gi;
 		
 		host.um.get(spec).send(p);
 		
@@ -78,10 +87,9 @@ public class GameManager {
 		
 		g.update(p);
 		
-		Packet p2 = g.createUpdatePacket();
 		for(String uid: updators.get(gId)) {
 			if(host.um.isOnline(uid)) {
-				host.um.get(uid).send(p2);
+				host.um.get(uid).send(p);
 				
 			} else {
 				// If the user is not online, remove them from the updators list

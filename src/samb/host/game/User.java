@@ -14,6 +14,8 @@ public class User {
 
 	public String id, username;
 	
+	public boolean waiting;
+	
 	private Host h;
 
 	public User(Host h, Packet p, DatagramPacket packet) {
