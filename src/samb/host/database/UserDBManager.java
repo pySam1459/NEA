@@ -43,9 +43,13 @@ public class UserDBManager {
 	private static void connectToDatabase() throws SQLException {
 		// This method creates the connection to the database using the credentials specified.
 		// Realistically the Admin credentials shouldn't be hard-coded, but this program isn't meant to be used commercially, so it doesn't particularly matter
-		
-		conn = DriverManager.getConnection(connectionURL, LoginCredentials.username, LoginCredentials.password);
-		
+		try {
+			conn = DriverManager.getConnection(connectionURL, LoginCredentials.username, LoginCredentials.password);
+		} catch(Exception e) {
+			System.out.println("You have not created the LoginCredentials Class!");
+			e.printStackTrace();
+			System.exit(-1);
+		}
 	}
 	
 	// Query Methods
