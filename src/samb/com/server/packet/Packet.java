@@ -19,12 +19,13 @@ public class Packet implements Serializable {
 	
 	public Header header;  // This is a Packet header, which is used by the receiving entity on the purpose of the packet (either synchronization data, login/signup details, etc)
 	public String id;      // Each player has a unique id, which can be used to identify each player in a database / HashMap / or other data holding structures.
+	public String spec;    // Spectator ID
 	
+	// Each 'Info' class contains information about their prefix
 	public LoginInfo loginInfo;
 	public GameInfo gameInfo;
 	public UpdateInfo updateInfo;
 	public UserStats userStats;
-	public String spec;
 	
 	public Packet(Header header) {
 		this.header = header;

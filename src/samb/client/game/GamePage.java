@@ -10,6 +10,7 @@ import samb.client.page.widget.ChatBox;
 import samb.client.page.widget.GameMenu;
 import samb.client.utils.ImageLoader;
 import samb.com.server.info.GameInfo;
+import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.enums.TableUseCase;
 
@@ -63,6 +64,11 @@ public class GamePage extends Page {
 		
 	}
 	
+	public void spectate(GameInfo gi) {
+		startGame(gi); // Might have to change if required
+		
+	}
+	
 	public void updateTable(Packet p) {
 		// This method updates the table, (when an opponent has hit the cue ball)
 		table.update(p.updateInfo);
@@ -81,12 +87,12 @@ public class GamePage extends Page {
 	}
 	
 	public Packet getUpdate() {
-		return table.createFullUpdate();
-	}
-	
-	public void spectate(GameInfo gi) {
-		startGame(gi); // Might have to change if required
+		Packet p = new Packet(Header.updateGame);
+		p.gameInfo = info;
+		p.gameInfo.balls = table.getBalls();
+		p.gameInfo.turn = table.turn ? info.id : info.opp;
 		
+		return p;
 	}
 	
 	

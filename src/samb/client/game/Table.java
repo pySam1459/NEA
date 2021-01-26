@@ -13,6 +13,7 @@ import samb.client.main.Client;
 import samb.client.main.Window;
 import samb.client.page.widget.Widget;
 import samb.client.utils.ImageLoader;
+import samb.client.utils.Maths;
 import samb.client.utils.datatypes.Dimf;
 import samb.client.utils.datatypes.Pointf;
 import samb.com.server.info.GameInfo;
@@ -20,7 +21,6 @@ import samb.com.server.info.UpdateInfo;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Circle;
-import samb.com.utils.Func;
 import samb.com.utils.enums.TableUseCase;
 
 public class Table extends Widget {
@@ -125,18 +125,18 @@ public class Table extends Widget {
 			if(cue.show) {
 				if(!cue.set) {
 					Pointf xy = getMouseOnTable();
-					cue.angle = getAngle(new Pointf(cueBall.x, cueBall.y), xy);
+					cue.angle = Maths.getAngle(new Pointf(cueBall.x, cueBall.y), xy);
 	
 					// If the user wants this angle
 					if(Client.mouse.left && Client.mouse.forleft < 2) {
 						cue.set = true;
-						cue.startDist = Func.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
+						cue.startDist = Maths.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
 					}
 					
 				} else if(Client.mouse.left) {
 					Pointf xy = getMouseOnTable();
-					double angle = getAngle(new Pointf(cueBall.x, cueBall.y), xy);
-					double distance = Func.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
+					//double angle = Maths.getAngle(new Pointf(cueBall.x, cueBall.y), xy);
+					double distance = Maths.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
 					
 					cue.power = cue.startDist - distance;
 					
@@ -158,23 +158,8 @@ public class Table extends Widget {
 		
 	}
 	
-	private double getAngle(Pointf c, Pointf p) {
-		// Returns the angle between Pointf c to Pointf p (cue to mouseXY)
-		double angle;
-		if(p.x - c.x == 0) {
-			angle = Math.PI/2;
-		} else {
-			angle = Math.atan((p.y - c.y) / (p.x - c.x));
-		}
-		
-		if(p.x > c.x) {
-			angle += Math.PI;
-		}
-		return angle;
-	}
-	
 	private void shoot() {
-		double[] vel = Func.getVelocity(cue.angle, cue.power);
+		double[] vel = Maths.getVelocity(cue.angle, cue.power);
 		turn = tuc != TableUseCase.playing;
 		
 		Packet p = createUpdate(vel);
@@ -226,16 +211,7 @@ public class Table extends Widget {
 		return p;
 	}
 	
-	public Packet createFullUpdate() {
-		Packet p = new Packet(Header.updateGame);
-		p.gameInfo = gp.info;
-		p.gameInfo.balls = getCircles();
-		p.gameInfo.turn = turn ? gp.info.id : gp.info.opp;
-		
-		return p;
-	}
-	
-	private List<Circle> getCircles() {
+	public List<Circle> getBalls() {
 		List<Circle> circles = new ArrayList<>();
 		for(Ball b: balls) {
 			circles.add(b);
@@ -297,16 +273,16 @@ public class Table extends Widget {
 			cueft.y += rect[1];
 			
 			
-			double[] start = Func.getProjection(cue.angle, cue.power + offset, cueft);
-			double[] end = Func.getProjection(cue.angle, cue.power + projectionLength + offset, cueft);
+			double[] start = Maths.getProjection(cue.angle, cue.power/2 + offset, cueft);
+			double[] end = Maths.getProjection(cue.angle, cue.power/2 + projectionLength + offset, cueft);
 			
 			g.setStroke(new BasicStroke(thickness));
 			g.setColor(Color.GRAY);
 			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);
 			
 			
-			start = Func.getProjection(cue.angle, cue.power + offset, cueft);
-			end = Func.getProjection(cue.angle, cue.power + cueLength + offset, cueft);
+			start = Maths.getProjection(cue.angle, cue.power/2 + offset, cueft);
+			end = Maths.getProjection(cue.angle, cue.power/2 + cueLength + offset, cueft);
 			
 			g.setColor(Color.YELLOW);
 			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);
