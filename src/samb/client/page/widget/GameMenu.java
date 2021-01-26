@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import samb.client.game.GamePage;
+import samb.client.main.Client;
 import samb.client.utils.Consts;
 import samb.com.server.info.GameInfo;
 
@@ -49,17 +50,34 @@ public class GameMenu extends Widget {
 	}
 	
 	public void setInfo(GameInfo gi) {
-		if(gi != null) {
-			this.gi = gi;
-			Text t = (Text) gp.get("title1");
+		this.gi = gi;
+		
+		Text t;
+		String[] titleIDs = new String[] {"title1", "title2"};
+		switch(gi.tuc) {
+		case playing:
+			if(gi.u1.id.equals(Client.getClient().udata.id)) {
+				titleIDs = new String[] {"title1", "title2"};
+			} else {
+				titleIDs = new String[] {"title2", "title1"};
+			}
+			// NOTE, no break here as using the next case's code
 			
+		case spectating:
+			t = (Text) gp.get(titleIDs[0]);
 			t.setText(gi.u1.username);
 			t.HIDDEN = false;
 			
-			t = (Text) gp.get("title2");
+			t = (Text) gp.get(titleIDs[1]);
 			t.setText(gi.u2.username);
 			t.HIDDEN = false;
+			break;
 			
+		case practicing:
+			t = (Text) gp.get("title1");
+			t.setText(Client.getClient().udata.info.username);
+			t.HIDDEN = false;
+			break;
 		}
 	}
 
@@ -78,11 +96,16 @@ public class GameMenu extends Widget {
 		g.setColor(BORDER_COLOR);
 		g.drawRoundRect(buffer/2, buffer/2, rect[2]-buffer, rect[3]-buffer, buffer, buffer);
 		
-		
+		renderScores(g);
 		
 		graph.drawImage(img, rect[0], rect[1], null);
 		super.animRender(graph);
 
+	}
+	
+	private void renderScores(Graphics2D g) {
+		
+		
 	}
 	
 }

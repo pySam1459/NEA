@@ -21,6 +21,7 @@ import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Circle;
 import samb.com.utils.Func;
+import samb.com.utils.enums.TableUseCase;
 
 public class Table extends Widget {
 	/* This subclass handles the table object, updating, ticking and rendering

@@ -21,12 +21,9 @@ public class MenuPage extends Page implements ButtonListener {
 	 * or practice on a offline table. Other sub-options include: profile, settings and stats
 	 * */
 	
-	private Client client;
-	
-	public MenuPage(Client client) {
+	public MenuPage() {
 		super("MenuPage");
 		
-		this.client = client;
 		initWidgets();
 		requestStats();
 		
@@ -34,7 +31,7 @@ public class MenuPage extends Page implements ButtonListener {
 	
 	private void initWidgets() {
 		int buffer = 32;
-		Text unTitle = new Text(client.udata.info.username, new int[] {buffer*5, 64, Window.dim.width/2, 100}, Consts.INTER.deriveFont(Font.PLAIN, 96), Consts.PAL1);
+		Text unTitle = new Text(Client.getClient().udata.info.username, new int[] {buffer*5, 64, Window.dim.width/2, 100}, Consts.INTER.deriveFont(Font.PLAIN, 96), Consts.PAL1);
 		unTitle.CENTERED = false;
 		add("unTitle", unTitle);
 		
@@ -72,7 +69,7 @@ public class MenuPage extends Page implements ButtonListener {
 	
 	private void requestStats() {
 		Packet p = new Packet(Header.getStats);
-		client.server.send(p);
+		Client.getClient().server.send(p);
 		
 	}
 

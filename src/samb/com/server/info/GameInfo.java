@@ -6,6 +6,7 @@ import java.util.List;
 
 import samb.com.database.UserInfo;
 import samb.com.utils.Circle;
+import samb.com.utils.enums.TableUseCase;
 
 public class GameInfo implements Serializable {
 	/* This class contains game information which is to be sent between a client and the host
@@ -17,9 +18,11 @@ public class GameInfo implements Serializable {
 	public UserInfo u1, u2;
 	public Dimension tDim = new Dimension(2048, 1024);
 	public List<Circle> balls; // List of balls (as circle objects)
+	public int red=0, yellow=0;
 	
 	public boolean practising = false;
 	public String turn, opp;
+	public TableUseCase tuc;
 	
 	public GameInfo(String id, UserInfo u1, UserInfo u2) {
 		this.id = id;

@@ -8,6 +8,7 @@ import samb.com.database.UserInfo;
 import samb.com.server.info.GameInfo;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
+import samb.com.utils.enums.TableUseCase;
 import samb.host.main.Host;
 
 public class GameManager {
@@ -50,6 +51,7 @@ public class GameManager {
 		
 		Packet p = new Packet(Header.newGame);
 		p.gameInfo = g;
+		p.gameInfo.tuc = TableUseCase.playing; // Only for the players
 		
 		host.um.get(u1).send(p);
 		host.um.get(u2).send(p);
@@ -74,6 +76,7 @@ public class GameManager {
 		
 		Packet p = new Packet(Header.spectate);
 		p.gameInfo = gi;
+		p.gameInfo.tuc = TableUseCase.spectating; // Only for spectators
 		
 		host.um.get(spec).send(p);
 		

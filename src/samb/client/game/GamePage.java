@@ -1,6 +1,5 @@
 package samb.client.game;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
@@ -12,6 +11,7 @@ import samb.client.page.widget.GameMenu;
 import samb.client.utils.ImageLoader;
 import samb.com.server.info.GameInfo;
 import samb.com.server.packet.Packet;
+import samb.com.utils.enums.TableUseCase;
 
 public class GamePage extends Page {
 	/* This page is where the user will play/spectate their games
@@ -25,9 +25,9 @@ public class GamePage extends Page {
 	
 	private Client client;
 	
-	public GamePage(Client client) {
+	public GamePage() {
 		super("GamePage");
-		this.client = client;
+		this.client = Client.getClient();
 		
 		initWidgets();
 		
@@ -70,10 +70,14 @@ public class GamePage extends Page {
 	}
 	
 	public void setGameInfo(GameInfo gi) {
-		this.info = gi;
-		this.info.opp = gi.u2.id.equals(client.udata.id) ? gi.u1.id : gi.u2.id;
-		this.menu.setInfo(info);
-		
+		if(gi != null) {
+			this.info = gi;
+			if(gi.tuc == TableUseCase.playing) {
+				this.info.opp = gi.u2.id.equals(client.udata.id) ? gi.u1.id : gi.u2.id;
+			}
+			
+			menu.setInfo(info);
+		}
 	}
 	
 	public Packet getUpdate() {

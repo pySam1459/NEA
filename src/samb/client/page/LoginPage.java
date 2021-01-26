@@ -35,11 +35,8 @@ public class LoginPage extends Page implements ButtonListener {
 	private Text sInvUsername, sInvEmail, sInvPassword, sInvDets;
 	private Button sButton;
 	
-	private Client client;
-	
-	public LoginPage(Client client) {
+	public LoginPage() {
 		super("LoginPage");
-		this.client = client;
 		
 		initLogin();
 		initSignUp();
@@ -157,7 +154,7 @@ public class LoginPage extends Page implements ButtonListener {
 			Packet p = new Packet(Header.login);
 			p.loginInfo = new LoginInfo(lUsername.getText(), Func.hashPassword(lUsername.getText(), lPassword.getText()));
 			
-			client.server.send(p);
+			Client.getClient().server.send(p);
 
 		}
 	}
@@ -199,7 +196,7 @@ public class LoginPage extends Page implements ButtonListener {
 			Packet p = new Packet(Header.signup);
 			p.loginInfo = new LoginInfo(sUsername.getText(), sEmail.getText(), Func.hashPassword(sUsername.getText(), sPassword.getText()));
 			
-			client.server.send(p);
+			Client.getClient().server.send(p);
 			
 		}
 	}

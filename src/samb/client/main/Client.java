@@ -31,18 +31,21 @@ public class Client extends BaseProcessor implements Runnable {
 	private PageManager pm;
 	public UserData udata;
 	
+	private static Client thisClient;
 	public static Window window;
 	public static Mouse mouse;
 	public static Keyboard keyboard;
 	
 	
 	public Client() {
+		Client.thisClient = this;
+		
 		this.server = new Server(this);
 		Client.window = new Window(this); // TODO might cause problems in the future
 		
 		Func.loadFonts();
 		
-		this.pm = new PageManager(this);
+		this.pm = new PageManager();
 		this.udata = new UserData();
 		
 		Client.mouse = new Mouse();
@@ -92,7 +95,7 @@ public class Client extends BaseProcessor implements Runnable {
 			if(p.loginInfo.authorized) {
 				udata.id = p.id;
 				udata.info = new UserInfo(p.id, p.loginInfo.username);
-				pm.changePage(new MenuPage(this));
+				pm.changePage(new MenuPage());
 				
 			} else {
 				lp = (LoginPage) pm.get();
@@ -105,7 +108,7 @@ public class Client extends BaseProcessor implements Runnable {
 			if(p.loginInfo.authorized) {
 				udata.id = p.id;
 				udata.info = new UserInfo(p.id, p.loginInfo.username);
-				pm.changePage(new MenuPage(this));
+				pm.changePage(new MenuPage());
 				
 			} else {
 				lp = (LoginPage) pm.get();
@@ -117,7 +120,7 @@ public class Client extends BaseProcessor implements Runnable {
 		case newGame:
 			// This case starts a new game 
 			if(!pm.get().id.equals("GamePage")) {
-				pm.changePage(new GamePage(this));
+				pm.changePage(new GamePage());
 			}
 			gp = (GamePage) pm.get();
 			gp.startGame(p.gameInfo);
@@ -127,7 +130,7 @@ public class Client extends BaseProcessor implements Runnable {
 		case updateGame:
 			// This case updates the on going game with the latest move
 			if(!pm.get().id.equals("GamePage")) {
-				pm.changePage(new GamePage(this));
+				pm.changePage(new GamePage());
 			}
 			gp = (GamePage) pm.get();
 			gp.updateTable(p);
@@ -146,12 +149,12 @@ public class Client extends BaseProcessor implements Runnable {
 			break;
 			
 		case stopGame:
-			pm.changePage(new MenuPage(this));
+			pm.changePage(new MenuPage());
 			break;
 		
 		case spectate:
 			if(!pm.get().id.equals("GamePage")) {
-				pm.changePage(new GamePage(this));
+				pm.changePage(new GamePage());
 			}
 			gp = (GamePage) pm.get();
 			gp.spectate(p.gameInfo);
@@ -220,6 +223,11 @@ public class Client extends BaseProcessor implements Runnable {
 			Packet p = new Packet(Header.leave);
 			server.send(p);
 		}
+	}
+	
+	public static Client getClient() {
+		return thisClient;
+		
 	}
 	
 	public static void main(String[] args) {

@@ -3,7 +3,6 @@ package samb.client.page;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import samb.client.main.Client;
 import samb.client.main.Window;
 
 public class PageManager {
@@ -12,12 +11,9 @@ public class PageManager {
 	
 	private BufferedImage prevPageImg;
 	private int xoff = 0, transitionSpeed=45;
-	
-	private Client client;
-	
-	public PageManager(Client client) {
-		this.client = client;
-		this.curPage = new LoginPage(client);
+
+	public PageManager() {
+		this.curPage = new LoginPage();
 
 	}
 	

@@ -1,4 +1,4 @@
-package samb.client.game;
+package samb.com.utils.enums;
 
 public enum TableUseCase {
 	
