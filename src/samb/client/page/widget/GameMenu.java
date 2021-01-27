@@ -17,7 +17,7 @@ public class GameMenu extends Widget {
 	private final Color BORDER_COLOR = new Color(58, 75, 72, 200);
 	
 	private GamePage gp;
-	private GameInfo gi;
+	//private GameInfo gi;
 	
 	public GameMenu(int[] rect, GamePage gp) {
 		super(rect);
@@ -50,7 +50,7 @@ public class GameMenu extends Widget {
 	}
 	
 	public void setInfo(GameInfo gi) {
-		this.gi = gi;
+		//this.gi = gi;
 		
 		Text t;
 		String[] titleIDs = new String[] {"title1", "title2"};

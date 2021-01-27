@@ -26,9 +26,9 @@ import samb.com.utils.enums.TableUseCase;
 public class Table extends Widget {
 	/* This subclass handles the table object, updating, ticking and rendering
 	 * I have programmed this table so that a Table object can be used players, spectators or users practising.
-	 * I decided to render the balls on a large image (2048 x 1024) and rescale it to the shape of the table
+	 * I decided to render the balls on a large image (2048 x 1024) and re-scale it to the shape of the table
 	 *   being rendered on the window
-	 * This can cause some complexity with scaling issues, but I believe that it will/has simplified other processes
+	 * This can cause some complexity with scaling issues, but it reduces the complexity of ball co-ordates and different sized windows
 	 * */
 	
 	public static final Dimension tdim = new Dimension(2048, 1024);
@@ -61,10 +61,11 @@ public class Table extends Widget {
 	}
 	
 	private static int[] calculateRect(int maxWidth) {
-		int buffer = 48;
+		// Returns the rectangle which the table will take up on the screen
+		final int buffer = 48;
 		// {gw, gh} is the width and height of the rendered table
-		int gw = maxWidth - buffer*2;
-		int gh = gw * imgDim.height / imgDim.width;
+		final int gw = maxWidth - buffer*2;
+		final int gh = gw * imgDim.height / imgDim.width;
 		
 		// bdim and bxy is the boundary dimensions and top left coords (boundary for the balls, ie the cushions)
 		bdim = new Dimf(imgBDim.width * (double)gw/imgDim.width, 
@@ -76,6 +77,7 @@ public class Table extends Widget {
 	}
 	
 	public void setUseCase(GameInfo gi, String id) {
+		// Determines the use of the table (playing, spectating, practicing)
 		if(gi.practising) {
 			tuc = TableUseCase.practicing;
 			turn = true;
@@ -96,6 +98,7 @@ public class Table extends Widget {
 		aim();
 		checkNewAim();
 		
+		// Balls tick and update separately as collision equations use un-updated values
 		for(Ball b: balls) {
 			b.tick();
 			
@@ -106,6 +109,7 @@ public class Table extends Widget {
 	}
 	
 	private void tickUpdate() {
+		// If an update Packet has been sent by the host, the update will occur here
 		if(updateInfo != null) {
 			this.turn = client.udata.id.equals(updateInfo.turn);
 			
@@ -119,7 +123,10 @@ public class Table extends Widget {
 	
 	private void aim() {
 		// TODO might consider showing cue to spectators/other player
-		if(tuc == TableUseCase.playing || tuc == TableUseCase.practicing) {
+		// This method controls how the user aims the cue, 
+		//   first getting an angle "set", then changing the "power" and finally shooting
+		
+		if(tuc != TableUseCase.spectating) {
 			cue.show = (tuc == TableUseCase.practicing || turn) && allowAim;
 			
 			if(cue.show) {
@@ -159,6 +166,8 @@ public class Table extends Widget {
 	}
 	
 	private void shoot() {
+		// This methods sends an update packet to the host about the new velocity of the cue ball
+		
 		double[] vel = Maths.getVelocity(cue.angle, cue.power);
 		turn = tuc != TableUseCase.playing;
 		
@@ -171,6 +180,9 @@ public class Table extends Widget {
 	}
 	
 	private void checkNewAim() {
+		// This method checks whether the player is allowed to aim or whether to wait
+		//   ie when the balls are still moving = invalid
+		
 		if(turn && tuc != TableUseCase.spectating) {
 			boolean newAim = true;
 			for(Ball b: balls) {
@@ -185,13 +197,15 @@ public class Table extends Widget {
 	}
 	
 	public void rack(GameInfo gi) {
+		// To "rack" is to set up the table, therefore all the relevant ball info is transfered to the table
+		
 		this.balls = new ArrayList<>();
 		Ball b;
 		for(Circle c: gi.balls) {
 			b = new Ball(c, this.balls);
 			balls.add(b);
 			
-			if(c.col == 0) {
+			if(c.col == 0) { // If the ball is the cue ball
 				cueBall = b;
 			}
 		}
@@ -203,6 +217,8 @@ public class Table extends Widget {
 	}
 	
 	public Packet createUpdate(double[] vel) {
+		// This method creates an update Packet, sends the velocity of the cue ball
+		
 		Packet p = new Packet(Header.updateGame);
 		p.updateInfo = new UpdateInfo(turn ? gp.info.id : gp.info.opp);
 		p.updateInfo.vx = vel[0];
@@ -212,6 +228,8 @@ public class Table extends Widget {
 	}
 	
 	public List<Circle> getBalls() {
+		// This method converts the balls to Circle objects (less data to send)
+		
 		List<Circle> circles = new ArrayList<>();
 		for(Ball b: balls) {
 			circles.add(b);
@@ -223,6 +241,9 @@ public class Table extends Widget {
 	
 	@Override
 	public void render(Graphics2D graph) {
+		// The render method is called by the GamePage object and must render
+		//   the table image -> the balls -> the cue -> any WidgetAnimations
+		
 		BufferedImage img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		
@@ -230,13 +251,13 @@ public class Table extends Widget {
 		renderBalls(g);
 		
 		graph.drawImage(img, rect[0], rect[1], rect[2], rect[3], null);
-		super.animRender(graph);
+		super.animRender(graph); // Renders any animations
 		
 		renderCue(graph);
 	} 
 	
 	private void renderBalls(Graphics2D g) {
-		int buffer = 64; // the buffer allows the balls going into pockets to be rendered
+		final int buffer = 64; // the buffer allows the balls going into pockets to be rendered
 		
 		// The ballsImg is 2048x1024, so it needs to be scaled down to bdim
 		BufferedImage ballsImg = getBallsImage(buffer);
@@ -248,7 +269,8 @@ public class Table extends Widget {
 	}
 	
 	private BufferedImage getBallsImage(int buffer) {
-		int scaledBuffer = (int) (buffer * (tdim.width / bdim.width));
+		// This method returns an image with the balls scaled to their position on the table
+		final int scaledBuffer = (int) (buffer * (tdim.width / bdim.width));
 		
 		BufferedImage img = new BufferedImage(tdim.width + scaledBuffer*2, tdim.height + scaledBuffer*2, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
@@ -262,17 +284,20 @@ public class Table extends Widget {
 	}
 	
 	private void renderCue(Graphics2D g) {
+		// Currently, the cue is rendered with 2 colours lines, instead of an image (maybe change later)
+		
 		if(cue.show) {
-			double projectionLength = 384;
-			double cueLength = 256;
-			double offset = Ball.DEFAULT_BALL_RADIUS*1.5;
-			int thickness = 4;
+			// Some constant to modifiy the length, thickness, offset of the cue
+			final double projectionLength = 384;
+			final double cueLength = 256;
+			final double offset = Ball.DEFAULT_BALL_RADIUS*1.5;
+			final int thickness = 4;
 			
 			Pointf cueft = fromTable(new Pointf(cueBall.x, cueBall.y));
 			cueft.x += rect[0];
 			cueft.y += rect[1];
 			
-			
+			// Line 1
 			double[] start = Maths.getProjection(cue.angle, cue.power/2 + offset, cueft);
 			double[] end = Maths.getProjection(cue.angle, cue.power/2 + projectionLength + offset, cueft);
 			
@@ -280,7 +305,7 @@ public class Table extends Widget {
 			g.setColor(Color.GRAY);
 			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);
 			
-			
+			// Line 2
 			start = Maths.getProjection(cue.angle, cue.power/2 + offset, cueft);
 			end = Maths.getProjection(cue.angle, cue.power/2 + cueLength + offset, cueft);
 			
@@ -290,6 +315,7 @@ public class Table extends Widget {
 		}
 	}
 	
+	// Some methods to map points to and from the table dimensions
 	public Pointf toTable(Pointf p) {
 		return new Pointf((p.x - bxy.x) * (tdim.width / bdim.width),
 						(p.y - bxy.y) * (tdim.height / bdim.height));

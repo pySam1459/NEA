@@ -15,8 +15,8 @@ import samb.com.server.packet.Packet;
 import samb.com.utils.enums.TableUseCase;
 
 public class GamePage extends Page {
-	/* This page is where the user will play/spectate their games
-	 * This class handles the updating of the table
+	/* This page is where the user will play/spectate/practice their games
+	 * This subclass h
 	 * */
 
 	public GameInfo info;

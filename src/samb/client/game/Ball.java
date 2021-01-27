@@ -5,8 +5,8 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import samb.client.utils.Maths;
 import samb.com.utils.Circle;
-import samb.com.utils.Func;
 
 public class Ball extends Circle {
 	/* An object of this subclass represents a single ball on the pool table
@@ -65,7 +65,7 @@ public class Ball extends Circle {
 	private void collisionBalls() {
 		for(Ball b: all) {
 			if(b != this) {
-				Func.collision(this, b);
+				Maths.collision(this, b);
 				
 			}
 		}
@@ -75,7 +75,7 @@ public class Ball extends Circle {
 		this.vx *= TABLE_FRICTION;
 		this.vy *= TABLE_FRICTION;
 		
-		if(Func.magnitude(vx, vy) > Ball.SPEED_THRESHOLD) {
+		if(Maths.magnitude(vx, vy) > Ball.SPEED_THRESHOLD) {
 			this.moving = true;
 			
 		} else {
