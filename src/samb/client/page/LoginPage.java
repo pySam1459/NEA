@@ -46,6 +46,8 @@ public class LoginPage extends Page implements ButtonListener {
 	
 	private void initLogin() {
 		// This method initializes all of the widgets for Login In side
+		// A widget object is instantiated and any extra attributes are assigned
+		// The widgets object will then be added to the page and the ticking/rendering will be handled by the Page super class
 		
 		add("LoginTitle", new Text("Login In", new int[] {Window.dim.width/4, 64, Window.dim.width/4, 128}, Consts.INTER.deriveFont(Font.PLAIN, 72), Consts.PAL1));
 		

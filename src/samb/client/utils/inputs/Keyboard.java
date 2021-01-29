@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import samb.client.main.Client;
 
 public class Keyboard extends ArrayList<Boolean> implements KeyListener {
-	
+	// This subclass stores information about key events, ie which keys are pressed/not pressed
+	// I found that making the class a subclass of ArrayList, an efficient and cleaner method
+	//     than having an List/ArrayList attribute
 	
 	private static final long serialVersionUID = 4904165755373607895L;
 

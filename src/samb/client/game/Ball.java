@@ -45,6 +45,7 @@ public class Ball extends Circle {
 	}
 	
 	private void collisionBounds() {
+		// This method checks the bounding collision (ie the cushions)
 		if(x-r <= 0) {
 			this.x = r;
 			this.vx *= -1;
@@ -63,6 +64,8 @@ public class Ball extends Circle {
 	}
 	
 	private void collisionBalls() {
+		// This method checks if the ball has collided with other balls on the table
+		// If it has, then it will do the relevant calculations to produce the mathematically accurate reaction
 		for(Ball b: all) {
 			if(b != this) {
 				Maths.collision(this, b);
@@ -72,6 +75,8 @@ public class Ball extends Circle {
 	}
 	
 	public void update() {
+		// This method applies friction to the velocity and checks if the balls is still moving, or not
+		
 		this.vx *= TABLE_FRICTION;
 		this.vy *= TABLE_FRICTION;
 		

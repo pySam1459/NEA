@@ -9,6 +9,9 @@ import java.awt.event.MouseListener;
 import samb.client.main.Client;
 
 public class Mouse implements MouseListener {
+	/* This object handles mouse events from the window
+	 * The Window object will call either the mousePressed or mouseReleased methods when relevant
+	 * */
 	
 	public boolean left=false, right=false, prevLeft=false, prevRight=false;
 	public int forleft=0, forright=0;
@@ -38,6 +41,7 @@ public class Mouse implements MouseListener {
 	}
 	
 	public Point getXY() {
+		// This method returns the current (x, y) co-ords of the mouse in the window 
 		try {
 			p1 = Client.window.getLocationOnScreen();
 			p2 = MouseInfo.getPointerInfo().getLocation();
@@ -49,6 +53,8 @@ public class Mouse implements MouseListener {
 	}
 	
 	public void update() {
+		// This method updates the 'prev' variables at the end of a tick
+		// These variables can be used to determine if the user has just clicked/released the mouse
 		this.prevLeft = left;
 		this.prevRight = right;
 		

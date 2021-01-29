@@ -1,6 +1,7 @@
 package samb.client.utils.datatypes;
 
 public class Dimf {
+	// This class represents a Dimension object which can handle float values
 	
 	public double width, height;
 	

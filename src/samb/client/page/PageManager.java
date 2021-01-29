@@ -57,4 +57,9 @@ public class PageManager {
 		
 	}
 	
+	public boolean isId(String id) {
+		return get().id.equals(id);
+		
+	}
+	
 }

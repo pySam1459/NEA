@@ -10,7 +10,7 @@ public class Consts {
 	 * */
 	
 	
-	public static final Color BACKGROUND_COLOUR = new Color(41, 40, 37); //new Color(22, 21, 18);
+	public static final Color BACKGROUND_COLOUR = new Color(41, 40, 37);
 	public static final Color PALE = new Color(251, 245, 237, 200);
 	public static final Color GREY_PALE = new Color(173, 168, 160, 200);
 	public static final Color INVALID_COLOUR = new Color(224, 40, 37, 200);
@@ -23,6 +23,7 @@ public class Consts {
 	
 	public static Font INTER;
 	
+	// this object is used when getting the length of rendered text of a particular font
 	public static final Graphics2D fmg = (Graphics2D) new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
 
 	

@@ -1,6 +1,7 @@
 package samb.client.utils.datatypes;
 
 public class Pointf {
+	// This class represents a Point object which can handle float values
 	
 	public double x, y;
 	
@@ -15,6 +16,7 @@ public class Pointf {
 	}
 	
 	public Pointf mul(double m) {
+		// TODO remove if unnecessary 
 		return new Pointf(this.x * m, this.y * m);
 		
 	}

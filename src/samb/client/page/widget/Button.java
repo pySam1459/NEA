@@ -46,11 +46,11 @@ public class Button extends Widget {
 			this.background_image = img;
 		}
 		
-		// TODO might change up later
 		addAnimation(new BoxFocusAnimation(rect));
 	}
 	
 	private void resizeText() {
+		// This method auto resizes the text in a button (if its too long)
 		int s = ti.getSize();
 		while(tiDim.width > rect[2]) {
 			ti.setSize(--s);
@@ -91,7 +91,8 @@ public class Button extends Widget {
 	}
 	
 	private void checkRelease() {
-		// This method checks whether the user has released the button, if so it called the onRelease method for each ButtonListener
+		// This method checks whether the user has released the button,
+		// if so it called the onRelease method for each ButtonListener
 		
 		if(hover && held) {
 			if(!Client.mouse.left && Client.mouse.prevLeft) {

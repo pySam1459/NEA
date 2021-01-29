@@ -10,6 +10,9 @@ import javax.imageio.ImageIO;
 import samb.client.main.Window;
 
 public class ImageLoader {
+	/* This class loads images into memory so they only have to be loaded once in one place
+	 * This class uses static attributes and methods so that any image can be used anywhere in the program
+	 * */
 	
 	private static HashMap<String, BufferedImage> images = new HashMap<>();
 	

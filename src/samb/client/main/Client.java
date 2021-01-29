@@ -41,7 +41,7 @@ public class Client extends BaseProcessor implements Runnable {
 		Client.thisClient = this;
 		
 		this.server = new Server(this);
-		Client.window = new Window(this); // TODO might cause problems in the future
+		Client.window = new Window(this);
 		
 		Func.loadFonts();
 		
@@ -55,9 +55,10 @@ public class Client extends BaseProcessor implements Runnable {
 	}
 	
 	private void tick() {
-		// This method calls an objects which require 'updating', ie balls moving, widget animations, etc
 		// This method is called $Client.TPS$ per second
-		
+		// Any objects which require 'updating', ie balls moving, widget animations, etc
+		//    will be called in this method
+
 		pm.tick();
 		
 		Client.mouse.update();
@@ -66,15 +67,15 @@ public class Client extends BaseProcessor implements Runnable {
 	}
 	
 	private void render() {
-		// When rendering, the window's class creates a 'Graphics2D' object which acts as a canvas to draw onto
-		// Any object which requires rendering will render onto this Graphics2D object, which will then be rendered onto the window frame
+		// When rendering, the Window class creates a 'Graphics2D' object, which acts as a canvas to draw onto
+		// Any object which requires rendering will render onto this Graphics2D object, which will then be rendered onto the window frame (ie the screen)
 		// Order of rendering is very important as objects which are rendered first will be drawn over by later objects
 		
 		Graphics2D g = window.getGraphics();  // Get 'canvas' to draw on
 		
-		pm.render(g); // Renders the page being show, or a transition
+		pm.render(g); // Renders the page being show, or a transition, or both
 		
-		window.render();  // Show 'painted canvas' to screen
+		window.render();  // Renders 'painted canvas' to screen
 		
 	}
 	
@@ -82,8 +83,10 @@ public class Client extends BaseProcessor implements Runnable {
 	@Override
 	public void handle(DatagramPacket packet) {
 		// This methods handles incoming DatagramPackets from the Host Server
-		// A DatagramPacket contains a Packet object which has a header
-		// This header is used to identify the purpose of the packet, ie login, signup, gameupadate, etc
+		// The data of a DatagramPacket is a serialized Packet object
+		// Each Packet has a header which is used to identify the purpose of the packet, 
+		//     ie login, signup, gameupadate, etc
+		// the switch/case statement will direct each packet (using the header) to wherever it is needed
 		
 		LoginPage lp;
 		GamePage gp;
@@ -119,9 +122,10 @@ public class Client extends BaseProcessor implements Runnable {
 			
 		case newGame:
 			// This case starts a new game 
-			if(!pm.get().id.equals("GamePage")) {
+			if(!pm.isId("GamePage") ) {
 				pm.changePage(new GamePage());
 			}
+
 			gp = (GamePage) pm.get();
 			gp.startGame(p.gameInfo);
 			
@@ -129,39 +133,47 @@ public class Client extends BaseProcessor implements Runnable {
 			
 		case updateGame:
 			// This case updates the on going game with the latest move
-			if(!pm.get().id.equals("GamePage")) {
+			if(!pm.isId("GamePage") ) {
 				pm.changePage(new GamePage());
 			}
+			
 			gp = (GamePage) pm.get();
 			gp.updateTable(p);
 			break;
 			
 		case getUpdateGame:
-			// The case sends the current state of the table to the server (used for new spectators)
-			if(!pm.get().id.equals("GamePage")) {
-				p.gameInfo = null;
-				
-			} else {
+			// This case sends the current state of the table to the server (used for new spectators)
+			if(pm.isId("GamePage") ) {
 				gp = (GamePage) pm.get();
 				p.gameInfo = gp.getUpdate().gameInfo;
+				
+			} else {
+				p.gameInfo = null;
 			}
+			
 			server.send(p);
 			break;
 			
 		case stopGame:
-			pm.changePage(new MenuPage());
+			// This case stops a game and returns the user back to the menu page
+			if(!pm.isId("MenuPage")) {
+				pm.changePage(new MenuPage());
+			}
 			break;
 		
 		case spectate:
-			if(!pm.get().id.equals("GamePage")) {
+			// This case informs the table of the current position of the spectated table
+			if(!pm.isId("GamePage")) {
 				pm.changePage(new GamePage());
 			}
+
 			gp = (GamePage) pm.get();
 			gp.spectate(p.gameInfo);
 			break;
 			
 			
 		case getStats:
+			// This case updates the udata of the users stats
 			udata.stats = p.userStats;
 			break;
 		
@@ -226,11 +238,14 @@ public class Client extends BaseProcessor implements Runnable {
 	}
 	
 	public static Client getClient() {
+		// A little trick I learnt from reading the Minecraft source code was to set a static variable to the main class instance
+		// Therefore, the main class instance does not need to be passed as a parameter but instead is returned by 'Client.getClient()'
 		return thisClient;
 		
 	}
 	
 	public static void main(String[] args) {
+		// This is the main function, called when the program starts, creating a new Client instance
 		new Client();
 		
 	}

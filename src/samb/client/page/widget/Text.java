@@ -8,6 +8,7 @@ import java.awt.Point;
 public class Text extends Widget {
 	/* This class is a subclass of the Widget class
 	 * This widget simply displays text onto the screen
+	 * The text, font, colour and size will be passed in as constructor parameters
 	 * */
 	
 	private TextInfo ti;
@@ -32,6 +33,8 @@ public class Text extends Widget {
 
 	@Override
 	public void render(Graphics2D g) {
+		// Renders the Text widget
+		
 		if(!HIDDEN) {
 			Point xy;
 			if(CENTERED) {

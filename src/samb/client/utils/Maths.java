@@ -4,6 +4,8 @@ import samb.client.game.Ball;
 import samb.client.utils.datatypes.Pointf;
 
 public class Maths {
+	/* This class handles all mathematics which is required, especially the collision mechanics
+	 * */
 	
 	public static void collision(Ball b1, Ball b2) {
 		// This method checks if ball b1 and ball b2 have collided

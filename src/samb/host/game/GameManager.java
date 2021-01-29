@@ -16,14 +16,15 @@ public class GameManager {
 	 * This class also handles who is playing / watching games
 	 * The system to record this revolves around a Game ID ('gId') which links game objects and 'updators' to a game
 	 * The updators map contains data revolving around who needs to be updated when a player does something in their game
+	 * The parts map links a user to a game, key value pair being (key: user id, value: game id)
 	 * */
 	
 	private HashMap<String, Game> games;
-	private HashMap<String, String> parts;  // Participants, {key: userId, Value: gameId}
+	private HashMap<String, String> parts;
 	private HashMap<String, CopyOnWriteArrayList<String>> updators;
 	// The class 'CopyOnWriteArrayList' is a list which deals with any concurrency issues which may arise
 	// For example, if you remove an element from the list during an iteration of that list
-	// In a regular list, this would produce an error, but a COWAL deals with this internally
+	// In a regular list, this would produce an error, but a COWAL deals with this abstractly
 	
 	private Host host;
 	
@@ -36,7 +37,7 @@ public class GameManager {
 	}
 	
 	public void newGame(String u1, String u2) {
-		// This method creates a new game between user u1 and user u2
+		// This method creates a new game between user u1 and user u2, and any other necessary objects
 		
 		String id = UUID.randomUUID().toString();
 		Game g = new Game(id, u1, u2);
@@ -103,6 +104,8 @@ public class GameManager {
 	}
 	
 	public UserInfo stopGame(UserInfo u1) {
+		// This method is called by the command line when an admin stops a game containing user u1
+		
 		String gId = parts.get(u1.id);
 		Game g = games.get(gId);
 		
@@ -115,12 +118,19 @@ public class GameManager {
 		}
 
 		endGame(gId);
-		
 		return u2;
+	}
+	
+	public void endGame(String gId) {
+		// This method finalises a result of a game, updates statistics and removes the game
+		// TODO update statistics, etc
+		removeGame(gId);
 		
 	}
 	
-	public void endGame(String gId) { // TODO might rename to removeGame, endGame maybe for end states
+	public void removeGame(String gId) {
+		// This method removes a game from all relevant locations
+		
 		Game g = games.get(gId);
 		
 		parts.remove(g.u1.id);
@@ -129,12 +139,10 @@ public class GameManager {
 		
 		updators.remove(gId);
 		
-		// TODO send updates and update stats db
-		// if game.win == user, send update
-		
 	}
 	
 	public void removeUser(String id) {
+		// This method is implicitly called by the command line, to check if a user is in a game before removing them
 		if(inGame(id)) {
 			String gId = parts.get(id);
 			games.get(gId).abandoner = id;
