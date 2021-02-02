@@ -78,16 +78,14 @@ public class Table extends Widget {
 	
 	public void setUseCase(GameInfo gi, String id) {
 		// Determines the use of the table (playing, spectating, practicing)
-		if(gi.practising) {
-			tuc = TableUseCase.practicing;
+		tuc = gi.tuc;
+		if(gi.tuc == TableUseCase.practicing) {
 			turn = true;
 			
-		} else if(gi.u1.id.equals(id) || gi.u2.id.equals(id)) {
-			tuc = TableUseCase.playing;
+		} else if(gi.tuc == TableUseCase.playing) {
 			turn = gi.turn.equals(id);
 			
-		} else {
-			tuc = TableUseCase.spectating;
+		} else if(gi.tuc == TableUseCase.spectating) {
 			turn = false;
 		}
 	}
@@ -171,8 +169,15 @@ public class Table extends Widget {
 		double[] vel = Maths.getVelocity(cue.angle, cue.power);
 		turn = tuc != TableUseCase.playing;
 		
-		Packet p = createUpdate(vel);
-		client.server.send(p);
+		if(tuc == TableUseCase.playing) {
+			Packet p = createUpdate(vel);
+			client.server.send(p);
+			
+		} else if(tuc == TableUseCase.practicing) {
+			cueBall.vx = vel[0];
+			cueBall.vy = vel[1];
+			
+		}
 		
 		allowAim = false;
 		cue.reset();

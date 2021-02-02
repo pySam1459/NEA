@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import samb.client.game.GamePage;
 import samb.client.main.Client;
 import samb.client.main.Window;
 import samb.client.page.widget.Button;
@@ -41,28 +42,50 @@ public class MenuPage extends Page implements ButtonListener {
 		but = new Button(new int[] {buffer*5, yoff + butH, butW, butH}, "Join Pool", null);
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
+		but.addListener(this);
 		add("jpButton", but);
 		
 		but = new Button(new int[] {buffer*6 + butW, yoff + butH, butW, butH}, "Spectate", null);
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
+		but.addListener(this);
 		add("specButton", but);
 		
 		but = new Button(new int[] {buffer*5, yoff+butH*2 + buffer, butW, butH}, "Invite Player", null);
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
+		but.addListener(this);
 		add("invButton", but);
 		
 		but = new Button(new int[] {buffer*6 + butW, yoff+butH*2 + buffer, butW, butH}, "Practice", null);
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
+		but.addListener(this);
 		add("pracButton", but);
 		
 	}
 	
 	@Override
 	public void onClick(Button b) {
+		GamePage gp;
 		switch(b.id) {
+		case "jpButton":
+			break;
+			
+		case "specButton":
+			break;
+			
+		case "invButton":
+			break;
+			
+		case "pracButton":
+			gp = new GamePage();
+			Client.getClient().pm.changePage(gp);
+			gp.practice();
+			break;
+			
+		default:
+			System.out.println("Unknown button " + b.id);
 		
 		}
 	}

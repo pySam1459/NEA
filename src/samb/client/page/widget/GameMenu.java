@@ -29,15 +29,15 @@ public class GameMenu extends Widget {
 	
 	private void initMenuWidgets() {
 		int titleSize = 64, buffer=4;
-		Text title1 = new Text("", new int[] {rect[0], rect[1], rect[2], titleSize},
+		Text title1 = new Text("???", new int[] {rect[0], rect[1], rect[2], titleSize},
 				Consts.INTER.deriveFont(Font.PLAIN, titleSize), Consts.PAL1);
-		title1.HIDDEN = true;
+		title1.HIDDEN = false;
 		title1.CENTERED = true;
 		gp.add("title1", title1);
 		
-		Text title2 = new Text("", new int[] {rect[0], rect[1]+titleSize+buffer, rect[2], titleSize},
+		Text title2 = new Text("???", new int[] {rect[0], rect[1]+titleSize+buffer, rect[2], titleSize},
 				Consts.INTER.deriveFont(Font.PLAIN, titleSize), Consts.PAL1);
-		title2.HIDDEN = true;
+		title2.HIDDEN = false;
 		title2.CENTERED = true;
 		gp.add("title2", title2);
 		
@@ -75,7 +75,20 @@ public class GameMenu extends Widget {
 			
 		case practicing:
 			t = (Text) gp.get("title1");
+			t.setText("Practicing");
+			t.HIDDEN = false;
+			
+			t = (Text) gp.get("title2");
+			t.HIDDEN = true;
+			break;
+		
+		default:
+			t = (Text) gp.get("title1");
 			t.setText(Client.getClient().udata.info.username);
+			t.HIDDEN = false;
+			
+			t = (Text) gp.get("title2");
+			t.setText("???");
 			t.HIDDEN = false;
 			break;
 		}

@@ -12,11 +12,11 @@ import samb.client.utils.ImageLoader;
 import samb.com.server.info.GameInfo;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
+import samb.com.utils.Func;
 import samb.com.utils.enums.TableUseCase;
 
 public class GamePage extends Page {
 	/* This page is where the user will play/spectate/practice their games
-	 * This subclass h
 	 * */
 
 	public GameInfo info;
@@ -56,7 +56,7 @@ public class GamePage extends Page {
 		
 	}
 	
-	public void startGame(GameInfo gi) {
+	public void start(GameInfo gi) {
 		// This method starts a new game
 		setGameInfo(gi);
 		table.rack(gi);
@@ -65,7 +65,15 @@ public class GamePage extends Page {
 	}
 	
 	public void spectate(GameInfo gi) {
-		startGame(gi); // Might have to change if required
+		start(gi); // Might have to change if required
+		
+	}
+	
+	public void practice() {
+		GameInfo gi = new GameInfo("practice", null, null);
+		gi.tuc = TableUseCase.practicing;
+		gi.balls = Func.createDefaultBalls(gi.tDim, Ball.DEFAULT_BALL_RADIUS);
+		start(gi);
 		
 	}
 	

@@ -28,7 +28,7 @@ public class Client extends BaseProcessor implements Runnable {
 	private Thread mainThread;
 	
 	public Server server;
-	private PageManager pm;
+	public PageManager pm;
 	public UserData udata;
 	
 	private static Client thisClient;
@@ -127,7 +127,7 @@ public class Client extends BaseProcessor implements Runnable {
 			}
 
 			gp = (GamePage) pm.get();
-			gp.startGame(p.gameInfo);
+			gp.start(p.gameInfo);
 			
 			break;
 			

@@ -20,7 +20,6 @@ public class GameInfo implements Serializable {
 	public List<Circle> balls; // List of balls (as circle objects)
 	public int red=0, yellow=0;
 	
-	public boolean practising = false;
 	public String turn, opp;
 	public TableUseCase tuc;
 	
