@@ -14,6 +14,7 @@ public class Consts {
 	public static final Color PALE = new Color(251, 245, 237, 200);
 	public static final Color GREY_PALE = new Color(173, 168, 160, 200);
 	public static final Color INVALID_COLOUR = new Color(224, 40, 37, 200);
+	public static final Color SHADOW_COLOUR = new Color(48, 48, 48, 127);
 	
 	public static final Color PAL1 = new Color(227, 251, 247);
 	public static final Color PAL2 = new Color(24, 231, 204);

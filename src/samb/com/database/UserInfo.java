@@ -8,6 +8,7 @@ public class UserInfo implements Serializable {
 	
 	private static final long serialVersionUID = -1335445462934410453L;
 	public String id, username, email, password;
+	public int elo;
 
 	public UserInfo() {}
 	

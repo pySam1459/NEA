@@ -191,6 +191,9 @@ public class Client extends BaseProcessor implements Runnable {
 		 * so there aren't any concurrency issues, also why the tick and render methods are called in the same Thread
 		 * */
 		
+//		int framerate = 0;
+//		long timer = System.currentTimeMillis();
+		
 		double ns = 1000000000.0 / TPS;  // number of nanoseconds between each tick
 		double delta = 0.0;
 		long now, lastTime = System.nanoTime();
@@ -203,7 +206,14 @@ public class Client extends BaseProcessor implements Runnable {
 				render();
 				
 				delta--;
+				//framerate++;
 			}
+			// Outputs the framerate
+//			if(System.currentTimeMillis() - timer >= 1000) {
+//				System.out.printf("Framerate %d\n", framerate);
+//				framerate = 0;
+//				timer = System.currentTimeMillis();
+//			} 
 		}
 	}
 	

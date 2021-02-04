@@ -70,6 +70,9 @@ public class MenuPage extends Page implements ButtonListener {
 		GamePage gp;
 		switch(b.id) {
 		case "jpButton":
+			gp = new GamePage();
+			Client.getClient().pm.changePage(gp);
+			gp.pooling();
 			break;
 			
 		case "specButton":

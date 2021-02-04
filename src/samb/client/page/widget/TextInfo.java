@@ -76,8 +76,12 @@ public class TextInfo {
 		g.setFont(font);
 		g.drawString(text, xy.x, xy.y);
 		
-//		g.setStroke(new BasicStroke(2));
-//		g.drawRect(xy.x, xy.y-dim.height, dim.width, dim.height);
+	}
+	
+	public void render(Graphics2D g, Point xy, Color col) {
+		g.setColor(col);
+		g.setFont(font);
+		g.drawString(text, xy.x, xy.y);
 		
 	}
 

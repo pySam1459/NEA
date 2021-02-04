@@ -28,18 +28,39 @@ public class GameMenu extends Widget {
 	}
 	
 	private void initMenuWidgets() {
-		int titleSize = 64, buffer=4;
-		Text title1 = new Text("???", new int[] {rect[0], rect[1], rect[2], titleSize},
+		int titleSize = 28, buffer=4, eloSize=16;
+		Text title1 = new Text("???", new int[] {rect[0]+buffer*6, rect[1]+buffer*2, rect[2]-buffer*8, titleSize},
 				Consts.INTER.deriveFont(Font.PLAIN, titleSize), Consts.PAL1);
 		title1.HIDDEN = false;
-		title1.CENTERED = true;
+		title1.CENTERED = false;
 		gp.add("title1", title1);
 		
-		Text title2 = new Text("???", new int[] {rect[0], rect[1]+titleSize+buffer, rect[2], titleSize},
+		Text elo1 = new Text("", new int[] {rect[0]+buffer*2, rect[1]+buffer*2, rect[2]-buffer*8, titleSize}, 
+				Consts.INTER.deriveFont(Font.PLAIN, eloSize), Consts.PAL1);
+		elo1.HIDDEN = true;
+		elo1.CENTERED = false;
+		elo1.setAlign("right");
+		gp.add("elo1", elo1);
+		
+		Text title2 = new Text("???", new int[] {rect[0]+buffer*6, rect[1]+titleSize+buffer*3, rect[2]-buffer*8, titleSize},
 				Consts.INTER.deriveFont(Font.PLAIN, titleSize), Consts.PAL1);
 		title2.HIDDEN = false;
-		title2.CENTERED = true;
+		title2.CENTERED = false;
 		gp.add("title2", title2);
+		
+		Text elo2 = new Text("", new int[] {rect[0]+buffer*2, rect[1]+titleSize+buffer*3, rect[2]-buffer*8, titleSize}, 
+				Consts.INTER.deriveFont(Font.PLAIN, eloSize), Consts.PAL1);
+		elo2.HIDDEN = true;
+		elo2.CENTERED = false;
+		elo2.setAlign("right");
+		gp.add("elo2", elo2);
+		
+		Text pracTitle = new Text("Practice", new int[] {rect[0], rect[1], rect[2], titleSize*2},
+				Consts.INTER.deriveFont(Font.PLAIN, titleSize), Consts.PAL1);
+		pracTitle.HIDDEN = true;
+		pracTitle.CENTERED = true;
+		pracTitle.SHADOW = true;
+		gp.add("pracTitle", pracTitle);
 		
 	}
 
@@ -53,45 +74,56 @@ public class GameMenu extends Widget {
 		//this.gi = gi;
 		
 		Text t;
-		String[] titleIDs = new String[] {"title1", "title2"};
+		String[] titleIDs = new String[] {"title1", "title2", "elo1", "elo2"};
 		switch(gi.tuc) {
 		case playing:
 			if(gi.u1.id.equals(Client.getClient().udata.id)) {
-				titleIDs = new String[] {"title1", "title2"};
+				titleIDs = new String[] {"title1", "title2", "elo1", "elo2"};
 			} else {
-				titleIDs = new String[] {"title2", "title1"};
+				titleIDs = new String[] {"title2", "title1", "elo2", "elo1"};
 			}
 			// NOTE, no break here as using the next case's code
 			
 		case spectating:
 			t = (Text) gp.get(titleIDs[0]);
-			t.setText(gi.u1.username);
-			t.HIDDEN = false;
+			t.showText(gi.u1.username);
+			t = (Text) gp.get(titleIDs[2]);
+			t.showText(Integer.toString(gi.u1.elo));
 			
 			t = (Text) gp.get(titleIDs[1]);
-			t.setText(gi.u2.username);
-			t.HIDDEN = false;
+			t.showText(gi.u2.username);
+			t = (Text) gp.get(titleIDs[3]);
+			t.showText(Integer.toString(gi.u2.elo));
 			break;
 			
 		case practicing:
-			t = (Text) gp.get("title1");
-			t.setText("Practicing");
-			t.HIDDEN = false;
+			t = (Text) gp.get("pracTitle");
+			t.showText("Practicing");
 			
+			t = (Text) gp.get("title1");
+			t.HIDDEN = true;
 			t = (Text) gp.get("title2");
 			t.HIDDEN = true;
 			break;
 		
 		default:
 			t = (Text) gp.get("title1");
-			t.setText(Client.getClient().udata.info.username);
-			t.HIDDEN = false;
+			t.showText(Client.getClient().udata.info.username);
+			t = (Text) gp.get("elo1");
+			t.showText(Integer.toString(Client.getClient().udata.stats.elo));
 			
 			t = (Text) gp.get("title2");
-			t.setText("???");
-			t.HIDDEN = false;
+			t.showText("???");
 			break;
 		}
+	}
+	
+	public void showLoading() {
+		
+	}
+	
+	public void unshowLoading() {
+		
 	}
 
 	

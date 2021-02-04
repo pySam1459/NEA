@@ -4,6 +4,7 @@ import samb.com.server.info.GameInfo;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Circle;
 import samb.com.utils.Func;
+import samb.host.database.StatsDBManager;
 import samb.host.database.UserDBManager;
 
 public class Game extends GameInfo {
@@ -20,6 +21,14 @@ public class Game extends GameInfo {
 
 		this.balls = Func.createDefaultBalls(tDim, Circle.DEFAULT_BALL_RADIUS);
 		this.turn = u1;
+		
+		setElos();
+		
+	}
+	
+	private void setElos() {
+		u1.elo = StatsDBManager.getElo(u1.id);
+		u2.elo = StatsDBManager.getElo(u2.id);
 		
 	}
 	

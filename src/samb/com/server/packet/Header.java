@@ -8,10 +8,13 @@ public enum Header {
 	leave,
 	
 	newGame,
+	stopGame,
+	
+	joinPool,
+	spectate,
+	
 	updateGame,
 	getUpdateGame,
-	spectate,
-	stopGame,
 	
 	getStats;
 	

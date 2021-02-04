@@ -9,7 +9,7 @@ public class PageManager {
 	
 	private Page curPage;
 	
-	private BufferedImage prevPageImg;
+	private BufferedImage prevPageImg, newPage;
 	private int xoff = 0, transitionSpeed=45;
 
 	public PageManager() {
@@ -35,6 +35,7 @@ public class PageManager {
 			if(xoff < 0) {
 				xoff = 0;
 				prevPageImg = null;
+				newPage = null;
 			}
 		}
 	}
@@ -43,10 +44,12 @@ public class PageManager {
 	public void render(Graphics2D g) {
 		if(prevPageImg != null) {
 			g.drawImage(prevPageImg, xoff-Window.dim.width, 0, null);
+			g.drawImage(newPage, xoff, 0, null);
+		
+		} else {
+			g.drawImage(curPage.getRender(), xoff, 0, null);
+		
 		}
-		
-		g.drawImage(curPage.getRender(), xoff, 0, null);
-		
 	}
 	
 	public void changePage(Page newPage) {
@@ -54,6 +57,7 @@ public class PageManager {
 		this.xoff = Window.dim.width;
 		
 		this.curPage = newPage;
+		this.newPage = curPage.getRender();
 		
 	}
 	

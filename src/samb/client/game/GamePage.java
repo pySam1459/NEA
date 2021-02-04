@@ -58,6 +58,8 @@ public class GamePage extends Page {
 	
 	public void start(GameInfo gi) {
 		// This method starts a new game
+		menu.unshowLoading();
+		
 		setGameInfo(gi);
 		table.rack(gi);
 		table.setUseCase(gi, client.udata.id);
@@ -69,6 +71,15 @@ public class GamePage extends Page {
 		
 	}
 	
+	
+	public void pooling() {
+		Packet p = new Packet(Header.joinPool);
+		client.server.send(p);
+		
+		menu.showLoading();
+		
+	}
+	
 	public void practice() {
 		GameInfo gi = new GameInfo("practice", null, null);
 		gi.tuc = TableUseCase.practicing;
@@ -76,6 +87,7 @@ public class GamePage extends Page {
 		start(gi);
 		
 	}
+	
 	
 	public void updateTable(Packet p) {
 		// This method updates the table, (when an opponent has hit the cue ball)

@@ -90,6 +90,11 @@ public class GameManager {
 		String gId = parts.get(p.id);
 		Game g = games.get(gId);
 		
+		if(g == null) {
+			// handle abandonment error?
+			return;
+		}
+		
 		g.update(p);
 		
 		for(String uid: updators.get(gId)) {
