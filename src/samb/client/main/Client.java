@@ -173,8 +173,13 @@ public class Client extends BaseProcessor implements Runnable {
 			
 			
 		case getStats:
-			// This case updates the udata of the users stats
+			// This case updates the udata of the user's stats
 			udata.stats = p.userStats;
+			break;
+			
+		case getFriends:
+			// This case updates the udata of the user's friends
+			udata.friends = p.friendsInfo;
 			break;
 		
 		default:

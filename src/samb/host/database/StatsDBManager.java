@@ -12,7 +12,7 @@ import samb.com.database.UserInfo;
 import samb.com.database.UserStats;
 
 public class StatsDBManager {
-	/* This class is contains static methods which are used to query and update the 'stats' table in 'online pool game' mysql database which is hosted on localhost
+	/* This class is contains static methods which are used to query and update the 'stats' table in 'OnlinePoolGame' mysql database which is hosted locally
 	 * This class allows the Host to interact with the database and add, remove, select data to/from the database
 	 * Each user has a row containing their unique id, Elo, # Games, # Games Won, # Games Lost, # balls potted, highestElo, highestEloVictory
 	 * */
@@ -44,10 +44,8 @@ public class StatsDBManager {
 	
 	private static void connectToDatabase() throws SQLException {
 		// This method creates the connection to the database using the credentials specified.
-		// Realistically the Admin credentials shouldn't be hard-coded, but this program isn't meant to be used commercially, so it doesn't particularly matter
-		
 		conn = DriverManager.getConnection(connectionURL, LoginCredentials.username, LoginCredentials.password);
-		
+	
 	}
 	
 	// Query Methods

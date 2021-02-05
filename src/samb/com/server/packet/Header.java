@@ -16,6 +16,7 @@ public enum Header {
 	updateGame,
 	getUpdateGame,
 	
-	getStats;
+	getStats,
+	getFriends;
 	
 }

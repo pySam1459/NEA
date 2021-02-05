@@ -11,6 +11,7 @@ import samb.com.server.BaseProcessor;
 import samb.com.server.packet.Error;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
+import samb.host.database.FriendsDBManager;
 import samb.host.database.StatsDBManager;
 import samb.host.database.UserDBManager;
 import samb.host.game.GameManager;
@@ -42,6 +43,7 @@ public class Host extends BaseProcessor implements Runnable {
 		this.um = new UserManager();
 		this.gm = new GameManager(this);
 		
+		FriendsDBManager.start(um);
 		start();
 		
 	}
@@ -272,6 +274,7 @@ public class Host extends BaseProcessor implements Runnable {
 		if(ui != null) {
 			UserDBManager.removeUser(ui.id);
 			StatsDBManager.removeUser(ui.id);
+			FriendsDBManager.removeUser(ui.id);
 			System.out.printf("User '%s' removed!\n", username);
 			
 		} else {
@@ -477,6 +480,13 @@ public class Host extends BaseProcessor implements Runnable {
 			gm.update(p);
 			break;
 			
+		case getUpdateGame:
+			if(um.isOnline(p.spec)) {
+				gm.addSpectate(p.spec, p.gameInfo);
+				
+			}
+			break;
+			
 			
 		case getStats:
 			// This case sends back the stats of a specific user (TODO check if actual user for security)
@@ -484,12 +494,9 @@ public class Host extends BaseProcessor implements Runnable {
 			server.sendTo(p, packet.getAddress(), packet.getPort());
 			break;
 			
-		case getUpdateGame:
-			if(um.isOnline(p.spec)) {
-				gm.addSpectate(p.spec, p.gameInfo);
-				
-			}
+		case getFriends:
 			break;
+			
 		
 		default:
 			System.out.printf("Unknown Header '%s'\n", p.header.toString());
@@ -514,6 +521,7 @@ public class Host extends BaseProcessor implements Runnable {
 		UserInfo ui = new UserInfo(p.id, p.loginInfo.username, p.loginInfo.email, p.loginInfo.password);
 		UserDBManager.addUser(ui);
 		StatsDBManager.addUser(new UserStats(p.id));
+		FriendsDBManager.addUser(p.id);
 		
 		User u = new User(this, p, packet);
 		um.add(u);
@@ -543,6 +551,7 @@ public class Host extends BaseProcessor implements Runnable {
 		
 		UserDBManager.close();
 		StatsDBManager.close();
+		FriendsDBManager.close();
 	}
 
 	public static void main(String[] args) {

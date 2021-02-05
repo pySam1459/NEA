@@ -11,7 +11,7 @@ import java.util.List;
 import samb.com.database.UserInfo;
 
 public class UserDBManager {
-	/* This class contains static methods which are used to query and update the 'users' table in 'online pool game' mysql database which is hosted on the locahost
+	/* This class contains static methods which are used to query and update the 'users' table in 'OnlinePoolGame' mysql database which is hosted locally
 	 * This class allows the Host to interact with the database and add, remove, select data to/from the database
 	 * Each user has a row containing their unique id, username, email and password
 	 * */
@@ -42,9 +42,10 @@ public class UserDBManager {
 	
 	private static void connectToDatabase() throws SQLException {
 		// This method creates the connection to the database using the credentials specified.
-		// Realistically the Admin credentials shouldn't be hard-coded, but this program isn't meant to be used commercially, so it doesn't particularly matter
+
 		try {
 			conn = DriverManager.getConnection(connectionURL, LoginCredentials.username, LoginCredentials.password);
+		
 		} catch(Exception e) {
 			System.out.println("You have not created the LoginCredentials Class!");
 			e.printStackTrace();
