@@ -119,6 +119,12 @@ public class GameMenu extends Widget {
 	}
 	
 	public void showLoading() {
+		Text t;
+		t = (Text) gp.get("title1");
+		t.showText(Client.getClient().udata.info.username);
+		t = (Text) gp.get("elo1");
+		t.showText(Integer.toString(Client.getClient().udata.stats.elo));
+		
 		
 	}
 	

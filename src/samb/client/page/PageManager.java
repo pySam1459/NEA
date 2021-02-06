@@ -10,7 +10,7 @@ public class PageManager {
 	private Page curPage;
 	
 	private BufferedImage prevPageImg, newPage;
-	private int xoff = 0, transitionSpeed=45;
+	private int xoff = 0, transitionSpeed=45, count=0;
 
 	public PageManager() {
 		this.curPage = new LoginPage();
@@ -31,11 +31,16 @@ public class PageManager {
 	private void pageTransition() {
 		if(xoff > 0) {
 			xoff -= transitionSpeed;
+			count++;
 			
 			if(xoff < 0) {
 				xoff = 0;
 				prevPageImg = null;
 				newPage = null;
+				count = 0;
+			} if(count % 5 == 0) {
+				newPage = curPage.getRender();
+				
 			}
 		}
 	}
