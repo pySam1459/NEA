@@ -473,6 +473,10 @@ public class Host extends BaseProcessor implements Runnable {
 			gm.removeUser(p.id);
 			um.remove(p.id);
 			break;
+			
+		
+		case joinPool:
+			break;
 		
 			
 		case updateGame:

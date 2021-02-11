@@ -97,7 +97,7 @@ public class Client extends BaseProcessor implements Runnable {
 			// This case receives from the host whether the user is authorized to continue
 			if(p.loginInfo.authorized) {
 				udata.id = p.id;
-				udata.info = new UserInfo(p.id, p.loginInfo.username);
+				udata.userInfo = new UserInfo(p.id, p.loginInfo.username);
 				pm.changePage(new MenuPage());
 				
 			} else {
@@ -110,7 +110,7 @@ public class Client extends BaseProcessor implements Runnable {
 			// This case receives from the host whether the user has been signed up
 			if(p.loginInfo.authorized) {
 				udata.id = p.id;
-				udata.info = new UserInfo(p.id, p.loginInfo.username);
+				udata.userInfo = new UserInfo(p.id, p.loginInfo.username);
 				pm.changePage(new MenuPage());
 				
 			} else {
@@ -174,7 +174,7 @@ public class Client extends BaseProcessor implements Runnable {
 			
 		case getStats:
 			// This case updates the udata of the user's stats
-			udata.stats = p.userStats;
+			udata.userStats = p.userStats;
 			break;
 			
 		case getFriends:

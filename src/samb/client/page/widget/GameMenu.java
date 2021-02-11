@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 
 import samb.client.game.GamePage;
 import samb.client.main.Client;
+import samb.client.page.widget.animations.LoadingDotsAnimation;
 import samb.client.utils.Consts;
 import samb.com.server.info.GameInfo;
 
@@ -62,6 +63,11 @@ public class GameMenu extends Widget {
 		pracTitle.SHADOW = true;
 		gp.add("pracTitle", pracTitle);
 		
+		BlankWidget loading = new BlankWidget(new int[] {rect[0]+buffer*6, rect[1]+titleSize+buffer*4,
+														rect[2]/4, titleSize});
+		loading.addAnimation(new LoadingDotsAnimation(loading.rect));
+		gp.add("loading", loading);
+		
 	}
 
 	@Override
@@ -72,6 +78,8 @@ public class GameMenu extends Widget {
 	
 	public void setInfo(GameInfo gi) {
 		//this.gi = gi;
+		unshowPlayers();
+		unshowLoading();
 		
 		Text t;
 		String[] titleIDs = new String[] {"title1", "title2", "elo1", "elo2"};
@@ -97,38 +105,72 @@ public class GameMenu extends Widget {
 			break;
 			
 		case practicing:
-			t = (Text) gp.get("pracTitle");
-			t.showText("Practicing");
-			
-			t = (Text) gp.get("title1");
-			t.HIDDEN = true;
-			t = (Text) gp.get("title2");
-			t.HIDDEN = true;
+			showPractice();
 			break;
 		
 		default:
-			t = (Text) gp.get("title1");
-			t.showText(Client.getClient().udata.info.username);
-			t = (Text) gp.get("elo1");
-			t.showText(Integer.toString(Client.getClient().udata.stats.elo));
-			
-			t = (Text) gp.get("title2");
-			t.showText("???");
+			showPlayer1AsUsername();
 			break;
+			
 		}
 	}
 	
-	public void showLoading() {
-		Text t;
-		t = (Text) gp.get("title1");
-		t.showText(Client.getClient().udata.info.username);
+	public void unshowPlayers() {
+		Text t = (Text) gp.get("title1");
+		t.HIDDEN = true;
 		t = (Text) gp.get("elo1");
-		t.showText(Integer.toString(Client.getClient().udata.stats.elo));
+		t.HIDDEN = true;
 		
+		t = (Text) gp.get("title2");
+		t.HIDDEN = true;
+		t = (Text) gp.get("elo2");
+		t.HIDDEN = true;
+		
+	}
+	
+	public void showPlayers() {
+		Text t = (Text) gp.get("title1");
+		t.HIDDEN = false;
+		t = (Text) gp.get("elo1");
+		t.HIDDEN = false;
+		
+		t = (Text) gp.get("title2");
+		t.HIDDEN = false;
+		t = (Text) gp.get("elo2");
+		t.HIDDEN = false;
+	}
+	
+	
+	public void showPlayer1AsUsername() {
+		Text t = (Text) gp.get("title1");
+		t.showText(Client.getClient().udata.userInfo.username);
+		
+		t = (Text) gp.get("elo1");
+		t.showText(Integer.toString(Client.getClient().udata.userStats.elo));
+		
+	}
+	
+	public void showPractice() {
+		Text t = (Text) gp.get("pracTitle");
+		t.showText("Practicing");
+		
+		t = (Text) gp.get("title1");
+		t.HIDDEN = true;
+		t = (Text) gp.get("title2");
+		t.HIDDEN = true;
+		
+		unshowLoading();
+	}
+	
+	public void showLoading() {
+		BlankWidget bw = (BlankWidget) gp.get("loading");
+		bw.showAnim();
 		
 	}
 	
 	public void unshowLoading() {
+		BlankWidget bw = (BlankWidget) gp.get("loading");
+		bw.unshowAnim();
 		
 	}
 
@@ -155,8 +197,23 @@ public class GameMenu extends Widget {
 	}
 	
 	private void renderScores(Graphics2D g) {
-		
-		
+		if(Client.getClient().udata.gameInfo != null) {
+			int buffer = 4;
+			int r = (int) ((rect[2]-buffer*4)/8 - buffer);
+			
+			Text t = (Text) gp.get("title2");
+			int y = t.rect[1]-rect[1] + t.rect[3] + buffer*12;
+			
+			g.setColor(new Color(254, 63, 32, 164));
+			for(int i=0; i<Client.getClient().udata.gameInfo.red; i++) {
+				g.drawOval(buffer*2 + i*(r+buffer)*2, y-r, r*2, r*2);
+			}
+
+			g.setColor(new Color(255, 170, 0, 164));
+			for(int i=0; i<Client.getClient().udata.gameInfo.yellow; i++) {
+				g.drawOval(buffer*2 + i*(r+buffer)*2, y+r+buffer*2-r, r*2, r*2);
+			}
+		}
 	}
 	
 }

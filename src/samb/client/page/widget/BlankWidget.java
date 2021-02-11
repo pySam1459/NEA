@@ -3,6 +3,8 @@ package samb.client.page.widget;
 import java.awt.Graphics2D;
 
 public class BlankWidget extends Widget {
+	
+	private boolean showAnim = true;
 
 	public BlankWidget(int[] rect) {
 		super(rect);
@@ -11,14 +13,27 @@ public class BlankWidget extends Widget {
 
 	@Override
 	public void tick() {
-		super.animTick();
+		if(showAnim) {
+			super.animTick();
 		
+		}
 	}
 
 	@Override
 	public void render(Graphics2D g) {
-		super.animRender(g);
+		if(showAnim) {
+			super.animRender(g);
 		
+		}
+	}
+	
+	public void showAnim() {
+		this.showAnim = true;
+		
+	}
+	
+	public void unshowAnim() {
+		this.showAnim = false;
 	}
 
 }

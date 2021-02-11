@@ -76,6 +76,8 @@ public class GamePage extends Page {
 		Packet p = new Packet(Header.joinPool);
 		client.server.send(p);
 		
+		menu.unshowPlayers();
+		menu.showPlayer1AsUsername();
 		menu.showLoading();
 		
 	}
@@ -98,6 +100,7 @@ public class GamePage extends Page {
 	public void setGameInfo(GameInfo gi) {
 		if(gi != null) {
 			this.info = gi;
+			Client.getClient().udata.gameInfo = gi;
 			if(gi.tuc == TableUseCase.playing) {
 				this.info.opp = gi.u2.id.equals(client.udata.id) ? gi.u1.id : gi.u2.id;
 			}
@@ -105,6 +108,7 @@ public class GamePage extends Page {
 			menu.setInfo(info);
 		}
 	}
+	
 	
 	public Packet getUpdate() {
 		Packet p = new Packet(Header.updateGame);

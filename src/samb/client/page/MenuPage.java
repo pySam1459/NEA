@@ -32,7 +32,7 @@ public class MenuPage extends Page implements ButtonListener {
 	
 	private void initWidgets() {
 		int buffer = 32;
-		Text unTitle = new Text(Client.getClient().udata.info.username, new int[] {buffer*5, 64, Window.dim.width/2, 100}, Consts.INTER.deriveFont(Font.PLAIN, 96), Consts.PAL1);
+		Text unTitle = new Text(Client.getClient().udata.userInfo.username, new int[] {buffer*5, 64, Window.dim.width/2, 100}, Consts.INTER.deriveFont(Font.PLAIN, 96), Consts.PAL1);
 		unTitle.CENTERED = false;
 		add("unTitle", unTitle);
 		
