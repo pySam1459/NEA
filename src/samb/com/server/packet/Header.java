@@ -16,6 +16,8 @@ public enum Header {
 	updateGame,
 	getUpdateGame,
 	
+	chat,
+	
 	getStats,
 	getFriends;
 	

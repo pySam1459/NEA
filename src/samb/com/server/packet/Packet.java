@@ -6,6 +6,7 @@ import samb.com.database.UserStats;
 import samb.com.server.info.FriendsInfo;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.LoginInfo;
+import samb.com.server.info.Message;
 import samb.com.server.info.UpdateInfo;
 
 public class Packet implements Serializable {
@@ -28,6 +29,7 @@ public class Packet implements Serializable {
 	public UpdateInfo updateInfo;
 	public UserStats userStats;
 	public FriendsInfo friendsInfo;
+	public Message message;
 	
 	public Packet(Header header) {
 		this.header = header;

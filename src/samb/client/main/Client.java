@@ -172,6 +172,14 @@ public class Client extends BaseProcessor implements Runnable {
 			break;
 			
 			
+		case chat:
+			if(pm.isId("GamePage")) {
+				gp = (GamePage) pm.get();
+				gp.addChat(p.message);
+			}
+			break;
+			
+			
 		case getStats:
 			// This case updates the udata of the user's stats
 			udata.userStats = p.userStats;

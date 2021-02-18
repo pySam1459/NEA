@@ -10,6 +10,7 @@ import samb.client.page.widget.ChatBox;
 import samb.client.page.widget.GameMenu;
 import samb.client.utils.ImageLoader;
 import samb.com.server.info.GameInfo;
+import samb.com.server.info.Message;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Func;
@@ -40,10 +41,10 @@ public class GamePage extends Page {
 		
 		int buffer = 8;
 		this.menu = new GameMenu(new int[] {3*Window.dim.width/4+buffer, buffer, 
-				Window.dim.width/4-buffer*4, 2*Window.dim.height/3-buffer*4}, this);
+				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
 		
-		this.chat = new ChatBox(new int[] {3*Window.dim.width/4+buffer, 2*Window.dim.height/3-buffer*2, 
-				Window.dim.width/4-buffer*4, Window.dim.height/3-buffer*4});
+		this.chat = new ChatBox(new int[] {3*Window.dim.width/4+buffer, Window.dim.height/2-buffer*2, 
+				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4});
 		add("chat", chat);
 	}
 	
@@ -117,6 +118,12 @@ public class GamePage extends Page {
 		p.gameInfo.turn = table.turn ? info.id : info.opp;
 		
 		return p;
+	}
+	
+	
+	public void addChat(Message msg) {
+		chat.addMessage(msg);
+		
 	}
 	
 	
