@@ -44,7 +44,7 @@ public class GamePage extends Page {
 				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
 		
 		this.chat = new ChatBox(new int[] {3*Window.dim.width/4+buffer, Window.dim.height/2-buffer*2, 
-				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4});
+				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
 		add("chat", chat);
 	}
 	

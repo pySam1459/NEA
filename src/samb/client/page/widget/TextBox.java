@@ -9,6 +9,8 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 import samb.client.main.Client;
 import samb.client.utils.Consts;
@@ -36,6 +38,8 @@ public class TextBox extends Widget implements KeyListener {
 	private int cursorPos = 0, cursorRot = 0, cursorDelay = 500;
 	private boolean selected = false;
 	
+	private List<TextBoxListener> listeners;
+	
 	public TextBox(int[] rect, String prompt) {
 		super(rect);
 		
@@ -47,12 +51,16 @@ public class TextBox extends Widget implements KeyListener {
 		hideTi = new TextInfo("", new Font("Inter", Font.PLAIN, (int)(rect[3]*0.45)), TEXT_COLOUR);
 		
 		Client.window.addKeyListener(this);
+		this.listeners = new ArrayList<>();
 		
 	}
 	
 	public String getText() {
-		return ti.getText();
-		
+		return ti.getText();	
+	}
+	
+	public void setText(String txt) {
+		ti.setText(txt);
 	}
 
 	@Override
@@ -101,6 +109,9 @@ public class TextBox extends Widget implements KeyListener {
 				
 			case KeyEvent.VK_ENTER:
 				selected = false;
+				for(TextBoxListener tbl: listeners) {
+					tbl.onEnter(this);
+				}
 				break;
 				
 			case KeyEvent.VK_LEFT:
@@ -229,6 +240,12 @@ public class TextBox extends Widget implements KeyListener {
 	private TextInfo getRdTi() { // If the characters are hidden, the hideTi TextInfo object should be rendered instead of ti
 		return HIDE_CHARS ? hideTi : ti;
 	}
+	
+	
+	public void addListener(TextBoxListener tbl) {
+		listeners.add(tbl);
+	}
+	
 	
 	@Override
 	public void keyReleased(KeyEvent e) {}

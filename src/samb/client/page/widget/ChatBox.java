@@ -7,9 +7,13 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import samb.client.game.GamePage;
+import samb.client.main.Client;
 import samb.com.server.info.Message;
+import samb.com.server.packet.Header;
+import samb.com.server.packet.Packet;
 
-public class ChatBox extends Widget {
+public class ChatBox extends Widget implements TextBoxListener {
 	
 	private final Color BACKGROUND_COLOR = new Color(64, 81, 77, 127);
 	private final Color BORDER_COLOR = new Color(58, 75, 72, 200);
@@ -18,12 +22,46 @@ public class ChatBox extends Widget {
 	private BufferedImage chatImg;
 	private List<Message> messages;
 
-	public ChatBox(int[] rect) {
+	public ChatBox(int[] rect, GamePage gp) {
 		super(rect);
 
 		this.messages = new ArrayList<>();
 		messages.add(new Message("Welcome to Pool, you can chat here...", null));
 		renderChat();
+		
+		initChatWidgets(gp);
+		
+	}
+	
+	private void initChatWidgets(GamePage gp) {
+		TextBox et = new TextBox(new int[] {rect[0]+BUFFER, rect[1]+rect[3]-BUFFER*8,
+				rect[2]-BUFFER*2, BUFFER*8}, "Chat Here...");
+		et.textRegex = ".";
+		et.addListener(this);
+		gp.add("enterText", et);
+	}
+	
+	@Override
+	public void onEnter(Widget w) {
+		// This method is called by a TextBox Widget when the enter key is pressed
+		
+		if(w.id.equals("enterText")) {
+			TextBox tb = (TextBox) w;
+			if(tb.getText().matches(".+")) {
+				Message m = new Message(tb.getText(), Client.getClient().udata.userInfo.username);
+				sendMessage(m);
+				addMessage(m);
+				
+				tb.setText("");
+			}
+		}
+	}
+	
+	private void sendMessage(Message m) {
+		Packet p = new Packet(Header.chat);
+		p.message = m;
+		
+		Client.getClient().server.send(p);
 		
 	}
 	
@@ -32,6 +70,7 @@ public class ChatBox extends Widget {
 		renderChat();
 		
 	}
+	
 
 	@Override
 	public void tick() {
@@ -65,4 +104,5 @@ public class ChatBox extends Widget {
 		g.fillRect(BUFFER, BUFFER, chatImg.getWidth(), chatImg.getHeight());
 		
 	}
+
 }

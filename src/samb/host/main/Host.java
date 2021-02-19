@@ -476,6 +476,7 @@ public class Host extends BaseProcessor implements Runnable {
 			
 		
 		case joinPool:
+			// TODO join pool
 			break;
 		
 			
@@ -499,8 +500,13 @@ public class Host extends BaseProcessor implements Runnable {
 			break;
 			
 		case getFriends:
+			// TODO get friends
 			break;
 			
+			
+		case chat:
+			relayChat(p);
+			break;
 		
 		default:
 			System.out.printf("Unknown Header '%s'\n", p.header.toString());
@@ -533,6 +539,12 @@ public class Host extends BaseProcessor implements Runnable {
 		p.loginInfo.authorized = true;
 		p.loginInfo.password = null;
 		u.send(p);
+	}
+	
+	private void relayChat(Packet p) {
+		String oid = gm.getOpposition(p.id);
+		um.get(oid).send(p);
+		
 	}
 	
 	

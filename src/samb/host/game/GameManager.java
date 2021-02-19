@@ -160,5 +160,14 @@ public class GameManager {
 		return parts.containsKey(uid);
 		
 	}
+	
+	public String getOpposition(String uid) {
+		if(inGame(uid)) {
+			String gId = parts.get(uid);
+			Game g = games.get(gId);
+			return g.u1.id.equals(uid) ? g.u2.id : g.u1.id;
+		}
+		return null;
+	}
 
 }
