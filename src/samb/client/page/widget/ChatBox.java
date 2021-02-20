@@ -18,6 +18,10 @@ import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 
 public class ChatBox extends Widget implements TextBoxListener {
+	/* This subclass implements the chat functionality on the game's page
+	 * The class creates the widgets and images displayed on screen, 
+	 *   and handles events relevant to the chat. 
+	 * */
 	
 	private final Color BACKGROUND_COLOR = new Color(64, 81, 77, 127);
 	private final Color BORDER_COLOR = new Color(58, 75, 72, 200);
@@ -43,6 +47,8 @@ public class ChatBox extends Widget implements TextBoxListener {
 	}
 	
 	private void initChatWidgets(GamePage gp) {
+		// This method creates the TextBox widget which a player enters their chat into
+		
 		TextBox et = new TextBox(new int[] {rect[0]+BUFFER, rect[1]+rect[3]-BUFFER*7,
 				rect[2]-BUFFER*2, BUFFER*6}, "Chat Here...");
 		et.round = false;
@@ -50,7 +56,7 @@ public class ChatBox extends Widget implements TextBoxListener {
 		et.charLimit = 100;
 		et.BACKGROUND_COLOUR = new Color(76, 93, 86, 0);
 		et.addListener(this);
-		gp.add("enterText", et);
+		gp.add("enterText", et); // added to page
 	}
 	
 	@Override
@@ -60,8 +66,8 @@ public class ChatBox extends Widget implements TextBoxListener {
 		if(w.id.equals("enterText")) {
 			TextBox tb = (TextBox) w;
 			Message m = new Message(tb.getText(), Client.getClient().udata.userInfo.username);
-			sendMessage(m);
-			addMessage(m);
+			sendMessage(m); // sends the message to host, then to opposition
+			addMessage(m);  // adds the message to the chat "log" 
 			
 			tb.setText("");
 		}
@@ -92,6 +98,7 @@ public class ChatBox extends Widget implements TextBoxListener {
 	@Override
 	public void render(Graphics2D graph) {
 		// This method renders the chat box and the chat inside that box
+		// The 'chatImg' is created by the renderChat method, not in this method every tick
 		
 		BufferedImage img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
@@ -167,6 +174,7 @@ public class ChatBox extends Widget implements TextBoxListener {
 
 		}
 
+		// The rawChat BufferedImage is the whole chat, needs to be cropped into size
 		BufferedImage cropChat;
 		y += chatSize/2;
 		if(y-chatImg.getHeight() > 0) {
