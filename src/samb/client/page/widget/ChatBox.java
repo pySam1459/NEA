@@ -58,13 +58,11 @@ public class ChatBox extends Widget implements TextBoxListener {
 		
 		if(w.id.equals("enterText")) {
 			TextBox tb = (TextBox) w;
-			if(tb.getText().matches(".+") || true) {
-				Message m = new Message(tb.getText(), Client.getClient().udata.userInfo.username);
-				sendMessage(m);
-				addMessage(m);
-				
-				tb.setText("");
-			}
+			Message m = new Message(tb.getText(), Client.getClient().udata.userInfo.username);
+			sendMessage(m);
+			addMessage(m);
+			
+			tb.setText("");
 		}
 	}
 	
