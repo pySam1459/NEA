@@ -28,6 +28,10 @@ public class TextBox extends Widget implements KeyListener {
 	public Color BACKGROUND_COLOUR = new Color(0, 154, 159, 200);
 	public Color TEXT_COLOUR = Consts.PAL1;
 	
+	public boolean round = true;
+	public boolean underline = false;
+	public Color UNDERLINE_COLOUR = new Color(227, 251, 247, 127);
+	
 	private TextInfo promptTi, ti, hideTi;
 	private int textOff=0;
 	
@@ -61,6 +65,10 @@ public class TextBox extends Widget implements KeyListener {
 	
 	public void setText(String txt) {
 		ti.setText(txt);
+		cursorPos = txt.length();
+		if(txt.equals("")) {
+			textOff = 0;
+		}
 	}
 
 	@Override
@@ -136,8 +144,9 @@ public class TextBox extends Widget implements KeyListener {
 				
 			default:
 				// If the character typed matches with the regex, it will be added into the textbox
-				if((e.getKeyChar()+"").matches(textRegex) && (str.length() <= charLimit || charLimit < 0)) {
-					ti.setText(str + e.getKeyChar());
+				if((e.getKeyChar()+"").matches(textRegex) && (str.length()+1 < charLimit || charLimit < 0)) {
+					str = str.substring(0, cursorPos) + e.getKeyChar() + str.substring(cursorPos);
+					ti.setText(str);
 					cursorPos++;
 				}
 			}
@@ -180,9 +189,18 @@ public class TextBox extends Widget implements KeyListener {
 		TextInfo text = getRdTi(); // gets displayed textInfo
 		
 		// Render
-		int s = Math.min(rect[2], rect[3]);
 		g.setColor(BACKGROUND_COLOUR);
-		g.fillRoundRect(0, 0, rect[2], rect[3], s/2, s/2); // Draws background
+		if(round) {
+			int s = Math.min(rect[2], rect[3]);
+			g.fillRoundRect(0, 0, rect[2], rect[3], s/2, s/2); // Draws background
+		} else {
+			g.fillRect(0, 0, rect[2], rect[3]);
+		}
+		
+		if(underline) {
+			g.setColor(UNDERLINE_COLOUR);
+			g.drawLine(buffer, rect[3]-buffer, rect[2]-buffer, rect[3]-buffer);
+		}
 		
 		Point xy;
 		int woff=0, adjust=0;

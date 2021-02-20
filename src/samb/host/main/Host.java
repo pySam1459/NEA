@@ -486,6 +486,7 @@ public class Host extends BaseProcessor implements Runnable {
 			break;
 			
 		case getUpdateGame:
+			// This case adds a spectator to a game with the gameInfo received from a player of that game
 			if(um.isOnline(p.spec)) {
 				gm.addSpectate(p.spec, p.gameInfo);
 				
@@ -494,18 +495,28 @@ public class Host extends BaseProcessor implements Runnable {
 			
 			
 		case getStats:
-			// This case sends back the stats of a specific user (TODO check if actual user for security)
-			p.userStats = StatsDBManager.getUS(p.id);
-			server.sendTo(p, packet.getAddress(), packet.getPort());
+			// This case sends back the stats of a specific user
+			if(um.isOnline(p.id)) {
+				p.userStats = StatsDBManager.getUS(p.id);
+				um.get(p.id).send(p);
+			}
 			break;
 			
 		case getFriends:
-			// TODO get friends
+			// This case sends back a user's friends list
+			if(um.isOnline(p.id)) {
+				p.friendsInfo.friends = p.friendsInfo.areOnline ? FriendsDBManager.getAllOnline(p.id) : FriendsDBManager.getAll(p.id);
+				um.get(p.id).send(p);
+			}
 			break;
 			
 			
 		case chat:
-			relayChat(p);
+			// This case sends the chat of a player to their opposition
+			String oid = gm.getOpposition(p.id);
+			if(oid != null) {
+				um.get(oid).send(p);
+			}
 			break;
 		
 		default:
@@ -539,12 +550,6 @@ public class Host extends BaseProcessor implements Runnable {
 		p.loginInfo.authorized = true;
 		p.loginInfo.password = null;
 		u.send(p);
-	}
-	
-	private void relayChat(Packet p) {
-		String oid = gm.getOpposition(p.id);
-		um.get(oid).send(p);
-		
 	}
 	
 	

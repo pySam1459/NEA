@@ -6,6 +6,7 @@ import samb.com.database.Friend;
 
 public class FriendsInfo {
 	
+	public boolean areOnline = false;
 	public List<Friend> friends;
 	
 	
