@@ -11,6 +11,7 @@ import java.util.List;
 
 import samb.client.game.GamePage;
 import samb.client.main.Client;
+import samb.client.page.widget.listeners.TextBoxListener;
 import samb.client.utils.Consts;
 import samb.com.server.info.Message;
 import samb.com.server.packet.Header;

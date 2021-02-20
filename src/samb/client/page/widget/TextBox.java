@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import samb.client.main.Client;
+import samb.client.page.widget.listeners.TextBoxListener;
 import samb.client.utils.Consts;
 import samb.com.utils.Func;
 
@@ -35,7 +36,7 @@ public class TextBox extends Widget implements KeyListener {
 	private TextInfo promptTi, ti, hideTi;
 	private int textOff=0;
 	
-	public String textRegex = "^[% -~]";
+	public String textRegex = "^[% -~]"; // no control characters
 	public int charLimit = -1;
 	public boolean HIDE_CHARS = false;
 	

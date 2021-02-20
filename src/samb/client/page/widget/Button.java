@@ -11,6 +11,7 @@ import java.util.List;
 
 import samb.client.main.Client;
 import samb.client.page.widget.animations.BoxFocusAnimation;
+import samb.client.page.widget.listeners.ButtonListener;
 
 public class Button extends Widget {
 	/* This class is a subclass of the Widget class
