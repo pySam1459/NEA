@@ -17,7 +17,7 @@ public class Ball extends Circle {
 	private static final long serialVersionUID = -6433658309710972703L;
 	public static final Color[] colours = new Color[] {new Color(231, 223, 193), new Color(254, 63, 32), new Color(255, 170, 0), new Color(17, 18, 20)};
 	//public static final double TABLE_FRICTION = 1, BALL_FRICTION = 1;
-	public static final double TABLE_FRICTION = 0.97, BALL_FRICTION = 0.8, SPEED_THRESHOLD = 2;
+	public static final double TABLE_FRICTION = 0.973, BALL_FRICTION = 0.85, SPEED_THRESHOLD = 1;
 	
 	public List<Ball> collidedWith = new ArrayList<>();
 	public boolean moving = false;
@@ -95,11 +95,6 @@ public class Ball extends Circle {
 	public void render(Graphics2D g, int off) {		
 		g.setColor(colours[col]);
 		g.fillOval((int)(x-r)+off, (int)(y-r)+off, (int)(r*2), (int)(r*2));
-
-		// Debatable to add or not
-//		g.setStroke(new BasicStroke(3));
-//		g.setColor(Color.BLACK);
-//		g.drawOval((int)(x-r)+off, (int)(y-r)+off, (int)(r*2), (int)(r*2));
 
 	}
 

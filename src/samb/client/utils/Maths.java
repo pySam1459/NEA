@@ -2,6 +2,7 @@ package samb.client.utils;
 
 import samb.client.game.Ball;
 import samb.client.utils.datatypes.Pointf;
+import samb.com.utils.Circle;
 
 public class Maths {
 	/* This class handles all mathematics which is required, especially the collision mechanics
@@ -12,6 +13,8 @@ public class Maths {
 		// If they have, it will calculate the new velocities of each and update them
 		
 		if(ball2(b1, b2) && !b1.collidedWith.contains(b2)) {
+			moveApart(b1, b2);
+			
 			double di = getDis(b1.x, b1.y, b2.x, b2.y);
 			double nex = (b2.x - b1.x) / di;
 			double ney = (b2.y - b1.y) / di;
@@ -22,9 +25,7 @@ public class Maths {
 			b2.vx = (b2.vx + p * nex) * Ball.BALL_FRICTION;
 			b2.vy = (b2.vy + p * ney) * Ball.BALL_FRICTION;
 			
-			moveApart(b1, b2);
 			b1.collidedWith.add(b2);
-			//b2.collidedWith.add(b1);
 			
 		}
 	}
@@ -77,6 +78,11 @@ public class Maths {
 	public static boolean ball2(Ball b1, Ball b2) {
 		// Stands for ball squared, checks if 2 balls (circles) overlap
 		return getDis(b1.x, b1.y, b2.x, b2.y) <= b1.r + b2.r;
+	}
+	
+	public static boolean circle2(Circle c1, Circle c2) {
+		// Stands for circle squared, checks if 2 circles overlap
+		return getDis(c1.x, c1.y, c2.x, c2.y) <= c1.r + c2.r;
 	}
 	
 	public static double[] getProjection(double angle, double radius, Pointf origin) {

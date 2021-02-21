@@ -143,7 +143,7 @@ public class ChatBox extends Widget implements TextBoxListener {
 			test="";
 			
 			// if last player is different to new chat
-			if(!fromLast.equals(m.from)) { 
+			if(!fromLast.equals(m.from) && !"".equals(m.from)) { 
 				g.setFont(chatNameFont);
 				fromLast = m.from;
 				

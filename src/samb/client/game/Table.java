@@ -47,6 +47,8 @@ public class Table extends Widget {
 	private List<Ball> balls;
 	private UpdateInfo updateInfo;
 	
+	private Pocket[] pockets;
+	
 	private Client client;
 	private GamePage gp;
 
@@ -57,6 +59,7 @@ public class Table extends Widget {
 		
 		this.cue = new Cue();
 		this.balls = new ArrayList<>();
+		createPockets();
 		
 	}
 	
@@ -74,6 +77,22 @@ public class Table extends Widget {
 		bxy = new Pointf((gw - bdim.width) / 2, (gh - bdim.height) / 2);
 		
 		return new int[] {buffer, Window.dim.height/2 - gh/2, gw, gh};
+	}
+	
+	private void createPockets() {
+		int r = 96, off=38;
+		this.pockets = new Pocket[] {
+			new Pocket(-off, -off, r, this),
+			new Pocket(tdim.width/2, -60, 64, this),
+			new Pocket(tdim.width+off, -off, r, this),
+			new Pocket(-off, tdim.height+off, r, this),
+			new Pocket(tdim.width/2, tdim.height+60, 64, this),
+			new Pocket(tdim.width+off, tdim.height+off, r, this)
+		};
+	}
+	
+	public void pocket(Ball b) {
+		
 	}
 	
 	public void setUseCase(GameInfo gi, String id) {
@@ -99,10 +118,10 @@ public class Table extends Widget {
 		// Balls tick and update separately as collision equations use un-updated values
 		for(Ball b: balls) {
 			b.tick();
-			
 		} for(Ball b: balls) {
 			b.update();
-			
+		} for(Pocket p: pockets) {
+			p.tick();
 		}
 	}
 	
@@ -232,7 +251,7 @@ public class Table extends Widget {
 		return p;
 	}
 	
-	public List<Circle> getBalls() {
+	public List<Circle> getCircles() {
 		// This method converts the balls to Circle objects (less data to send)
 		
 		List<Circle> circles = new ArrayList<>();
@@ -241,6 +260,10 @@ public class Table extends Widget {
 		}
 		
 		return circles;
+	}
+	
+	public List<Ball> getBalls() {
+		return balls;
 	}
 	
 	
@@ -279,6 +302,10 @@ public class Table extends Widget {
 		
 		BufferedImage img = new BufferedImage(tdim.width + scaledBuffer*2, tdim.height + scaledBuffer*2, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
+		
+		for(Pocket p: pockets) {
+			p.render(g, scaledBuffer);
+		}
 		
 		for(Ball b: balls) {
 			b.render(g, scaledBuffer);

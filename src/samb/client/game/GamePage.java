@@ -18,6 +18,7 @@ import samb.com.utils.enums.TableUseCase;
 
 public class GamePage extends Page {
 	/* This page is where the user will play/spectate/practice their games
+	 * The main 3 widgets are the Table, GameMenu and ChatBox
 	 * */
 
 	public GameInfo info;
@@ -42,7 +43,7 @@ public class GamePage extends Page {
 		int buffer = 8;
 		this.menu = new GameMenu(new int[] {3*Window.dim.width/4+buffer, buffer, 
 				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
-		
+
 		this.chat = new ChatBox(new int[] {3*Window.dim.width/4+buffer, Window.dim.height/2-buffer*2, 
 				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
 		add("chat", chat);
@@ -114,7 +115,7 @@ public class GamePage extends Page {
 	public Packet getUpdate() {
 		Packet p = new Packet(Header.updateGame);
 		p.gameInfo = info;
-		p.gameInfo.balls = table.getBalls();
+		p.gameInfo.balls = table.getCircles();
 		p.gameInfo.turn = table.turn ? info.id : info.opp;
 		
 		return p;
