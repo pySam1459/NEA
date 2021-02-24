@@ -13,6 +13,7 @@ import samb.client.main.Client;
 import samb.client.main.Window;
 import samb.client.page.widget.Widget;
 import samb.client.utils.ImageLoader;
+import samb.client.utils.Line;
 import samb.client.utils.Maths;
 import samb.client.utils.datatypes.Dimf;
 import samb.client.utils.datatypes.Pointf;
@@ -36,6 +37,7 @@ public class Table extends Widget {
 	private static final Dimension imgBDim = new Dimension(1408, 704);
 	private static Dimf bdim;
 	private static Pointf bxy;
+	private static final Line[] cushions = getCushions();
 	
 	public TableUseCase tuc;
 	public boolean turn = false;
@@ -77,18 +79,6 @@ public class Table extends Widget {
 		bxy = new Pointf((gw - bdim.width) / 2, (gh - bdim.height) / 2);
 		
 		return new int[] {buffer, Window.dim.height/2 - gh/2, gw, gh};
-	}
-	
-	private void createPockets() {
-		int r = 96, off=38;
-		this.pockets = new Pocket[] {
-			new Pocket(-off, -off, r, this),
-			new Pocket(tdim.width/2, -60, 64, this),
-			new Pocket(tdim.width+off, -off, r, this),
-			new Pocket(-off, tdim.height+off, r, this),
-			new Pocket(tdim.width/2, tdim.height+60, 64, this),
-			new Pocket(tdim.width+off, tdim.height+off, r, this)
-		};
 	}
 	
 	public void pocket(Ball b) {
@@ -235,6 +225,8 @@ public class Table extends Widget {
 		}
 	}
 	
+	
+	// Synchronisation methods
 	public void update(UpdateInfo upinfo) {
 		this.updateInfo = upinfo;
 		
@@ -267,6 +259,7 @@ public class Table extends Widget {
 	}
 	
 	
+	// Render Methods
 	@Override
 	public void render(Graphics2D graph) {
 		// The render method is called by the GamePage object and must render
@@ -290,10 +283,7 @@ public class Table extends Widget {
 		// The ballsImg is 2048x1024, so it needs to be scaled down to bdim
 		BufferedImage ballsImg = getBallsImage(buffer);
 		g.drawImage(ballsImg, (int)bxy.x-buffer, (int)bxy.y-buffer, (int)bdim.width+buffer*2, (int)bdim.height+buffer*2, null);
-
-		// Boundary, TODO remove later
-		g.setColor(Color.ORANGE);
-		g.drawRect((int)bxy.x, (int)bxy.y, (int)bdim.width, (int)bdim.height);
+		
 	}
 	
 	private BufferedImage getBallsImage(int buffer) {
@@ -302,6 +292,12 @@ public class Table extends Widget {
 		
 		BufferedImage img = new BufferedImage(tdim.width + scaledBuffer*2, tdim.height + scaledBuffer*2, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
+		
+		g.setColor(Color.ORANGE);
+		for(Line l: cushions) {
+			g.drawLine((int)l.x1-buffer*2, (int)l.y1-buffer*2, 
+					(int)l.x2-buffer*2, (int)l.y2-buffer*2);
+		}
 		
 		for(Pocket p: pockets) {
 			p.render(g, scaledBuffer);
@@ -347,6 +343,7 @@ public class Table extends Widget {
 		}
 	}
 	
+	
 	// Some methods to map points to and from the table dimensions
 	public Pointf toTable(Pointf p) {
 		return new Pointf((p.x - bxy.x) * (tdim.width / bdim.width),
@@ -356,6 +353,44 @@ public class Table extends Widget {
 	public Pointf fromTable(Pointf p) {
 		return new Pointf(p.x * (bdim.width / tdim.width) + bxy.x,
 						p.y * (bdim.height / tdim.height) + bxy.y);
+	}
+	
+	
+	// These methods are at the bottom as they take up space and look ugly
+	private void createPockets() {
+		int r = 96, off=38;
+		this.pockets = new Pocket[] {
+			new Pocket(-off, -off, r, this),
+			new Pocket(tdim.width/2, -60, 64, this),
+			new Pocket(tdim.width+off, -off, r, this),
+			new Pocket(-off, tdim.height+off, r, this),
+			new Pocket(tdim.width/2, tdim.height+60, 64, this),
+			new Pocket(tdim.width+off, tdim.height+off, r, this)
+		};
+	}
+	
+	private static Line[] getCushions() {
+		// These are the coordinates for each cushion, including pocket cushions
+		return new Line[] {
+			new Line(108, 242, 160, 290),
+			new Line(160, 290, 1046, 290),
+			new Line(1046, 290, 1060, 248),
+			new Line(1151, 248, 1163, 290),
+			new Line(1163, 290, 2047, 290),
+			new Line(2047, 290, 2104, 242),
+			new Line(120, 1356, 160, 1314),
+			new Line(160, 1314, 1046, 1314),
+			new Line(1046, 1314, 1056, 1350),
+			new Line(1154, 1346, 1163, 1314),
+			new Line(1163, 1314, 2047, 1314),
+			new Line(2047, 1314, 2085, 1352),
+			new Line(29, 317, 80, 370),
+			new Line(80, 370, 80, 1230),
+			new Line(80, 1230, 36, 1278),
+			new Line(2175, 321, 2130, 370),
+			new Line(2130, 370, 2130, 1230),
+			new Line(2130, 1230, 2168, 1268),
+		};
 	}
 
 }
