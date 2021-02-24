@@ -8,7 +8,15 @@ public class Maths {
 	/* This class handles all mathematics which is required, especially the collision mechanics
 	 * */
 	
-	public static void collision(Ball b1, Ball b2) {
+	public static boolean lineInBall(Ball b, Line l) {
+		return false;
+	}
+	
+	public static void ballCollisionLine(Ball b, Line l) {
+		
+	}
+	
+	public static void ballCollisionBall(Ball b1, Ball b2) {
 		// This method checks if ball b1 and ball b2 have collided
 		// If they have, it will calculate the new velocities of each and update them
 		

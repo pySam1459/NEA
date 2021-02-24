@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import samb.client.utils.Line;
 import samb.client.utils.Maths;
 import samb.com.utils.Circle;
 
@@ -33,7 +34,7 @@ public class Ball extends Circle {
 	
 	public void tick() {
 		move();
-		collisionBounds();
+		collisionCushions();
 		collisionBalls();
 		
 	}
@@ -44,22 +45,18 @@ public class Ball extends Circle {
 		
 	}
 	
-	private void collisionBounds() {
-		// This method checks the bounding collision (ie the cushions)
-		if(x-r <= 0) {
-			this.x = r;
-			this.vx *= -1;
-		} if(y-r <= 0) {
-			this.y = r;
-			this.vy *= -1;
-		}
-		
-		if(x+r > Table.tdim.width) {
-			this.x = Table.tdim.width-r;
-			this.vx *= -1;
-		} if(y+r > Table.tdim.height) {
-			this.y = Table.tdim.height-r;
-			this.vy *= -1;
+	
+	private void collisionCushions() {
+		for(Line l: Table.cushions) {
+			if(Maths.lineInBall(this, l)) {
+				if(l.x1 == l.x2) {
+					this.vx *= -1;
+				} else if(l.y1 == l.y2) {
+					this.vy *= -1;
+				} else {
+					Maths.ballCollisionLine(this, l);
+				}
+			}
 		}
 	}
 	
@@ -68,7 +65,7 @@ public class Ball extends Circle {
 		// If it has, then it will do the relevant calculations to produce the mathematically accurate reaction
 		for(Ball b: all) {
 			if(b != this) {
-				Maths.collision(this, b);
+				Maths.ballCollisionBall(this, b);
 				
 			}
 		}

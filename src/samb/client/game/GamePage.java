@@ -65,6 +65,7 @@ public class GamePage extends Page {
 		setGameInfo(gi);
 		table.rack(gi);
 		table.setUseCase(gi, client.udata.id);
+		chat.setUseCase(gi.tuc);
 		
 	}
 	

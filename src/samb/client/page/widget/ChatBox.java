@@ -16,6 +16,7 @@ import samb.client.utils.Consts;
 import samb.com.server.info.Message;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
+import samb.com.utils.enums.TableUseCase;
 
 public class ChatBox extends Widget implements TextBoxListener {
 	/* This subclass implements the chat functionality on the game's page
@@ -32,30 +33,31 @@ public class ChatBox extends Widget implements TextBoxListener {
 	private final Font chatNameFont = new Font("comicsansms", Font.BOLD, chatSize);
 	private final Color chatColour = Consts.PAL1;
 	
+	private TextBox et;
 	private BufferedImage chatImg;
 	private List<Message> messages;
 
 	public ChatBox(int[] rect, GamePage gp) {
 		super(rect);
-
-		this.messages = new ArrayList<>();
-		messages.add(new Message("Welcome to Pool, you can chat here...", ""));
-		renderChat();
 		
 		initChatWidgets(gp);
+
+		this.messages = new ArrayList<>();
+		renderChat();
 		
 	}
 	
 	private void initChatWidgets(GamePage gp) {
 		// This method creates the TextBox widget which a player enters their chat into
 		
-		TextBox et = new TextBox(new int[] {rect[0]+BUFFER, rect[1]+rect[3]-BUFFER*7,
+		this.et = new TextBox(new int[] {rect[0]+BUFFER, rect[1]+rect[3]-BUFFER*7,
 				rect[2]-BUFFER*2, BUFFER*6}, "Chat Here...");
 		et.round = false;
 		et.underline = true;
 		et.charLimit = 100;
 		et.BACKGROUND_COLOUR = new Color(76, 93, 86, 0);
 		et.addListener(this);
+		et.HIDDEN = true;
 		gp.add("enterText", et); // added to page
 	}
 	
@@ -73,7 +75,29 @@ public class ChatBox extends Widget implements TextBoxListener {
 		}
 	}
 	
+	public void setUseCase(TableUseCase tuc) {
+		// This method tells the class what to render, depended on whether the user is: playing, practicing or spectating
+		String msg;
+		et.HIDDEN = true;
+		switch(tuc) {
+		case playing:
+			msg = "You can chat here...";
+			et.HIDDEN = false;
+			break;
+		case practicing:
+			msg = "You are on the practice table.";
+			break;
+		case spectating:
+			msg = "You are spectating, not chatting.";
+			break;
+		default:
+			msg = "Hopefully this message isn't seen, if it does something has gone wrong!";
+		}
+		addMessage(new Message(msg, ""));
+	}
+	
 	private void sendMessage(Message m) {
+		// Sends the message typed to the host server to be forwarded to the opposition
 		Packet p = new Packet(Header.chat);
 		p.message = m;
 		
@@ -123,15 +147,16 @@ public class ChatBox extends Widget implements TextBoxListener {
 		// When a player sends a chat, if the last chat wasn't them, it will display their name in bold, then the message
 		// Otherwise, it will display their chat below their previous chat
 		
-		chatImg = new BufferedImage(rect[2]-BUFFER, rect[3]-BUFFER*9, BufferedImage.TYPE_INT_ARGB);
+		int biggerBuffer = et.HIDDEN ? BUFFER : BUFFER*9;
+		chatImg = new BufferedImage(rect[2]-BUFFER, rect[3]-biggerBuffer, BufferedImage.TYPE_INT_ARGB);
 		
-		int h = (int)((messages.size()+1)*3*chatSize*1.2);
+		int h = (int)((messages.size()+1)*3*chatSize*1.2); // All of the chat
 		BufferedImage rawChat = new BufferedImage(rect[2]-BUFFER, h, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) rawChat.getGraphics();
 		g.setColor(chatColour);
 		
 		int y = 0;
-		String fromLast = "", text="", test=""; // last player to send a chat
+		String fromLast = "", text="", test="";
 		String[] parts;
 		
 		g.setFont(chatFont);

@@ -74,12 +74,14 @@ public class TextBox extends Widget implements KeyListener {
 
 	@Override
 	public void tick() {
-		if(selected) {
-			cursorRot = (cursorRot+1) % (int)(Client.TPS*((double)cursorDelay/1000.0)*2);
-
+		if(!HIDDEN) {
+			if(selected) {
+				cursorRot = (cursorRot+1) % (int)(Client.TPS*((double)cursorDelay/1000.0)*2);
+	
+			}
+			checkSelected();
+			super.animTick();
 		}
-		checkSelected();
-		super.animTick();
 	}
 	
 	private void checkSelected() {
@@ -183,54 +185,55 @@ public class TextBox extends Widget implements KeyListener {
 	@Override
 	public void render(Graphics2D graph) {
 		// Renders the text Box, this is a complicated method as the variability offered increases the complexity of the rendering process
-		
-		BufferedImage img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
-		Graphics2D g = (Graphics2D) img.getGraphics();
-		
-		TextInfo text = getRdTi(); // gets displayed textInfo
-		
-		// Render
-		g.setColor(BACKGROUND_COLOUR);
-		if(round) {
-			int s = Math.min(rect[2], rect[3]);
-			g.fillRoundRect(0, 0, rect[2], rect[3], s/2, s/2); // Draws background
-		} else {
-			g.fillRect(0, 0, rect[2], rect[3]);
-		}
-		
-		if(underline) {
-			g.setColor(UNDERLINE_COLOUR);
-			g.drawLine(buffer, rect[3]-buffer, rect[2]-buffer, rect[3]-buffer);
-		}
-		
-		Point xy;
-		int woff=0, adjust=0;
-		
-		if(ti.getText() == null || "".equals(ti.getText())) {
-			xy = new Point(buffer*4, promptTi.dim.height/2 + rect[3]/2);
-			g.setColor(Color.GRAY);
-			promptTi.render(g, xy);  // Draws prompt text
+		if(!HIDDEN) {
+			BufferedImage img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g = (Graphics2D) img.getGraphics();
 			
-		} else {
-			woff = text.calculateDims(textOff).width;
-			adjust = HIDE_CHARS ? text.font.getSize()/4: 0;
-			xy = new Point(buffer*4-woff, text.dim.height/2 + rect[3]/2 +adjust);
-			text.render(g, xy);  // Draws the to-be-rendered text
-		}
-		
-		if(selected && cursorRot < Client.TPS * cursorDelay/1000) { // Draws the cursor
-			g.setColor(Consts.PALE);
-			Dimension coff = text.calculateDims(cursorPos);
-			if(woff != 0) {
-				coff.width -= woff;
+			TextInfo text = getRdTi(); // gets displayed textInfo
+			
+			// Render
+			g.setColor(BACKGROUND_COLOUR);
+			if(round) {
+				int s = Math.min(rect[2], rect[3]);
+				g.fillRoundRect(0, 0, rect[2], rect[3], s/2, s/2); // Draws background
+			} else {
+				g.fillRect(0, 0, rect[2], rect[3]);
 			}
-			g.setStroke(new BasicStroke(3));
-			g.drawLine(coff.width+buffer*4, buffer*2, coff.width+buffer*4, rect[3]-buffer*2);
+			
+			if(underline) {
+				g.setColor(UNDERLINE_COLOUR);
+				g.drawLine(buffer, rect[3]-buffer, rect[2]-buffer, rect[3]-buffer);
+			}
+			
+			Point xy;
+			int woff=0, adjust=0;
+			
+			if(ti.getText() == null || "".equals(ti.getText())) {
+				xy = new Point(buffer*4, promptTi.dim.height/2 + rect[3]/2);
+				g.setColor(Color.GRAY);
+				promptTi.render(g, xy);  // Draws prompt text
+				
+			} else {
+				woff = text.calculateDims(textOff).width;
+				adjust = HIDE_CHARS ? text.font.getSize()/4: 0;
+				xy = new Point(buffer*4-woff, text.dim.height/2 + rect[3]/2 +adjust);
+				text.render(g, xy);  // Draws the to-be-rendered text
+			}
+			
+			if(selected && cursorRot < Client.TPS * cursorDelay/1000) { // Draws the cursor
+				g.setColor(Consts.PALE);
+				Dimension coff = text.calculateDims(cursorPos);
+				if(woff != 0) {
+					coff.width -= woff;
+				}
+				g.setStroke(new BasicStroke(3));
+				g.drawLine(coff.width+buffer*4, buffer*2, coff.width+buffer*4, rect[3]-buffer*2);
+			}
+			
+			graph.drawImage(img, rect[0], rect[1], null);
+			
+			super.animRender(graph);
 		}
-		
-		graph.drawImage(img, rect[0], rect[1], null);
-		
-		super.animRender(graph);
 	}
 	
 	private int getCursorPos(Point xy) {

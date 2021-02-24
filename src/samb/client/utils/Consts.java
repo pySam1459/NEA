@@ -27,6 +27,7 @@ public class Consts {
 	// this object is used when getting the length of rendered text of a particular font
 	public static final Graphics2D fmg = (Graphics2D) new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
 
-	
+	// Dev section, TODO remove in release
+	public static boolean DEV_SHOW_MOUSE_POS = false;
 	
 }

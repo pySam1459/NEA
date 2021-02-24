@@ -12,6 +12,7 @@ import java.util.List;
 import samb.client.main.Client;
 import samb.client.main.Window;
 import samb.client.page.widget.Widget;
+import samb.client.utils.Consts;
 import samb.client.utils.ImageLoader;
 import samb.client.utils.Line;
 import samb.client.utils.Maths;
@@ -37,7 +38,7 @@ public class Table extends Widget {
 	private static final Dimension imgBDim = new Dimension(1408, 704);
 	private static Dimf bdim;
 	private static Pointf bxy;
-	private static final Line[] cushions = getCushions();
+	public static final Line[] cushions = getCushions();
 	
 	public TableUseCase tuc;
 	public boolean turn = false;
@@ -76,13 +77,26 @@ public class Table extends Widget {
 		bdim = new Dimf(imgBDim.width * (double)gw/imgDim.width, 
 						imgBDim.height * (double)gh/imgDim.height);
 		
-		bxy = new Pointf((gw - bdim.width) / 2, (gh - bdim.height) / 2);
+		bxy = new Pointf((gw - bdim.width) / 2.0, (gh - bdim.height) / 2.0);
 		
 		return new int[] {buffer, Window.dim.height/2 - gh/2, gw, gh};
 	}
 	
 	public void pocket(Ball b) {
-		
+		if(b.col == 0) {
+			// Place cue ball wherever
+			
+		} else {
+			balls.remove(b);
+			
+			if(b.col == 1) {
+				gp.info.red++;
+			} else if(b.col == 2) {
+				gp.info.yellow++;
+			} else if(b.col == 3) {
+				
+			}
+		}
 	}
 	
 	public void setUseCase(GameInfo gi, String id) {
@@ -104,6 +118,7 @@ public class Table extends Widget {
 		tickUpdate();
 		aim();
 		checkNewAim();
+		getpos();
 		
 		// Balls tick and update separately as collision equations use un-updated values
 		for(Ball b: balls) {
@@ -112,6 +127,13 @@ public class Table extends Widget {
 			b.update();
 		} for(Pocket p: pockets) {
 			p.tick();
+		}
+	}
+	
+	private void getpos() {
+		if(Consts.DEV_SHOW_MOUSE_POS && Client.mouse.left && !Client.mouse.prevLeft) {
+			System.out.println(getMouseOnTable());
+		
 		}
 	}
 	
@@ -294,9 +316,10 @@ public class Table extends Widget {
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		
 		g.setColor(Color.ORANGE);
+		g.setStroke(new BasicStroke(2));
 		for(Line l: cushions) {
-			g.drawLine((int)l.x1-buffer*2, (int)l.y1-buffer*2, 
-					(int)l.x2-buffer*2, (int)l.y2-buffer*2);
+			g.drawLine((int)l.x1+scaledBuffer, (int)l.y1+scaledBuffer, 
+					(int)l.x2+scaledBuffer, (int)l.y2+scaledBuffer);
 		}
 		
 		for(Pocket p: pockets) {
@@ -305,6 +328,7 @@ public class Table extends Widget {
 		
 		for(Ball b: balls) {
 			b.render(g, scaledBuffer);
+			
 		}
 		
 		return img;
@@ -372,24 +396,27 @@ public class Table extends Widget {
 	private static Line[] getCushions() {
 		// These are the coordinates for each cushion, including pocket cushions
 		return new Line[] {
-			new Line(108, 242, 160, 290),
-			new Line(160, 290, 1046, 290),
-			new Line(1046, 290, 1060, 248),
-			new Line(1151, 248, 1163, 290),
-			new Line(1163, 290, 2047, 290),
-			new Line(2047, 290, 2104, 242),
-			new Line(120, 1356, 160, 1314),
-			new Line(160, 1314, 1046, 1314),
-			new Line(1046, 1314, 1056, 1350),
-			new Line(1154, 1346, 1163, 1314),
-			new Line(1163, 1314, 2047, 1314),
-			new Line(2047, 1314, 2085, 1352),
-			new Line(29, 317, 80, 370),
-			new Line(80, 370, 80, 1230),
-			new Line(80, 1230, 36, 1278),
-			new Line(2175, 321, 2130, 370),
-			new Line(2130, 370, 2130, 1230),
-			new Line(2130, 1230, 2168, 1268),
+			new Line(38, -39, 78, 0),
+			new Line(78, 0, 966, 0),
+			new Line(966, 0, 973, -29),
+			new Line(1073, -28, 1080, 0),
+			new Line(1080, 0, 1968, 0),
+			new Line(1968, 0, 2003, -35),
+			
+			new Line(2088, 39, 2048, 83),
+			new Line(2048, 83, 2048, 943),
+			new Line(2048, 943, 2078, 970),
+			
+			new Line(45, 1058, 82, 1022),
+			new Line(82, 1022, 967, 1024),
+			new Line(967, 1024, 975, 1051),
+			new Line(1075, 1058, 1082, 1024),
+			new Line(1082, 1024, 1970, 1027),
+			new Line(1970, 1027, 2000, 1054),
+			
+			new Line(-25, 54, 0, 81),
+			new Line(0, 81, 0, 942),
+			new Line(0, 942, -25, 966)
 		};
 	}
 
