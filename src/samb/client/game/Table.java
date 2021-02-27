@@ -278,6 +278,7 @@ public class Table extends Widget {
 	}
 	
 	public Ball[] getBalls() {
+		// Returns and array of Ball objects
 		return balls.toArray(new Ball[0]);
 	}
 	

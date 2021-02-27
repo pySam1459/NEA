@@ -31,6 +31,8 @@ public class GameMenu extends Widget {
 	}
 	
 	private void initMenuWidgets() {
+		// This method initialises menu widgets
+		
 		int titleSize = 28, buffer=4, eloSize=16;
 		Text title1 = new Text("???", new int[] {rect[0]+buffer*6, rect[1]+buffer*2, rect[2]-buffer*8, titleSize},
 				Consts.INTER.deriveFont(Font.PLAIN, titleSize), Consts.PAL1);
@@ -74,12 +76,13 @@ public class GameMenu extends Widget {
 
 	@Override
 	public void tick() {
-		
 		super.animTick();
+	
 	}
 	
 	public void setInfo(GameInfo gi) {
-		//this.gi = gi;
+		// This method determines which widgets to show dependent on the TableUseCase, using the methods below
+		
 		unshowPlayers();
 		unshowLoading();
 		
@@ -117,6 +120,7 @@ public class GameMenu extends Widget {
 		}
 	}
 	
+	// These methods show different arrangements of title and elo widgets dependent on the TableUseCase
 	public void unshowPlayers() {
 		Text t = (Text) gp.get("title1");
 		t.HIDDEN = true;
@@ -164,6 +168,7 @@ public class GameMenu extends Widget {
 		unshowLoading();
 	}
 	
+	// These methods will show/unshow a loading animation, 3 dots which oscillate
 	public void showLoading() {
 		BlankWidget bw = (BlankWidget) gp.get("loading");
 		bw.showAnim();
@@ -177,8 +182,10 @@ public class GameMenu extends Widget {
 	}
 
 	
+	// Render Methods
 	@Override
 	public void render(Graphics2D graph) {
+		// This method renders the game menu, excluding some widgets
 		BufferedImage img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		
@@ -199,6 +206,8 @@ public class GameMenu extends Widget {
 	}
 	
 	private void renderScores(Graphics2D g) {
+		// Renders the scores of the players
+		
 		if(Client.getClient().udata.gameInfo != null) {
 			int buffer = 8;
 			int r = (int) (Ball.DEFAULT_BALL_RADIUS*0.8);
@@ -213,6 +222,7 @@ public class GameMenu extends Widget {
 	}
 	
 	private void _renderIndividualScore(Graphics2D g, int score, boolean black, int r, int y, int buffer, Color colour) {
+		// Renders a player's score with given params
 		g.setColor(colour);
 		for(int i=0; i<7; i++) {
 			if(i < score) {
