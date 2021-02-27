@@ -9,7 +9,27 @@ public class Maths {
 	 * */
 	
 	public static boolean lineInBall(Ball b, Line l) {
-		return false;
+		double dis;
+		if(l.x2 - l.x1 == 0.0) { // If line is vertical
+			dis = Math.abs(l.x1 - b.x);
+			
+		} else if(l.y2 - l.y1 == 0) { // If line is horizontal
+			dis = Math.abs(l.y1 - b.y);
+			
+		} else {
+			// Equation of line
+			double m = (l.y2 - l.y1) / (l.x2 - l.x1);
+			double c = l.y1 - m * l.x1;
+			
+			// Point on line closest to ball
+			double x = (2*b.x + 2*m*b.y -  2*m*c) / (2 * (1 + m*m));
+			double y = m*x + c;
+			
+			// Distance from closest point to centre of circle
+			dis = Math.sqrt((b.x-x)*(b.x-x) + (b.y-y)*(b.y-y));
+		}
+
+		return dis <= b.r;		
 	}
 	
 	public static void ballCollisionLine(Ball b, Line l) {
