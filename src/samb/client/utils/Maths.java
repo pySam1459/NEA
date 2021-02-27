@@ -8,28 +8,23 @@ public class Maths {
 	/* This class handles all mathematics which is required, especially the collision mechanics
 	 * */
 	
+	public static boolean ballInRect(Ball b, double[] rect) {
+		return b.x-b.r <= rect[0]+rect[2] && b.y-b.r <= rect[1]+rect[3] &&
+				rect[0] <= b.x+b.r && rect[1] <= b.y+b.r;
+	}
+	
 	public static boolean lineInBall(Ball b, Line l) {
-		double dis;
-		if(l.x2 - l.x1 == 0.0) { // If line is vertical
-			dis = Math.abs(l.x1 - b.x);
-			
-		} else if(l.y2 - l.y1 == 0) { // If line is horizontal
-			dis = Math.abs(l.y1 - b.y);
-			
-		} else {
-			// Equation of line
-			double m = (l.y2 - l.y1) / (l.x2 - l.x1);
-			double c = l.y1 - m * l.x1;
-			
-			// Point on line closest to ball
-			double x = (2*b.x + 2*m*b.y -  2*m*c) / (2 * (1 + m*m));
-			double y = m*x + c;
-			
-			// Distance from closest point to centre of circle
-			dis = Math.sqrt((b.x-x)*(b.x-x) + (b.y-y)*(b.y-y));
+		double x1=l.x1-b.x, y1=l.y1-b.y, x2=l.x2-b.x, y2=l.y2-b.y;
+		
+		double dx=x2-x1, dy=y2-y1;
+		double dr = Math.sqrt(dx*dx + dy*dy);
+		double D = x1*y2 - x2*y1;
+		
+		if(b.r*b.r * dr*dr - D*D >= 0) {
+			double d1=getDis(x1, y1, 0, 0), d2=getDis(x2, y2, 0, 0);
+			return d1-b.r <= dr && d2-b.r <= dr;
 		}
-
-		return dis <= b.r;		
+		return false;
 	}
 	
 	public static void ballCollisionLine(Ball b, Line l) {

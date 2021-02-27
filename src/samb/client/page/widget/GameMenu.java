@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import samb.client.game.Ball;
 import samb.client.game.GamePage;
 import samb.client.main.Client;
 import samb.client.page.widget.animations.LoadingDotsAnimation;
@@ -16,6 +17,7 @@ public class GameMenu extends Widget {
 
 	private final Color BACKGROUND_COLOR = new Color(64, 81, 77, 127);
 	private final Color BORDER_COLOR = new Color(58, 75, 72, 200);
+	private final BasicStroke SCORE_OUTLINE = new BasicStroke(3);
 	
 	private GamePage gp;
 	//private GameInfo gi;
@@ -198,22 +200,36 @@ public class GameMenu extends Widget {
 	
 	private void renderScores(Graphics2D g) {
 		if(Client.getClient().udata.gameInfo != null) {
-			int buffer = 4;
-			int r = (int) ((rect[2]-buffer*4)/8 - buffer);
+			int buffer = 8;
+			int r = (int) (Ball.DEFAULT_BALL_RADIUS*0.8);
 			
 			Text t = (Text) gp.get("title2");
-			int y = t.rect[1]-rect[1] + t.rect[3] + buffer*12;
-			
-			g.setColor(new Color(254, 63, 32, 164));
-			for(int i=0; i<Client.getClient().udata.gameInfo.red; i++) {
-				g.drawOval(buffer*2 + i*(r+buffer)*2, y-r, r*2, r*2);
-			}
+			int y = t.rect[1] + t.rect[3] + buffer*6;
 
-			g.setColor(new Color(255, 170, 0, 164));
-			for(int i=0; i<Client.getClient().udata.gameInfo.yellow; i++) {
-				g.drawOval(buffer*2 + i*(r+buffer)*2, y+r+buffer*2-r, r*2, r*2);
-			}
+			_renderIndividualScore(g, Client.getClient().udata.gameInfo.red, false, r, y, buffer, new Color(254, 63, 32, 192));
+			_renderIndividualScore(g, Client.getClient().udata.gameInfo.yellow, false, r, y+r*2+buffer*2, buffer, new Color(255, 170, 0, 192));
+			
 		}
 	}
 	
+	private void _renderIndividualScore(Graphics2D g, int score, boolean black, int r, int y, int buffer, Color colour) {
+		g.setColor(colour);
+		for(int i=0; i<7; i++) {
+			if(i < score) {
+				g.fillOval(buffer*2 + i*(r+buffer)*2, y-r, r*2, r*2);
+			} else {
+				g.setStroke(SCORE_OUTLINE);
+				g.drawOval(buffer*2 + i*(r+buffer)*2, y-r, r*2, r*2);
+			}
+		}
+		
+		g.setColor(new Color(16, 16, 16, 192));
+		if(black) {
+			g.fillOval(buffer*2 + 7*(r+buffer)*2, y-r, r*2, r*2);
+		} else {
+			g.setStroke(SCORE_OUTLINE);
+			g.drawOval(buffer*2 + 7*(r+buffer)*2, y-r, r*2, r*2);
+		}
+	}
+
 }

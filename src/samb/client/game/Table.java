@@ -36,6 +36,7 @@ public class Table extends Widget {
 	public static final Dimension tdim = new Dimension(2048, 1024);
 	private static final Dimension imgDim = new Dimension(1566, 860);
 	private static final Dimension imgBDim = new Dimension(1408, 704);
+	
 	private static Dimf bdim;
 	private static Pointf bxy;
 	public static final Line[] cushions = getCushions();
@@ -276,8 +277,8 @@ public class Table extends Widget {
 		return circles;
 	}
 	
-	public List<Ball> getBalls() {
-		return balls;
+	public Ball[] getBalls() {
+		return balls.toArray(new Ball[0]);
 	}
 	
 	
@@ -407,12 +408,12 @@ public class Table extends Widget {
 			new Line(2048, 83, 2048, 943),
 			new Line(2048, 943, 2078, 970),
 			
-			new Line(45, 1058, 82, 1022),
-			new Line(82, 1022, 967, 1024),
-			new Line(967, 1024, 975, 1051),
-			new Line(1075, 1058, 1082, 1024),
-			new Line(1082, 1024, 1970, 1027),
-			new Line(1970, 1027, 2000, 1054),
+			new Line(45, 1058, 82, 1023),
+			new Line(82, 1023, 967, 1023),
+			new Line(967, 1023, 975, 1051),
+			new Line(1075, 1058, 1082, 1025),
+			new Line(1082, 1025, 1970, 1025),
+			new Line(1970, 1025, 2000, 1054),
 			
 			new Line(-25, 54, 0, 81),
 			new Line(0, 81, 0, 942),

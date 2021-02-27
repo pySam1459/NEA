@@ -19,6 +19,7 @@ public class Ball extends Circle {
 	public static final Color[] colours = new Color[] {new Color(231, 223, 193), new Color(254, 63, 32), new Color(255, 170, 0), new Color(17, 18, 20)};
 	//public static final double TABLE_FRICTION = 1, BALL_FRICTION = 1;
 	public static final double TABLE_FRICTION = 0.973, BALL_FRICTION = 0.85, SPEED_THRESHOLD = 1;
+	private double[] NON_CUSHION_RECT;
 	
 	public List<Ball> collidedWith = new ArrayList<>();
 	public boolean moving = false;
@@ -28,6 +29,7 @@ public class Ball extends Circle {
 	public Ball(Circle c, List<Ball> all) {
 		super(c.x, c.y, c.vx, c.vy, c.r, c.col);
 		
+		this.NON_CUSHION_RECT = new double[] {r*2, r*2, Table.tdim.width-r*4, Table.tdim.height-r*4};
 		this.all = all;
 		
 	}
@@ -47,14 +49,24 @@ public class Ball extends Circle {
 	
 	
 	private void collisionCushions() {
-		for(Line l: Table.cushions) {
-			if(Maths.lineInBall(this, l)) {
-				if(l.x1 == l.x2) {
-					this.vx *= -1;
-				} else if(l.y1 == l.y2) {
-					this.vy *= -1;
-				} else {
-					Maths.ballCollisionLine(this, l);
+		// This method checks whether the ball has collided with a cushion
+		// If it has, then the ball will bounce off
+		
+		if(!Maths.ballInRect(this, NON_CUSHION_RECT)) {
+			for(Line l: Table.cushions) {
+				if(Maths.lineInBall(this, l)) {
+					if(l.x1 == l.x2) {
+						this.vx *= -1;
+						this.x = this.x > l.x1 ? l.x1+r : l.x1-r;
+						
+					} else if(l.y1 == l.y2) {
+						this.vy *= -1;
+						this.y = this.y > l.y1 ? l.y1+r : l.y1-r;
+						
+					} else {
+						Maths.ballCollisionLine(this, l);
+						
+					}
 				}
 			}
 		}
