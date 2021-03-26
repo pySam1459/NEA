@@ -13,6 +13,7 @@ import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
 import samb.com.utils.Func;
 import samb.host.database.FriendsDBManager;
+import samb.host.database.LoginCredentials;
 import samb.host.database.StatsDBManager;
 import samb.host.database.UserDBManager;
 import samb.host.game.GameManager;
@@ -38,6 +39,7 @@ public class Host extends BaseProcessor implements Runnable {
 	public GameManager gm;
 	
 	public Host() {
+		LoginCredentials.loadCredentials();
 		UserDBManager.start();
 		StatsDBManager.start();
 		
