@@ -6,6 +6,10 @@ import java.awt.image.BufferedImage;
 import samb.client.main.Window;
 
 public class PageManager {
+	/* This class is used to manage the pages, 
+	 *   acts as an interface for the page being displayed
+	 *   abstracts the specifics of each page
+	 * */
 	
 	private Page curPage;
 	
@@ -58,6 +62,8 @@ public class PageManager {
 	}
 	
 	public void changePage(Page newPage) {
+		// This method is called when a new page is to be displayed
+		
 		this.prevPageImg = curPage.getRender();
 		this.xoff = Window.dim.width;
 		

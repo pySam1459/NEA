@@ -19,6 +19,9 @@ public class GameMenu extends Widget {
 	private final Color BORDER_COLOR = new Color(58, 75, 72, 200);
 	private final BasicStroke SCORE_OUTLINE = new BasicStroke(3);
 	
+	public static final Color RED = new Color(254, 63, 32, 192);
+	public static final Color YELLOW = new Color(255, 170, 0, 192);
+	
 	private GamePage gp;
 	//private GameInfo gi;
 	
@@ -215,8 +218,8 @@ public class GameMenu extends Widget {
 			Text t = (Text) gp.get("title2");
 			int y = t.rect[1] + t.rect[3] + buffer*6;
 
-			_renderIndividualScore(g, Client.getClient().udata.gameInfo.red, false, r, y, buffer, new Color(254, 63, 32, 192));
-			_renderIndividualScore(g, Client.getClient().udata.gameInfo.yellow, false, r, y+r*2+buffer*2, buffer, new Color(255, 170, 0, 192));
+			_renderIndividualScore(g, Client.getClient().udata.gameState.red, false, r, y, buffer, RED);
+			_renderIndividualScore(g, Client.getClient().udata.gameState.yellow, false, r, y+r*2+buffer*2, buffer, YELLOW);
 			
 		}
 	}

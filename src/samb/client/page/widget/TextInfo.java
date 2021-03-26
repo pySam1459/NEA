@@ -29,11 +29,19 @@ public class TextInfo {
 		this.dim = calculateDims(-1);
 	}
 	
+	
+	// Getters
 	public String getText() {
 		return this.text;
 		
 	}
+	
+	public int getSize() {
+		return this.font.getSize();
+		
+	}
 
+	// Setters
 	public void setText(String text) {
 		this.text = text;
 		this.dim = calculateDims(-1);
@@ -46,16 +54,17 @@ public class TextInfo {
 		
 	}
 	
-	public int getSize() {
-		return this.font.getSize();
+	public void setColour(Color colour) {
+		this.col = colour;
 		
-	}
+	} 
 	
 	public void setSize(int size) {
 		this.font = new Font(font.getFontName(), font.getStyle(), size);
 		this.calculateDims(-1);
 		
 	}
+	
 	
 	public Dimension calculateDims(int i) {
 		// This method calculates the dimensions of the rendered text
@@ -71,6 +80,8 @@ public class TextInfo {
 		return new Dimension((int)r.getWidth(), (int)(r.getHeight()*0.6));
 	}
 	
+	
+	// Render Methods
 	public void render(Graphics2D g, Point xy) {
 		g.setColor(col);
 		g.setFont(font);

@@ -180,24 +180,37 @@ public class Table extends Widget {
 	}
 	
 	public void pocket(Ball b) {
-		if(b.col == 0) {
+		// This method is called when a ball is pocketed
+		
+		if(b.col == 0) { // Cue Ball
 			// Place cue ball wherever
 			
 			String msg = String.format("FOUL: %s potted the Cue ball", turnName);
 			gp.addChat(new Message(msg, "$BOLD$"));
 			
-		} else if (b.col == 3) {
+		} else if (b.col == 3) { // 8 Ball
 			
-			String msg = String.format("FOUL: %s potted the 8 ball", turnName);
+			String msg = String.format("LOSS: %s potted the 8 ball", turnName);
 			gp.addChat(new Message(msg, "$BOLD$"));
 			
 		} else {
 			balls.remove(b);
 			
-			if(b.col == 1) {
-				gp.info.red++;
-			} else if(b.col == 2) {
-				gp.info.yellow++;
+			if(b.col == 1) { // Red Ball
+				gp.state.red++;
+				if(gp.state.redID == null && tuc == TableUseCase.playing) {
+					gp.state.redID = gp.getTurnID();
+					gp.state.yellowID = gp.getNotTurnID();
+					gp.setMenuTitleColours();
+				}
+				
+			} else if(b.col == 2) { // Yellow Ball
+				gp.state.yellow++;
+				if(gp.state.yellowID == null && tuc == TableUseCase.playing) {
+					gp.state.yellowID = gp.getTurnID();
+					gp.state.redID = gp.getNotTurnID();
+					gp.setMenuTitleColours();
+				}
 			}
 		}
 	}
@@ -213,7 +226,7 @@ public class Table extends Widget {
 		// If an update Packet has been sent by the host, the update will occur here
 		if(updateInfo != null) {
 			this.turn = client.udata.id.equals(updateInfo.turn);
-			this.turnName = getTurnName();
+			this.turnName = gp.getTurnName();
 			
 			cueBall.vx = updateInfo.vx;
 			cueBall.vy = updateInfo.vy;
@@ -263,14 +276,6 @@ public class Table extends Widget {
 		if(Consts.DEV_SHOW_MOUSE_POS && Client.mouse.left && !Client.mouse.prevLeft) {
 			System.out.println(getMouseOnTable());
 		
-		}
-	}
-	
-	private String getTurnName() {
-		if(gp.info.id.equals(gp.info.u1.id)) {
-			return this.turn ? gp.info.u1.username : gp.info.u2.username;
-		} else {
-			return this.turn ? gp.info.u2.username : gp.info.u1.username;
 		}
 	}
 	
@@ -403,7 +408,7 @@ public class Table extends Widget {
 		} else if(gi.tuc == TableUseCase.spectating) {
 			turn = false;
 		}
-		turnName = getTurnName();
+		turnName = gp.getTurnName();
 	}
 	
 	// These methods are at the bottom as they take up space and look ugly

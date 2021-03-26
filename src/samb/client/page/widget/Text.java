@@ -29,6 +29,8 @@ public class Text extends Widget {
 		
 	}
 	
+	
+	// Setters
 	public void setText(String txt) {
 		this.ti.setText(txt);
 		
@@ -51,7 +53,14 @@ public class Text extends Widget {
 			break;
 		}
 	}
+	
+	public void setColour(Color colour) {
+		ti.setColour(colour);
+		
+	}
 
+	
+	// Render Method
 	@Override
 	public void render(Graphics2D g) {
 		// Renders the Text widget

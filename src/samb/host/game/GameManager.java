@@ -53,8 +53,11 @@ public class GameManager {
 		Packet p = new Packet(Header.newGame);
 		p.gameInfo = g;
 		p.gameInfo.tuc = TableUseCase.playing; // Only for the players
+		p.gameState = g.state;
 		
 		host.um.get(u1).send(p);
+		
+		p.gameInfo.first = false;
 		host.um.get(u2).send(p);
 		
 	}

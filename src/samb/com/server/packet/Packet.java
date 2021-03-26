@@ -5,6 +5,7 @@ import java.io.Serializable;
 import samb.com.database.UserStats;
 import samb.com.server.info.FriendsInfo;
 import samb.com.server.info.GameInfo;
+import samb.com.server.info.GameState;
 import samb.com.server.info.LoginInfo;
 import samb.com.server.info.Message;
 import samb.com.server.info.UpdateInfo;
@@ -26,6 +27,7 @@ public class Packet implements Serializable {
 	// Each 'Info' class contains information about their prefix
 	public LoginInfo loginInfo;
 	public GameInfo gameInfo;
+	public GameState gameState;
 	public UpdateInfo updateInfo;
 	public UserStats userStats;
 	public FriendsInfo friendsInfo;

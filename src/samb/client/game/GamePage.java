@@ -8,8 +8,10 @@ import samb.client.main.Window;
 import samb.client.page.Page;
 import samb.client.page.widget.ChatBox;
 import samb.client.page.widget.GameMenu;
+import samb.client.page.widget.Text;
 import samb.client.utils.ImageLoader;
 import samb.com.server.info.GameInfo;
+import samb.com.server.info.GameState;
 import samb.com.server.info.Message;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
@@ -22,6 +24,7 @@ public class GamePage extends Page {
 	 * */
 
 	public GameInfo info;
+	public GameState state;
 	private Table table;
 	private GameMenu menu;
 	private ChatBox chat;
@@ -36,6 +39,8 @@ public class GamePage extends Page {
 		
 	}
 	
+	
+	// Inits
 	private void initWidgets() {
 		this.table = new Table(client, this);
 		add("table", table);
@@ -49,6 +54,8 @@ public class GamePage extends Page {
 		add("chat", chat);
 	}
 	
+	
+	// Tick method
 	@Override
 	public void tick() {
 		menu.tick();
@@ -58,6 +65,8 @@ public class GamePage extends Page {
 		
 	}
 	
+	
+	// Start methods
 	public void start(GameInfo gi) {
 		// This method starts a new game
 		menu.unshowLoading();
@@ -94,6 +103,7 @@ public class GamePage extends Page {
 	}
 	
 	
+	// Update Methods
 	public void updateTable(Packet p) {
 		// This method updates the table, (when an opponent has hit the cue ball)
 		table.update(p.updateInfo);
@@ -104,6 +114,7 @@ public class GamePage extends Page {
 		if(gi != null) {
 			this.info = gi;
 			Client.getClient().udata.gameInfo = gi;
+					
 			if(gi.tuc == TableUseCase.playing) {
 				this.info.opp = gi.u2.id.equals(client.udata.id) ? gi.u1.id : gi.u2.id;
 			}
@@ -123,9 +134,50 @@ public class GamePage extends Page {
 	}
 	
 	
+	// Chat Methods
 	public void addChat(Message msg) {
 		chat.addMessage(msg);
 		
+	}
+	
+	
+	// Getters (sort of) 
+	public String getTurnID() {
+		if(info.first) {
+			return table.turn ? info.u1.id : info.u2.id;
+		} else {
+			return table.turn ? info.u2.id : info.u1.id;
+		}
+	}
+	
+	public String getNotTurnID() {
+		if(info.first) {
+			return table.turn ? info.u2.id : info.u1.id;
+		} else {
+			return table.turn ? info.u1.id : info.u2.id;
+		}
+	}
+	
+	public String getTurnName() {
+		if(info.first) {
+			return table.turn ? info.u1.username : info.u2.username;
+		} else {
+			return table.turn ? info.u2.username : info.u1.username;
+		}
+	}
+	
+	
+	// Setters (sort of)
+	public void setMenuTitleColours() {
+		if(Client.getClient().udata.id.equals(state.redID)) {
+			((Text)this.get("title1")).setColour(GameMenu.RED);
+			((Text)this.get("title2")).setColour(GameMenu.YELLOW);
+			
+		} else {
+			((Text)this.get("title1")).setColour(GameMenu.YELLOW);
+			((Text)this.get("title2")).setColour(GameMenu.RED);
+			
+		}
 	}
 	
 	
