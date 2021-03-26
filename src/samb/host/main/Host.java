@@ -11,6 +11,7 @@ import samb.com.server.BaseProcessor;
 import samb.com.server.packet.Error;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
+import samb.com.utils.Func;
 import samb.host.database.FriendsDBManager;
 import samb.host.database.StatsDBManager;
 import samb.host.database.UserDBManager;
@@ -458,9 +459,11 @@ public class Host extends BaseProcessor implements Runnable {
 				String query = String.format("SELECT * FROM users WHERE email='%s';", p.loginInfo.email);
 				List<UserInfo> us = UserDBManager.executeQuery(query);
 				if(us.size() == 0) {
-					signupUser(p, packet);
-					return;
-					
+					if(!Func.isFlag(p.loginInfo.username)) {
+						signupUser(p, packet);
+						return;
+						
+					} else {p.loginInfo.err = Error.usernameTaken; }
 				} else { p.loginInfo.err = Error.emailTaken; }
 			} else { p.loginInfo.err = Error.usernameTaken; }
 			

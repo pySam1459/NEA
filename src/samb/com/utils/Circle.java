@@ -3,6 +3,9 @@ package samb.com.utils;
 import java.io.Serializable;
 
 public class Circle implements Serializable {
+	/* This class contains the bare minimum information required when sending ball information
+	 * This class is used instead of the Ball class to reduce volume of datato be sent
+	 * */
 	
 	private static final long serialVersionUID = -5151581815740461263L;
 	public static final double DEFAULT_BALL_RADIUS = 24.0;

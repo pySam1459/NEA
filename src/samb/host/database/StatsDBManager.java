@@ -44,7 +44,7 @@ public class StatsDBManager {
 	
 	private static void connectToDatabase() throws SQLException {
 		// This method creates the connection to the database using the credentials specified.
-		conn = DriverManager.getConnection(connectionURL, LoginCredentials.username, LoginCredentials.password);
+		conn = DriverManager.getConnection(connectionURL, LoginCredentials.getUsername(), LoginCredentials.getPassword());
 	
 	}
 	

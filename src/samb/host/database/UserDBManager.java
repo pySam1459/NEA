@@ -44,7 +44,7 @@ public class UserDBManager {
 		// This method creates the connection to the database using the credentials specified.
 
 		try {
-			conn = DriverManager.getConnection(connectionURL, LoginCredentials.username, LoginCredentials.password);
+			conn = DriverManager.getConnection(connectionURL, LoginCredentials.getUsername(), LoginCredentials.getPassword());
 		
 		} catch(Exception e) {
 			System.out.println("You have not created the LoginCredentials Class!");

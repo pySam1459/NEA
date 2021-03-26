@@ -1,5 +1,6 @@
 /.project
 /.settings/
 /.classpath
-/src/samb/host/database/LoginCredentials.java
 /bin/
+/res/misc/sqlCredentials.cred
+/res/rules.txt

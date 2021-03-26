@@ -19,6 +19,7 @@ import samb.client.utils.Maths;
 import samb.client.utils.datatypes.Dimf;
 import samb.client.utils.datatypes.Pointf;
 import samb.com.server.info.GameInfo;
+import samb.com.server.info.Message;
 import samb.com.server.info.UpdateInfo;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
@@ -43,6 +44,7 @@ public class Table extends Widget {
 	
 	public TableUseCase tuc;
 	public boolean turn = false;
+	private String turnName = "";
 	private boolean allowAim = true;
 	
 	private Cue cue;
@@ -66,53 +68,7 @@ public class Table extends Widget {
 		createPockets();
 		
 	}
-	
-	private static int[] calculateRect(int maxWidth) {
-		// Returns the rectangle which the table will take up on the screen
-		final int buffer = 48;
-		// {gw, gh} is the width and height of the rendered table
-		final int gw = maxWidth - buffer*2;
-		final int gh = gw * imgDim.height / imgDim.width;
-		
-		// bdim and bxy is the boundary dimensions and top left coords (boundary for the balls, ie the cushions)
-		bdim = new Dimf(imgBDim.width * (double)gw/imgDim.width, 
-						imgBDim.height * (double)gh/imgDim.height);
-		
-		bxy = new Pointf((gw - bdim.width) / 2.0, (gh - bdim.height) / 2.0);
-		
-		return new int[] {buffer, Window.dim.height/2 - gh/2, gw, gh};
-	}
-	
-	public void pocket(Ball b) {
-		if(b.col == 0) {
-			// Place cue ball wherever
-			
-		} else {
-			balls.remove(b);
-			
-			if(b.col == 1) {
-				gp.info.red++;
-			} else if(b.col == 2) {
-				gp.info.yellow++;
-			} else if(b.col == 3) {
-				
-			}
-		}
-	}
-	
-	public void setUseCase(GameInfo gi, String id) {
-		// Determines the use of the table (playing, spectating, practicing)
-		tuc = gi.tuc;
-		if(gi.tuc == TableUseCase.practicing) {
-			turn = true;
-			
-		} else if(gi.tuc == TableUseCase.playing) {
-			turn = gi.turn.equals(id);
-			
-		} else if(gi.tuc == TableUseCase.spectating) {
-			turn = false;
-		}
-	}
+
 
 	@Override
 	public void tick() {
@@ -131,26 +87,8 @@ public class Table extends Widget {
 		}
 	}
 	
-	private void getpos() {
-		if(Consts.DEV_SHOW_MOUSE_POS && Client.mouse.left && !Client.mouse.prevLeft) {
-			System.out.println(getMouseOnTable());
-		
-		}
-	}
 	
-	private void tickUpdate() {
-		// If an update Packet has been sent by the host, the update will occur here
-		if(updateInfo != null) {
-			this.turn = client.udata.id.equals(updateInfo.turn);
-			
-			cueBall.vx = updateInfo.vx;
-			cueBall.vy = updateInfo.vy;
-			
-			updateInfo = null;
-
-		}
-	}
-	
+	// Game Play Methods
 	private void aim() {
 		// TODO might consider showing cue to spectators/other player
 		// This method controls how the user aims the cue, 
@@ -186,13 +124,6 @@ public class Table extends Widget {
 				}
 			}
 		}
-	}
-	
-	private Pointf getMouseOnTable() {
-		// Returns the mouse's XY on the table
-		Point p = Client.mouse.getXY();
-		return toTable(new Pointf(p.x-rect[0], p.y-rect[1]));
-		
 	}
 	
 	private void shoot() {
@@ -248,11 +179,48 @@ public class Table extends Widget {
 		}
 	}
 	
+	public void pocket(Ball b) {
+		if(b.col == 0) {
+			// Place cue ball wherever
+			
+			String msg = String.format("FOUL: %s potted the Cue ball", turnName);
+			gp.addChat(new Message(msg, "$BOLD$"));
+			
+		} else if (b.col == 3) {
+			
+			String msg = String.format("FOUL: %s potted the 8 ball", turnName);
+			gp.addChat(new Message(msg, "$BOLD$"));
+			
+		} else {
+			balls.remove(b);
+			
+			if(b.col == 1) {
+				gp.info.red++;
+			} else if(b.col == 2) {
+				gp.info.yellow++;
+			}
+		}
+	}
+	
 	
 	// Synchronisation methods
 	public void update(UpdateInfo upinfo) {
 		this.updateInfo = upinfo;
 		
+	}
+	
+	private void tickUpdate() {
+		// If an update Packet has been sent by the host, the update will occur here
+		if(updateInfo != null) {
+			this.turn = client.udata.id.equals(updateInfo.turn);
+			this.turnName = getTurnName();
+			
+			cueBall.vx = updateInfo.vx;
+			cueBall.vy = updateInfo.vy;
+			
+			updateInfo = null;
+
+		}
 	}
 	
 	public Packet createUpdate(double[] vel) {
@@ -266,6 +234,8 @@ public class Table extends Widget {
 		return p;
 	}
 	
+	
+	// Getters (sort of)
 	public List<Circle> getCircles() {
 		// This method converts the balls to Circle objects (less data to send)
 		
@@ -280,6 +250,28 @@ public class Table extends Widget {
 	public Ball[] getBalls() {
 		// Returns and array of Ball objects
 		return balls.toArray(new Ball[0]);
+	}
+	
+	private Pointf getMouseOnTable() {
+		// Returns the mouse's XY on the table
+		Point p = Client.mouse.getXY();
+		return toTable(new Pointf(p.x-rect[0], p.y-rect[1]));
+		
+	}
+	
+	private void getpos() {
+		if(Consts.DEV_SHOW_MOUSE_POS && Client.mouse.left && !Client.mouse.prevLeft) {
+			System.out.println(getMouseOnTable());
+		
+		}
+	}
+	
+	private String getTurnName() {
+		if(gp.info.id.equals(gp.info.u1.id)) {
+			return this.turn ? gp.info.u1.username : gp.info.u2.username;
+		} else {
+			return this.turn ? gp.info.u2.username : gp.info.u1.username;
+		}
 	}
 	
 	
@@ -381,6 +373,38 @@ public class Table extends Widget {
 						p.y * (bdim.height / tdim.height) + bxy.y);
 	}
 	
+	
+	// Initialization methods
+	private static int[] calculateRect(int maxWidth) {
+		// Returns the rectangle which the table will take up on the screen
+		final int buffer = 48;
+		// {gw, gh} is the width and height of the rendered table
+		final int gw = maxWidth - buffer*2;
+		final int gh = gw * imgDim.height / imgDim.width;
+		
+		// bdim and bxy is the boundary dimensions and top left coords (boundary for the balls, ie the cushions)
+		bdim = new Dimf(imgBDim.width * (double)gw/imgDim.width, 
+						imgBDim.height * (double)gh/imgDim.height);
+		
+		bxy = new Pointf((gw - bdim.width) / 2.0, (gh - bdim.height) / 2.0);
+		
+		return new int[] {buffer, Window.dim.height/2 - gh/2, gw, gh};
+	}
+	
+	public void setUseCase(GameInfo gi, String id) {
+		// Determines the use of the table (playing, spectating, practicing)
+		tuc = gi.tuc;
+		if(gi.tuc == TableUseCase.practicing) {
+			turn = true;
+			
+		} else if(gi.tuc == TableUseCase.playing) {
+			turn = gi.turn.equals(id);
+			
+		} else if(gi.tuc == TableUseCase.spectating) {
+			turn = false;
+		}
+		turnName = getTurnName();
+	}
 	
 	// These methods are at the bottom as they take up space and look ugly
 	private void createPockets() {

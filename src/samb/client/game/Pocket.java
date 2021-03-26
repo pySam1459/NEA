@@ -7,6 +7,10 @@ import samb.client.utils.Maths;
 import samb.com.utils.Circle;
 
 public class Pocket extends Circle {
+	/* This class represents a pocket on the table
+	 * 6 pockets will check whether a ball has 'fallen' in every game tick
+	 * if so, the table class 'pocket' method will be called
+	 * */
 
 	private static final long serialVersionUID = -2691551611350119501L;
 	private Table t;
@@ -27,6 +31,8 @@ public class Pocket extends Circle {
 	}
 	
 	public void render(Graphics2D g, int off) {
+		// Development and Debugging Purposes
+		
 		g.setColor(new Color(0, 0, 255, 127));
 		g.fillOval((int)(x-r)+off, (int)(y-r)+off, (int)(r*2), (int)(r*2));
 		

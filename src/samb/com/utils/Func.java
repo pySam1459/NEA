@@ -16,6 +16,9 @@ import samb.client.utils.Consts;
 public class Func {
 	/* This class is a contains useful functions which can be called statically from either the host or client program */
 
+	// These FLAGS are used throughout the program, a username cannot equals any of these flags
+	public static final String[] FLAGS = new String[] {"$BOLD$", "$ITALICS$", "$PLAIN$"};
+	
 	
 	public static String hashPassword(String name, String password) {
 		// This method hashes and salts a user's password
@@ -80,6 +83,16 @@ public class Func {
 
 		return arr;
 		
+	}
+	
+	public static boolean isFlag(String flag) {
+		// Check whether 'flag' is a FLAG
+		
+		for(String s: FLAGS) {
+			if(s.equals(flag)) {
+				return true;
+			}
+		} return false;
 	}
 	
 }

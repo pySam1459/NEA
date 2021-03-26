@@ -16,12 +16,13 @@ import samb.client.utils.Consts;
 import samb.com.server.info.Message;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
+import samb.com.utils.Func;
 import samb.com.utils.enums.TableUseCase;
 
 public class ChatBox extends Widget implements TextBoxListener {
-	/* This subclass implements the chat functionality on the game's page
+	/* This subclass implements the chat functionality on the gamePage
 	 * The class creates the widgets and images displayed on screen, 
-	 *   and handles events relevant to the chat. 
+	 *   and handles events relevant to the chat (Sending, Receiving, Rendering, etc)
 	 * */
 	
 	private final Color BACKGROUND_COLOR = new Color(64, 81, 77, 127);
@@ -29,7 +30,9 @@ public class ChatBox extends Widget implements TextBoxListener {
 	private final int BUFFER = 8;
 	
 	private final int chatSize = 14;
-	private final Font chatFont = new Font("comicsansms", Font.PLAIN, chatSize);
+	private final Font chatFont = new Font("comicsansms", Font.PLAIN, chatSize), 
+			chatFontBold = new Font("comicsansms", Font.BOLD, chatSize),
+			chatFontItalics = new Font("comicsansms", Font.ITALIC, chatSize);
 	private final Font chatNameFont = new Font("comicsansms", Font.BOLD, chatSize);
 	private final Color chatColour = Consts.PAL1;
 	
@@ -93,7 +96,7 @@ public class ChatBox extends Widget implements TextBoxListener {
 		default:
 			msg = "Hopefully this message isn't seen, if it does something has gone wrong!";
 		}
-		addMessage(new Message(msg, ""));
+		addMessage(new Message(msg, "$PLAIN$"));
 	}
 	
 	private void sendMessage(Message m) {
@@ -167,8 +170,8 @@ public class ChatBox extends Widget implements TextBoxListener {
 			text="";
 			test="";
 			
-			// if last player is different to new chat
-			if(!fromLast.equals(m.from) && !"".equals(m.from)) { 
+			// if last player is different to new chat or 'm.from' is a specific program flag
+			if(!fromLast.equals(m.from) && !Func.isFlag(m.from)) { 
 				g.setFont(chatNameFont);
 				fromLast = m.from;
 				
@@ -180,6 +183,10 @@ public class ChatBox extends Widget implements TextBoxListener {
 			// render message, each word is separated to check is the sentence will be longer than the chat box, if so wrap around
 			g.setFont(chatFont);
 			parts = m.text.split(" ");
+			
+			if(Func.isFlag(m.from)) {
+				renderDoFlag(g, m.from);
+			}
 			
 			for(String s: parts) {
 				test += s + " ";
@@ -211,6 +218,20 @@ public class ChatBox extends Widget implements TextBoxListener {
 		g = (Graphics2D) chatImg.getGraphics();
 		g.drawImage(cropChat, 0, BUFFER, null);
 		
+	}
+	
+	private void renderDoFlag(Graphics2D g, String flag) {
+		switch(flag) {
+		case "$PLAIN$":
+			g.setFont(chatFont);
+			break;
+		case "$BOLD$":
+			g.setFont(chatFontBold);
+			break;
+		case "$ITALICS":
+			g.setFont(chatFontItalics);
+			break;
+		}
 	}
 
 }
