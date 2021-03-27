@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import samb.client.main.Client;
 import samb.client.utils.Line;
 import samb.client.utils.Maths;
 import samb.com.utils.Circle;
@@ -79,6 +78,10 @@ public class Ball extends Circle {
 		for(Ball b: all) {
 			if(b != this) {
 				if(Maths.ballCollisionBall(this, b)) {
+					if(!Table.collisions && Table.userCol != b.col) { // Check for foul
+						Table.wrongCollision = true;
+					}
+					
 					Table.collisions = true;
 				}
 			}

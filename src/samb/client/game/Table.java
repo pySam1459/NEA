@@ -18,6 +18,7 @@ import samb.client.utils.Line;
 import samb.client.utils.Maths;
 import samb.client.utils.datatypes.Dimf;
 import samb.client.utils.datatypes.Pointf;
+import samb.com.server.info.Foul;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.Message;
 import samb.com.server.info.UpdateInfo;
@@ -45,8 +46,9 @@ public class Table extends Widget {
 	public TableUseCase tuc;
 	public boolean turn = false;
 	private String turnName = "";
-	private boolean doCheck=false, allowAim = true;
-	public static boolean collisions = false;
+	private boolean doCheck = false, allowAim = true;
+	public static boolean collisions = false, wrongCollision = false;
+	public static int userCol;
 	
 	private Cue cue;
 	private Ball cueBall;
@@ -169,11 +171,79 @@ public class Table extends Widget {
 		}
 	}
 	
+	private void foul(Foul foul) {
+		if(turn) {
+			Packet p = new Packet(Header.updateGame);
+			p.updateInfo = new UpdateInfo(foul);
+			Client.getClient().server.send(p);
+		}
+	}
+	
 	private void switchTurn() {
+		if(!Table.collisions) { // If the cue didn't collide, a foul has occured
+			foul(Foul.noHit);
+		} else if(Table.wrongCollision) {
+			foul(Foul.wrongHit);
+		}
+		
 		this.turn = !turn;
 		this.turnName = gp.getTurnName();
 		Table.collisions = false;
+		Table.wrongCollision = false;
 	}
+	
+	public void pocket(Ball b) {
+		// This method is called when a ball is pocketed
+		
+		String msg;
+		if(b.col == 0) { // Cue Ball
+			msg = String.format("FOUL: %s potted the Cue ball", turnName);
+			gp.addChat(new Message(msg, "$BOLD$"));
+			
+			foul(Foul.potCue);
+			
+		} else if (b.col == 3) { // 8 Ball
+			msg = String.format("LOSS: %s potted the 8 ball", turnName);
+			gp.addChat(new Message(msg, "$BOLD$"));
+			
+			foul(Foul.potBlack);
+			
+		} else {
+			balls.remove(b);
+			
+			if(b.col == 1) { // Red Ball
+				gp.state.red++;
+				msg = String.format("%s potted a red", turnName);
+				gp.addChat(new Message(msg, "$BOLD$"));
+				
+				if(gp.state.redID == null && tuc == TableUseCase.playing) {
+					gp.state.redID = gp.getTurnID();
+					gp.state.yellowID = gp.getNotTurnID();
+					gp.setMenuTitleColours();
+					Table.userCol = 1;
+					
+					msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
+					gp.addChat(new Message(msg, "$BOLD$"));
+				}
+				
+			} else if(b.col == 2) { // Yellow Ball
+				gp.state.yellow++;
+				msg = String.format("%s potted a yellow", turnName);
+				gp.addChat(new Message(msg, "$BOLD$"));
+				
+				if(gp.state.yellowID == null && tuc == TableUseCase.playing) {
+					gp.state.yellowID = gp.getTurnID();
+					gp.state.redID = gp.getNotTurnID();
+					gp.setMenuTitleColours();
+					Table.userCol = 2;
+					
+					msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
+					gp.addChat(new Message(msg, "$BOLD$"));
+				}
+			}
+		}
+	}
+	
 	
 	public void rack(GameInfo gi) {
 		// To "rack" is to set up the table, therefore all the relevant ball info is transfered to the table
@@ -190,55 +260,6 @@ public class Table extends Widget {
 		}
 	}
 	
-	public void pocket(Ball b) {
-		// This method is called when a ball is pocketed
-		
-		String msg;
-		if(b.col == 0) { // Cue Ball
-			// Place cue ball wherever
-			
-			msg = String.format("FOUL: %s potted the Cue ball", turnName);
-			gp.addChat(new Message(msg, "$BOLD$"));
-			
-		} else if (b.col == 3) { // 8 Ball
-			
-			msg = String.format("LOSS: %s potted the 8 ball", turnName);
-			gp.addChat(new Message(msg, "$BOLD$"));
-			
-		} else {
-			balls.remove(b);
-			
-			if(b.col == 1) { // Red Ball
-				gp.state.red++;
-				msg = String.format("%s potted a red", turnName);
-				gp.addChat(new Message(msg, "$BOLD$"));
-				
-				if(gp.state.redID == null && tuc == TableUseCase.playing) {
-					gp.state.redID = gp.getTurnID();
-					gp.state.yellowID = gp.getNotTurnID();
-					gp.setMenuTitleColours();
-					
-					msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
-					gp.addChat(new Message(msg, "$BOLD$"));
-				}
-				
-			} else if(b.col == 2) { // Yellow Ball
-				gp.state.yellow++;
-				msg = String.format("%s potted a yellow", turnName);
-				gp.addChat(new Message(msg, "$BOLD$"));
-				
-				if(gp.state.yellowID == null && tuc == TableUseCase.playing) {
-					gp.state.yellowID = gp.getTurnID();
-					gp.state.redID = gp.getNotTurnID();
-					gp.setMenuTitleColours();
-					
-					msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
-					gp.addChat(new Message(msg, "$BOLD$"));
-				}
-			}
-		}
-	}
-	
 	
 	// Synchronisation methods
 	public void update(UpdateInfo upinfo) {
@@ -249,14 +270,19 @@ public class Table extends Widget {
 	private void tickUpdate() {
 		// If an update Packet has been sent by the host, the update will occur here
 		if(updateInfo != null) {
-			cueBall.vx = updateInfo.vx;
-			cueBall.vy = updateInfo.vy;
-			cueBall.moving = true;
+			if(updateInfo.foul != null) {
+				
+				
+			} else {
+				cueBall.vx = updateInfo.vx;
+				cueBall.vy = updateInfo.vy;
+				cueBall.moving = true;
+				
+				allowAim = false;
+				doCheck = true;
+			}
 			
 			updateInfo = null;
-			allowAim = false;
-			doCheck = true;
-
 		}
 	}
 	
