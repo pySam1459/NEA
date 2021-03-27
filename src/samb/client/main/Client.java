@@ -127,7 +127,7 @@ public class Client extends BaseProcessor implements Runnable {
 			}
 
 			gp = (GamePage) pm.get();
-			gp.start(p.gameInfo);
+			gp.start(p.gameInfo, p.gameState);
 			
 			break;
 			
@@ -146,9 +146,11 @@ public class Client extends BaseProcessor implements Runnable {
 			if(pm.isId("GamePage") ) {
 				gp = (GamePage) pm.get();
 				p.gameInfo = gp.getUpdate().gameInfo;
+				p.gameState = gp.getUpdate().gameState;
 				
 			} else {
 				p.gameInfo = null;
+				p.gameState = null;
 			}
 			
 			server.send(p);
@@ -168,7 +170,7 @@ public class Client extends BaseProcessor implements Runnable {
 			}
 
 			gp = (GamePage) pm.get();
-			gp.spectate(p.gameInfo);
+			gp.spectate(p.gameInfo, p.gameState);
 			break;
 			
 			

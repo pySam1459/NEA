@@ -67,7 +67,7 @@ public class GamePage extends Page {
 	
 	
 	// Start methods
-	public void start(GameInfo gi) {
+	public void start(GameInfo gi, GameState state) {
 		// This method starts a new game
 		menu.unshowLoading();
 		
@@ -76,10 +76,13 @@ public class GamePage extends Page {
 		table.setUseCase(gi, client.udata.id);
 		chat.setUseCase(gi.tuc);
 		
+		this.state = state;
+		Client.getClient().udata.gameState = state;
+		
 	}
 	
-	public void spectate(GameInfo gi) {
-		start(gi); // Might have to change if required
+	public void spectate(GameInfo gi, GameState state) {
+		start(gi, state); // Might have to change if required
 		
 	}
 	
@@ -98,7 +101,7 @@ public class GamePage extends Page {
 		GameInfo gi = new GameInfo("practice", null, null);
 		gi.tuc = TableUseCase.practicing;
 		gi.balls = Func.createDefaultBalls(gi.tDim, Ball.DEFAULT_BALL_RADIUS);
-		start(gi);
+		start(gi, new GameState());
 		
 	}
 	
