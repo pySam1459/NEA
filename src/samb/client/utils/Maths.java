@@ -31,7 +31,7 @@ public class Maths {
 		
 	}
 	
-	public static void ballCollisionBall(Ball b1, Ball b2) {
+	public static boolean ballCollisionBall(Ball b1, Ball b2) {
 		// This method checks if ball b1 and ball b2 have collided
 		// If they have, it will calculate the new velocities of each and update them
 		
@@ -49,8 +49,9 @@ public class Maths {
 			b2.vy = (b2.vy + p * ney) * Ball.BALL_FRICTION;
 			
 			b1.collidedWith.add(b2);
-			
+			return true;
 		}
+		return false;
 	}
 	
 	public static void moveApart(Ball b1, Ball b2) {

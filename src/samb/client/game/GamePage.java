@@ -164,6 +164,14 @@ public class GamePage extends Page {
 		}
 	}
 	
+	public String getNotTurnName() {
+		if(info.first) {
+			return table.turn ? info.u2.username : info.u1.username;
+		} else {
+			return table.turn ? info.u1.username : info.u2.username;
+		}
+	}
+	
 	
 	// Setters (sort of)
 	public void setMenuTitleColours() {

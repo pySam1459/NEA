@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import samb.client.main.Client;
 import samb.client.utils.Line;
 import samb.client.utils.Maths;
 import samb.com.utils.Circle;
@@ -77,8 +78,9 @@ public class Ball extends Circle {
 		// If it has, then it will do the relevant calculations to produce the mathematically accurate reaction
 		for(Ball b: all) {
 			if(b != this) {
-				Maths.ballCollisionBall(this, b);
-				
+				if(Maths.ballCollisionBall(this, b)) {
+					Table.collisions = true;
+				}
 			}
 		}
 	}

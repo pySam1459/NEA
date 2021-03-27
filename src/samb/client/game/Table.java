@@ -46,6 +46,7 @@ public class Table extends Widget {
 	public boolean turn = false;
 	private String turnName = "";
 	private boolean doCheck=false, allowAim = true;
+	public static boolean collisions = false;
 	
 	private Cue cue;
 	private Ball cueBall;
@@ -162,11 +163,16 @@ public class Table extends Widget {
 			
 			allowAim = newAim;
 			if(allowAim) { // Turn switches
-				this.turn = !turn;
-				this.turnName = gp.getTurnName();
+				switchTurn();
 				doCheck = false;
 			}
 		}
+	}
+	
+	private void switchTurn() {
+		this.turn = !turn;
+		this.turnName = gp.getTurnName();
+		Table.collisions = false;
 	}
 	
 	public void rack(GameInfo gi) {
@@ -187,15 +193,16 @@ public class Table extends Widget {
 	public void pocket(Ball b) {
 		// This method is called when a ball is pocketed
 		
+		String msg;
 		if(b.col == 0) { // Cue Ball
 			// Place cue ball wherever
 			
-			String msg = String.format("FOUL: %s potted the Cue ball", turnName);
+			msg = String.format("FOUL: %s potted the Cue ball", turnName);
 			gp.addChat(new Message(msg, "$BOLD$"));
 			
 		} else if (b.col == 3) { // 8 Ball
 			
-			String msg = String.format("LOSS: %s potted the 8 ball", turnName);
+			msg = String.format("LOSS: %s potted the 8 ball", turnName);
 			gp.addChat(new Message(msg, "$BOLD$"));
 			
 		} else {
@@ -203,18 +210,30 @@ public class Table extends Widget {
 			
 			if(b.col == 1) { // Red Ball
 				gp.state.red++;
+				msg = String.format("%s potted a red", turnName);
+				gp.addChat(new Message(msg, "$BOLD$"));
+				
 				if(gp.state.redID == null && tuc == TableUseCase.playing) {
 					gp.state.redID = gp.getTurnID();
 					gp.state.yellowID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
+					
+					msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
+					gp.addChat(new Message(msg, "$BOLD$"));
 				}
 				
 			} else if(b.col == 2) { // Yellow Ball
 				gp.state.yellow++;
+				msg = String.format("%s potted a yellow", turnName);
+				gp.addChat(new Message(msg, "$BOLD$"));
+				
 				if(gp.state.yellowID == null && tuc == TableUseCase.playing) {
 					gp.state.yellowID = gp.getTurnID();
 					gp.state.redID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
+					
+					msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
+					gp.addChat(new Message(msg, "$BOLD$"));
 				}
 			}
 		}
