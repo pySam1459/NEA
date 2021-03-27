@@ -22,7 +22,6 @@ public class Game extends GameInfo {
 		super(id, UserDBManager.getUI(u1), UserDBManager.getUI(u2));
 
 		this.balls = Func.createDefaultBalls(tDim, Circle.DEFAULT_BALL_RADIUS);
-		this.turn = u1;
 		this.state = new GameState();
 		
 		setElos();
@@ -37,7 +36,6 @@ public class Game extends GameInfo {
 	
 	public void update(Packet p) {
 		if(p.gameInfo == null) {
-			this.turn = p.updateInfo.turn;
 			this.state = p.gameState;
 			
 		} else {

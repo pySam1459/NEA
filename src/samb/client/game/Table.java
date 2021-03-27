@@ -45,7 +45,7 @@ public class Table extends Widget {
 	public TableUseCase tuc;
 	public boolean turn = false;
 	private String turnName = "";
-	private boolean allowAim = true;
+	private boolean doCheck=false, allowAim = true;
 	
 	private Cue cue;
 	private Ball cueBall;
@@ -130,7 +130,6 @@ public class Table extends Widget {
 		// This methods sends an update packet to the host about the new velocity of the cue ball
 		
 		double[] vel = Maths.getVelocity(cue.angle, cue.power);
-		turn = tuc != TableUseCase.playing;
 		
 		if(tuc == TableUseCase.playing) {
 			Packet p = createUpdate(vel);
@@ -140,9 +139,10 @@ public class Table extends Widget {
 			cueBall.vx = vel[0];
 			cueBall.vy = vel[1];
 			
+			allowAim = false;
+			doCheck = true;
 		}
 		
-		allowAim = false;
 		cue.reset();
 		
 	}
@@ -151,7 +151,7 @@ public class Table extends Widget {
 		// This method checks whether the player is allowed to aim or whether to wait
 		//   ie when the balls are still moving = invalid
 		
-		if(turn && tuc != TableUseCase.spectating) {
+		if(tuc != TableUseCase.spectating && doCheck) {
 			boolean newAim = true;
 			for(Ball b: balls) {
 				if(b.moving) {
@@ -159,8 +159,13 @@ public class Table extends Widget {
 					
 				}
 			} 
-			allowAim = newAim;
 			
+			allowAim = newAim;
+			if(allowAim) { // Turn switches
+				this.turn = !turn;
+				this.turnName = gp.getTurnName();
+				doCheck = false;
+			}
 		}
 	}
 	
@@ -225,13 +230,13 @@ public class Table extends Widget {
 	private void tickUpdate() {
 		// If an update Packet has been sent by the host, the update will occur here
 		if(updateInfo != null) {
-			this.turn = client.udata.id.equals(updateInfo.turn);
-			this.turnName = gp.getTurnName();
-			
 			cueBall.vx = updateInfo.vx;
 			cueBall.vy = updateInfo.vy;
+			cueBall.moving = true;
 			
 			updateInfo = null;
+			allowAim = false;
+			doCheck = true;
 
 		}
 	}
@@ -240,9 +245,7 @@ public class Table extends Widget {
 		// This method creates an update Packet, sends the velocity of the cue ball
 		
 		Packet p = new Packet(Header.updateGame);
-		p.updateInfo = new UpdateInfo(turn ? gp.info.id : gp.info.opp);
-		p.updateInfo.vx = vel[0];
-		p.updateInfo.vy = vel[1];
+		p.updateInfo = new UpdateInfo(vel[0], vel[1]);
 		
 		return p;
 	}
@@ -403,7 +406,7 @@ public class Table extends Widget {
 			turn = true;
 			
 		} else if(gi.tuc == TableUseCase.playing) {
-			turn = gi.turn.equals(id);
+			turn = gi.u1.id.equals(id);
 			
 		} else if(gi.tuc == TableUseCase.spectating) {
 			turn = false;

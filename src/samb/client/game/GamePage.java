@@ -117,12 +117,8 @@ public class GamePage extends Page {
 		if(gi != null) {
 			this.info = gi;
 			Client.getClient().udata.gameInfo = gi;
-					
-			if(gi.tuc == TableUseCase.playing) {
-				this.info.opp = gi.u2.id.equals(client.udata.id) ? gi.u1.id : gi.u2.id;
-			}
-			
 			menu.setInfo(info);
+			
 		}
 	}
 	
@@ -131,7 +127,6 @@ public class GamePage extends Page {
 		Packet p = new Packet(Header.updateGame);
 		p.gameInfo = info;
 		p.gameInfo.balls = table.getCircles();
-		p.gameInfo.turn = table.turn ? info.id : info.opp;
 		
 		return p;
 	}
