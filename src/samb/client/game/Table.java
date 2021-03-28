@@ -46,9 +46,10 @@ public class Table extends Widget {
 	public TableUseCase tuc;
 	public boolean turn = false;
 	private String turnName = "";
-	private boolean doCheck = false, allowAim = true;
+	private boolean cuePlacement=false, doCheck = false, allowAim = true;
 	public static boolean collisions = false, wrongCollision = false;
 	public static int userCol;
+	private Foul foul;
 	
 	private Cue cue;
 	private Ball cueBall;
@@ -172,17 +173,37 @@ public class Table extends Widget {
 	}
 	
 	private void foul(Foul foul) {
-		if(turn) {
-			Packet p = new Packet(Header.updateGame);
-			p.updateInfo = new UpdateInfo(foul);
-			Client.getClient().server.send(p);
+		this.foul = foul;
+		
+	}
+	
+	private void dealWithFoul(Foul foul, boolean self) {
+		switch(foul) {
+		case potBlack:
+			break;
+		
+		case potCue:
+			break;
+			
+		case potWrong:
+			break;
+			
+		case noHit:
+			break;
+			
+		case wrongHit:
+			break;
+		
 		}
 	}
 	
 	private void switchTurn() {
-		if(!Table.collisions) { // If the cue didn't collide, a foul has occured
+		if(!Table.collisions) { // If the cue ball didn't collide, a foul has occurred
+			warnMessage(String.format("FOUL: No ball was struck by %s", turnName));
 			foul(Foul.noHit);
-		} else if(Table.wrongCollision) {
+			
+		} else if(Table.wrongCollision) { // If the cue ball collided with the wrong colour ball
+			warnMessage(String.format("FOUL: %s struck the wrong colour ball", turnName));
 			foul(Foul.wrongHit);
 		}
 		
@@ -190,22 +211,26 @@ public class Table extends Widget {
 		this.turnName = gp.getTurnName();
 		Table.collisions = false;
 		Table.wrongCollision = false;
+		
+		dealWithFoul(this.foul, !turn);
+	}
+	
+	private void warnMessage(String msg) {
+		gp.addChat(new Message(msg, "$BOLD$"));
+		
 	}
 	
 	public void pocket(Ball b) {
 		// This method is called when a ball is pocketed
 		
-		String msg;
 		if(b.col == 0) { // Cue Ball
-			msg = String.format("FOUL: %s potted the Cue ball", turnName);
-			gp.addChat(new Message(msg, "$BOLD$"));
+			balls.remove(b);
 			
+			warnMessage(String.format("FOUL: %s potted the Cue ball", turnName));
 			foul(Foul.potCue);
 			
 		} else if (b.col == 3) { // 8 Ball
-			msg = String.format("LOSS: %s potted the 8 ball", turnName);
-			gp.addChat(new Message(msg, "$BOLD$"));
-			
+			warnMessage(String.format("LOSS: %s potted the 8 ball", turnName));
 			foul(Foul.potBlack);
 			
 		} else {
@@ -213,8 +238,7 @@ public class Table extends Widget {
 			
 			if(b.col == 1) { // Red Ball
 				gp.state.red++;
-				msg = String.format("%s potted a red", turnName);
-				gp.addChat(new Message(msg, "$BOLD$"));
+				warnMessage(String.format("%s potted a red", turnName));
 				
 				if(gp.state.redID == null && tuc == TableUseCase.playing) {
 					gp.state.redID = gp.getTurnID();
@@ -222,14 +246,12 @@ public class Table extends Widget {
 					gp.setMenuTitleColours();
 					Table.userCol = 1;
 					
-					msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
-					gp.addChat(new Message(msg, "$BOLD$"));
+					warnMessage(String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName()));
 				}
 				
 			} else if(b.col == 2) { // Yellow Ball
 				gp.state.yellow++;
-				msg = String.format("%s potted a yellow", turnName);
-				gp.addChat(new Message(msg, "$BOLD$"));
+				warnMessage(String.format("%s potted a yellow", turnName));
 				
 				if(gp.state.yellowID == null && tuc == TableUseCase.playing) {
 					gp.state.yellowID = gp.getTurnID();
@@ -237,8 +259,7 @@ public class Table extends Widget {
 					gp.setMenuTitleColours();
 					Table.userCol = 2;
 					
-					msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
-					gp.addChat(new Message(msg, "$BOLD$"));
+					warnMessage(String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName()));
 				}
 			}
 		}
@@ -270,18 +291,12 @@ public class Table extends Widget {
 	private void tickUpdate() {
 		// If an update Packet has been sent by the host, the update will occur here
 		if(updateInfo != null) {
-			if(updateInfo.foul != null) {
-				
-				
-			} else {
-				cueBall.vx = updateInfo.vx;
-				cueBall.vy = updateInfo.vy;
-				cueBall.moving = true;
-				
-				allowAim = false;
-				doCheck = true;
-			}
+			cueBall.vx = updateInfo.vx;
+			cueBall.vy = updateInfo.vy;
+			cueBall.moving = true;
 			
+			allowAim = false;
+			doCheck = true;
 			updateInfo = null;
 		}
 	}
