@@ -142,6 +142,7 @@ public class Table extends Widget {
 		} else if(tuc == TableUseCase.practicing) {
 			cueBall.vx = vel[0];
 			cueBall.vy = vel[1];
+			cueBall.moving = true;
 			
 			allowAim = false;
 			doCheck = true;
@@ -165,39 +166,14 @@ public class Table extends Widget {
 			} 
 			
 			allowAim = newAim;
-			if(allowAim) { // Turn switches
-				switchTurn();
+			if(allowAim) { // Turn ends
+				endTurn();
 				doCheck = false;
 			}
 		}
 	}
 	
-	private void foul(Foul foul) {
-		this.foul = foul;
-		
-	}
-	
-	private void dealWithFoul(Foul foul, boolean self) {
-		switch(foul) {
-		case potBlack:
-			break;
-		
-		case potCue:
-			break;
-			
-		case potWrong:
-			break;
-			
-		case noHit:
-			break;
-			
-		case wrongHit:
-			break;
-		
-		}
-	}
-	
-	private void switchTurn() {
+	private void endTurn() {
 		if(!Table.collisions) { // If the cue ball didn't collide, a foul has occurred
 			warnMessage(String.format("FOUL: No ball was struck by %s", turnName));
 			foul(Foul.noHit);
@@ -219,6 +195,38 @@ public class Table extends Widget {
 		gp.addChat(new Message(msg, "$BOLD$"));
 		
 	}
+	
+	private void foul(Foul foul) {
+		this.foul = foul;
+		
+	}
+	
+	private void dealWithFoul(Foul foul, boolean self) {
+		switch(foul) {
+		case potCue: // foul
+			if(!self) {
+				cuePlacement = true;
+			}
+			break;
+		
+		case potBlack:  // loss
+			break;
+		
+		case wrongHit:
+			break;
+			
+		case potWrong:
+			break;
+			
+		case noHit: // foul
+			if(!self) {
+				cuePlacement = true;
+			}
+			break;
+			
+		}
+	}
+	
 	
 	public void pocket(Ball b) {
 		// This method is called when a ball is pocketed
