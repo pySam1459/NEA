@@ -53,6 +53,7 @@ public class Table extends Widget {
 	
 	private Cue cue;
 	private Ball cueBall;
+	private Pointf cueBallPlacement;
 	
 	private List<Ball> balls;
 	private UpdateInfo updateInfo;
@@ -99,8 +100,8 @@ public class Table extends Widget {
 		//   first getting an angle "set", then changing the "power" and finally shooting
 		
 		if(tuc != TableUseCase.spectating) {
-			cue.show = (tuc == TableUseCase.practicing || turn) && allowAim;
-			
+			cue.show = (tuc == TableUseCase.practicing || turn) && allowAim && !cuePlacement;
+
 			if(cue.show) {
 				if(!cue.set) {
 					Pointf xy = getMouseOnTable();
@@ -116,7 +117,6 @@ public class Table extends Widget {
 					Pointf xy = getMouseOnTable();
 					//double angle = Maths.getAngle(new Pointf(cueBall.x, cueBall.y), xy);
 					double distance = Maths.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
-					
 					cue.power = cue.startDist - distance;
 					
 				} else if(!Client.mouse.left && cue.power > 2.5) {
@@ -125,6 +125,14 @@ public class Table extends Widget {
 				} else {
 					cue.halfReset();
 
+				}
+			} else if(cuePlacement) {
+				cueBallPlacement = getMouseOnTable();
+				
+				if(Client.mouse.left && Client.mouse.forleft < 2) {
+					Ball b = new Ball(new Circle(cueBallPlacement.x, cueBallPlacement.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
+					balls.add(b);
+					cueBall = b;
 				}
 			}
 		}
@@ -174,6 +182,9 @@ public class Table extends Widget {
 	}
 	
 	private void endTurn() {
+		// This method is called at the end of a player's turn
+		// It will handle any fouls/losses and turn switches
+		
 		if(!Table.collisions) { // If the cue ball didn't collide, a foul has occurred
 			warnMessage(String.format("FOUL: No ball was struck by %s", turnName));
 			foul(Foul.noHit);
@@ -183,10 +194,14 @@ public class Table extends Widget {
 			foul(Foul.wrongHit);
 		}
 		
-		this.turn = !turn;
-		this.turnName = gp.getTurnName();
+		if(!potted || foul != null) {
+			this.turn = !turn;
+			this.turnName = gp.getTurnName();
+		}
+		
 		Table.collisions = false;
 		Table.wrongCollision = false;
+		potted = false;
 		
 		dealWithFoul(this.foul, !turn);
 	}
@@ -202,6 +217,8 @@ public class Table extends Widget {
 	}
 	
 	private void dealWithFoul(Foul foul, boolean self) {
+		// This method deals with each foul/loss after a player's turn
+		
 		switch(foul) {
 		case potCue: // foul, cue ball is moved afterwards
 		case wrongHit:
@@ -218,6 +235,7 @@ public class Table extends Widget {
 			break;
 			
 		}
+		this.foul = null;
 	}
 	
 	
@@ -239,6 +257,7 @@ public class Table extends Widget {
 			
 			if(b.col == 1) { // Red Ball
 				gp.state.red++;
+				potted = true;
 				warnMessage(String.format("%s potted a red", turnName));
 				
 				if(gp.state.redID == null && tuc == TableUseCase.playing) {
@@ -252,6 +271,7 @@ public class Table extends Widget {
 				
 			} else if(b.col == 2) { // Yellow Ball
 				gp.state.yellow++;
+				potted = true;
 				warnMessage(String.format("%s potted a yellow", turnName));
 				
 				if(gp.state.yellowID == null && tuc == TableUseCase.playing) {
@@ -394,6 +414,10 @@ public class Table extends Widget {
 			
 		}
 		
+		g.setColor(Ball.colours[0]);
+		g.fillOval((int)(cueBallPlacement.x-Circle.DEFAULT_BALL_RADIUS), (int)(cueBallPlacement.y-Circle.DEFAULT_BALL_RADIUS), 
+				(int)Circle.DEFAULT_BALL_RADIUS*2, (int)Circle.DEFAULT_BALL_RADIUS*2);
+		
 		return img;
 		
 	}
@@ -425,6 +449,18 @@ public class Table extends Widget {
 			end = Maths.getProjection(cue.angle, cue.power/2 + cueLength + offset, cueft);
 			
 			g.setColor(Color.YELLOW);
+			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);
+			
+			
+			// Shot Line
+			cueft.x -= rect[0];
+			cueft.y -= rect[1];
+			
+			final double angle = cue.angle + Math.PI;
+			start = Maths.getProjection(angle, offset, cueft);
+			end = Maths.getProjection(angle, offset + 1000, cueft);
+			
+			g.setColor(new Color(127, 127, 127, 127));
 			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);
 			
 		}
