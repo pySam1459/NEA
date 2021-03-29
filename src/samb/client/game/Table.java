@@ -46,7 +46,7 @@ public class Table extends Widget {
 	public TableUseCase tuc;
 	public boolean turn = false;
 	private String turnName = "";
-	private boolean cuePlacement=false, doCheck = false, allowAim = true;
+	private boolean cuePlacement=false, doCheck = false, allowAim = true, potted=false;
 	public static boolean collisions = false, wrongCollision = false;
 	public static int userCol;
 	private Foul foul;
@@ -203,25 +203,18 @@ public class Table extends Widget {
 	
 	private void dealWithFoul(Foul foul, boolean self) {
 		switch(foul) {
-		case potCue: // foul
+		case potCue: // foul, cue ball is moved afterwards
+		case wrongHit:
 			if(!self) {
 				cuePlacement = true;
 			}
-			break;
-		
-		case potBlack:  // loss
-			break;
-		
-		case wrongHit:
 			break;
 			
 		case potWrong:
+		case noHit: // foul, cue ball is not moved afterwards
 			break;
 			
-		case noHit: // foul
-			if(!self) {
-				cuePlacement = true;
-			}
+		case potBlack:  // loss
 			break;
 			
 		}
