@@ -178,6 +178,9 @@ public class ChatBox extends Widget implements TextBoxListener {
 				y += chatSize*1.2;
 				g.drawString(m.from, (int)(BUFFER*1.5), y+chatSize);
 				y += chatSize*1.2;
+				
+			} if(Func.isFlag(m.from)) {
+				y += chatSize;
 			}
 			
 			// render message, each word is separated to check is the sentence will be longer than the chat box, if so wrap around

@@ -78,7 +78,7 @@ public class Ball extends Circle {
 		for(Ball b: all) {
 			if(b != this) {
 				if(Maths.ballCollisionBall(this, b)) {
-					if(!Table.collisions && Table.userCol != b.col) { // Check for foul
+					if(!Table.collisions && Table.userCol != b.col && Table.userCol != 0) { // Check for foul
 						Table.wrongCollision = true;
 					}
 					

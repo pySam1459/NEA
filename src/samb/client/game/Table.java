@@ -48,7 +48,7 @@ public class Table extends Widget {
 	private String turnName = "";
 	private boolean cuePlacement=false, doCheck = false, allowAim = true, potted=false;
 	public static boolean collisions = false, wrongCollision = false;
-	public static int userCol;
+	public static int userCol = 0;
 	private Foul foul;
 	
 	private Cue cue;
@@ -133,6 +133,7 @@ public class Table extends Widget {
 					Ball b = new Ball(new Circle(cueBallPlacement.x, cueBallPlacement.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
 					balls.add(b);
 					cueBall = b;
+					cuePlacement = false;
 				}
 			}
 		}
@@ -203,7 +204,9 @@ public class Table extends Widget {
 		Table.wrongCollision = false;
 		potted = false;
 		
-		dealWithFoul(this.foul, !turn);
+		if(foul != null) {
+			dealWithFoul(this.foul, !turn);
+		}
 	}
 	
 	private void warnMessage(String msg) {
@@ -264,7 +267,7 @@ public class Table extends Widget {
 					gp.state.redID = gp.getTurnID();
 					gp.state.yellowID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
-					Table.userCol = 1;
+					Table.userCol = turn ? 1 : 2;
 					
 					warnMessage(String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName()));
 				}
@@ -278,7 +281,7 @@ public class Table extends Widget {
 					gp.state.yellowID = gp.getTurnID();
 					gp.state.redID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
-					Table.userCol = 2;
+					Table.userCol = turn ? 2 : 1;
 					
 					warnMessage(String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName()));
 				}
@@ -405,18 +408,21 @@ public class Table extends Widget {
 					(int)l.x2+scaledBuffer, (int)l.y2+scaledBuffer);
 		}
 		
+		// TODO remove this rendering
 		for(Pocket p: pockets) {
 			p.render(g, scaledBuffer);
 		}
 		
 		for(Ball b: balls) {
 			b.render(g, scaledBuffer);
-			
 		}
 		
-		g.setColor(Ball.colours[0]);
-		g.fillOval((int)(cueBallPlacement.x-Circle.DEFAULT_BALL_RADIUS), (int)(cueBallPlacement.y-Circle.DEFAULT_BALL_RADIUS), 
-				(int)Circle.DEFAULT_BALL_RADIUS*2, (int)Circle.DEFAULT_BALL_RADIUS*2);
+		if(cuePlacement && cueBallPlacement != null) {
+			g.setColor(Ball.colours[0]);
+			Pointf cpoint = toTable(cueBallPlacement);
+			g.fillOval((int)(cpoint.x-Circle.DEFAULT_BALL_RADIUS), (int)(cpoint.y-Circle.DEFAULT_BALL_RADIUS), 
+					(int)Circle.DEFAULT_BALL_RADIUS*2, (int)Circle.DEFAULT_BALL_RADIUS*2);
+		}
 		
 		return img;
 		
@@ -453,9 +459,6 @@ public class Table extends Widget {
 			
 			
 			// Shot Line
-			cueft.x -= rect[0];
-			cueft.y -= rect[1];
-			
 			final double angle = cue.angle + Math.PI;
 			start = Maths.getProjection(angle, offset, cueft);
 			end = Maths.getProjection(angle, offset + 1000, cueft);

@@ -17,7 +17,7 @@ public class UserDBManager {
 	 * */
 	
 	private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame";
+	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	
 	public static final int[] MAX_UI_LENGTHS = new int[] {36, 20, 64, 64};
 	
