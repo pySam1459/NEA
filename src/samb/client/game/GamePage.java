@@ -141,6 +141,7 @@ public class GamePage extends Page {
 	
 	// Getters (sort of) 
 	public String getTurnID() {
+		if(table.tuc == TableUseCase.practicing) { return Client.getClient().udata.id; }
 		if(info.first) {
 			return table.turn ? info.u1.id : info.u2.id;
 		} else {
@@ -149,6 +150,7 @@ public class GamePage extends Page {
 	}
 	
 	public String getNotTurnID() {
+		if(table.tuc == TableUseCase.practicing) { return Client.getClient().udata.id; }
 		if(info.first) {
 			return table.turn ? info.u2.id : info.u1.id;
 		} else {
@@ -157,6 +159,7 @@ public class GamePage extends Page {
 	}
 	
 	public String getTurnName() {
+		if(table.tuc == TableUseCase.practicing) { return "You"; }
 		if(info.first) {
 			return table.turn ? info.u1.username : info.u2.username;
 		} else {
@@ -165,6 +168,7 @@ public class GamePage extends Page {
 	}
 	
 	public String getNotTurnName() {
+		if(table.tuc == TableUseCase.practicing) { return "You"; }
 		if(info.first) {
 			return table.turn ? info.u2.username : info.u1.username;
 		} else {

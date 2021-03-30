@@ -28,7 +28,7 @@ import samb.com.utils.Circle;
 import samb.com.utils.enums.TableUseCase;
 
 public class Table extends Widget {
-	/* This subclass handles the table object, updating, ticking and rendering
+	/* This subclass handles the table object, updating, ticking, rendering and most game events
 	 * I have programmed this table so that a Table object can be used players, spectators or users practising.
 	 * I decided to render the balls on a large image (2048 x 1024) and re-scale it to the shape of the table
 	 *   being rendered on the window
@@ -130,9 +130,16 @@ public class Table extends Widget {
 				cueBallPlacement = getMouseOnTable();
 				
 				if(Client.mouse.left && Client.mouse.forleft < 2) {
-					Ball b = new Ball(new Circle(cueBallPlacement.x, cueBallPlacement.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
-					balls.add(b);
-					cueBall = b;
+					Packet p = new Packet(Header.updateGame);
+					p.updateInfo = new UpdateInfo(cueBallPlacement);
+					
+					if(tuc == TableUseCase.playing) {
+						Client.getClient().server.send(p);
+						
+					} else if(tuc == TableUseCase.practicing) {
+						updateInfo = p.updateInfo;
+					}
+					
 					cuePlacement = false;
 				}
 			}
@@ -143,18 +150,14 @@ public class Table extends Widget {
 		// This methods sends an update packet to the host about the new velocity of the cue ball
 		
 		double[] vel = Maths.getVelocity(cue.angle, cue.power);
+		Packet p = createUpdate(vel);
 		
 		if(tuc == TableUseCase.playing) {
-			Packet p = createUpdate(vel);
 			client.server.send(p);
 			
 		} else if(tuc == TableUseCase.practicing) {
-			cueBall.vx = vel[0];
-			cueBall.vy = vel[1];
-			cueBall.moving = true;
+			updateInfo = p.updateInfo;
 			
-			allowAim = false;
-			doCheck = true;
 		}
 		
 		cue.reset();
@@ -195,7 +198,7 @@ public class Table extends Widget {
 			foul(Foul.wrongHit);
 		}
 		
-		if(!potted || foul != null) {
+		if((!potted || foul != null) && tuc != TableUseCase.practicing) {
 			this.turn = !turn;
 			this.turnName = gp.getTurnName();
 		}
@@ -227,6 +230,10 @@ public class Table extends Widget {
 		case wrongHit:
 			if(!self) {
 				cuePlacement = true;
+				
+				if(cueBall != null && balls.contains(cueBall)) {
+					balls.remove(cueBall);
+				}
 			}
 			break;
 			
@@ -263,7 +270,7 @@ public class Table extends Widget {
 				potted = true;
 				warnMessage(String.format("%s potted a red", turnName));
 				
-				if(gp.state.redID == null && tuc == TableUseCase.playing) {
+				if(gp.state.redID == null && tuc != TableUseCase.practicing) {
 					gp.state.redID = gp.getTurnID();
 					gp.state.yellowID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
@@ -277,7 +284,7 @@ public class Table extends Widget {
 				potted = true;
 				warnMessage(String.format("%s potted a yellow", turnName));
 				
-				if(gp.state.yellowID == null && tuc == TableUseCase.playing) {
+				if(gp.state.yellowID == null && tuc != TableUseCase.practicing) {
 					gp.state.yellowID = gp.getTurnID();
 					gp.state.redID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
@@ -315,13 +322,20 @@ public class Table extends Widget {
 	private void tickUpdate() {
 		// If an update Packet has been sent by the host, the update will occur here
 		if(updateInfo != null) {
-			cueBall.vx = updateInfo.vx;
-			cueBall.vy = updateInfo.vy;
-			cueBall.moving = true;
-			
-			allowAim = false;
-			doCheck = true;
-			updateInfo = null;
+			if(updateInfo.xy != null) {
+				Ball b = new Ball(new Circle(updateInfo.xy.x, updateInfo.xy.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
+				balls.add(b);
+				cueBall = b;
+				
+			} else {
+				cueBall.vx = updateInfo.vx;
+				cueBall.vy = updateInfo.vy;
+				cueBall.moving = true;
+				
+				allowAim = false;
+				doCheck = true;
+				updateInfo = null;
+			}
 		}
 	}
 	

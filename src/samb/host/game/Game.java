@@ -35,12 +35,10 @@ public class Game extends GameInfo {
 	}
 	
 	public void update(Packet p) {
-		if(p.gameInfo == null) {
+		if(p.gameState != null) {
 			this.state = p.gameState;
-			
-		} else {
+		} if(p.gameInfo != null) {
 			this.balls = p.gameInfo.balls;
-		
 		}
 	}
 	
