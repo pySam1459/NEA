@@ -1,8 +1,11 @@
-package samb.client.utils.datatypes;
+package samb.com.utils.data;
 
-public class Pointf {
+import java.io.Serializable;
+
+public class Pointf implements Serializable {
 	// This class represents a Point object which can handle float values
 	
+	private static final long serialVersionUID = 7275992100716149913L;
 	public double x, y;
 	
 	public Pointf() {
@@ -13,12 +16,6 @@ public class Pointf {
 	public Pointf(double x, double y) {
 		this.x = x;
 		this.y = y;
-	}
-	
-	public Pointf mul(double m) {
-		// TODO remove if unnecessary 
-		return new Pointf(this.x * m, this.y * m);
-		
 	}
 	
 	@Override

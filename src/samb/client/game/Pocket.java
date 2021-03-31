@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 
 import samb.client.utils.Maths;
 import samb.com.utils.Circle;
+import samb.com.utils.data.Pointf;
 
 public class Pocket extends Circle {
 	/* This class represents a pocket on the table
@@ -23,7 +24,7 @@ public class Pocket extends Circle {
 	
 	public void tick() {
 		for(Ball b: t.getBalls()) {
-			if(Maths.circle2(this, b)) {
+			if(Maths.pointInCircle(new Pointf(b.x, b.y), this)) {
 				t.pocket(b);
 				
 			}

@@ -57,6 +57,9 @@ public class Server extends BaseServer {
 		
 		p.id = client.udata.id;
 		byte[] data = PacketFactory.getBytes(p);
+		if(data.length > 4096) { // TODO remove
+			System.out.println(data.length + " " + p.header.toString());
+		}
 		sendPacket = new DatagramPacket(data, data.length, HOST_IP, HOST_PORT);
 		
 		try {

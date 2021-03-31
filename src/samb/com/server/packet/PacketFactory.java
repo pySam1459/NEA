@@ -16,7 +16,6 @@ public class PacketFactory {
 		/* This method uses a ByteArrayInputStream and an ObjectInputStream to convert a byte array
 		 * (containing the packet object data) into a Packet Object 
 		 * This byte data will have been sent across the Internet, so there is always a chance that the data may have been corrupted */
-		
 		try {
 			ByteArrayInputStream bis = new ByteArrayInputStream(data);
 			ObjectInputStream in = new ObjectInputStream(bis);

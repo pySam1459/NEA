@@ -1,8 +1,8 @@
 package samb.client.utils;
 
 import samb.client.game.Ball;
-import samb.client.utils.datatypes.Pointf;
 import samb.com.utils.Circle;
+import samb.com.utils.data.Pointf;
 
 public class Maths {
 	/* This class handles all mathematics which is required, especially the collision mechanics
@@ -107,6 +107,10 @@ public class Maths {
 	public static boolean circle2(Circle c1, Circle c2) {
 		// Stands for circle squared, checks if 2 circles overlap
 		return getDis(c1.x, c1.y, c2.x, c2.y) <= c1.r + c2.r;
+	}
+	
+	public static boolean pointInCircle(Pointf p, Circle c) {
+		return getDis(p.x, p.y, c.x, c.y) <= c.r;
 	}
 	
 	public static double[] getProjection(double angle, double radius, Pointf origin) {

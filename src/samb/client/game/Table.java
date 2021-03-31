@@ -16,8 +16,6 @@ import samb.client.utils.Consts;
 import samb.client.utils.ImageLoader;
 import samb.client.utils.Line;
 import samb.client.utils.Maths;
-import samb.client.utils.datatypes.Dimf;
-import samb.client.utils.datatypes.Pointf;
 import samb.com.server.info.Foul;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.Message;
@@ -25,6 +23,8 @@ import samb.com.server.info.UpdateInfo;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Circle;
+import samb.com.utils.data.Dimf;
+import samb.com.utils.data.Pointf;
 import samb.com.utils.enums.TableUseCase;
 
 public class Table extends Widget {
@@ -48,7 +48,7 @@ public class Table extends Widget {
 	private String turnName = "";
 	private boolean cuePlacement=false, doCheck = false, allowAim = true, potted=false;
 	public static boolean collisions = false, wrongCollision = false;
-	public static int userCol = 0;
+	public static int turnCol = 0;
 	private Foul foul;
 	
 	private Cue cue;
@@ -199,10 +199,15 @@ public class Table extends Widget {
 		}
 		
 		if((!potted || foul != null) && tuc != TableUseCase.practicing) {
+			// Swap turns
 			this.turn = !turn;
 			this.turnName = gp.getTurnName();
+			
+			if(Table.turnCol != 0) {
+				Table.turnCol = turnCol == 1 ? 2 : 1;
+			}
 		}
-		
+
 		Table.collisions = false;
 		Table.wrongCollision = false;
 		potted = false;
@@ -231,9 +236,8 @@ public class Table extends Widget {
 			if(!self) {
 				cuePlacement = true;
 				
-				if(cueBall != null && balls.contains(cueBall)) {
-					balls.remove(cueBall);
-				}
+			} if(cueBall != null && balls.contains(cueBall)) {
+				balls.remove(cueBall);
 			}
 			break;
 			
@@ -274,7 +278,7 @@ public class Table extends Widget {
 					gp.state.redID = gp.getTurnID();
 					gp.state.yellowID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
-					Table.userCol = turn ? 1 : 2;
+					Table.turnCol = 1;
 					
 					warnMessage(String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName()));
 				}
@@ -288,8 +292,8 @@ public class Table extends Widget {
 					gp.state.yellowID = gp.getTurnID();
 					gp.state.redID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
-					Table.userCol = turn ? 2 : 1;
-					
+					Table.turnCol = 2;
+
 					warnMessage(String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName()));
 				}
 			}
@@ -334,9 +338,10 @@ public class Table extends Widget {
 				
 				allowAim = false;
 				doCheck = true;
-				updateInfo = null;
 			}
-		}
+			
+			updateInfo = null;
+		} 
 	}
 	
 	public Packet createUpdate(double[] vel) {
@@ -414,18 +419,18 @@ public class Table extends Widget {
 		
 		BufferedImage img = new BufferedImage(tdim.width + scaledBuffer*2, tdim.height + scaledBuffer*2, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
-		
-		g.setColor(Color.ORANGE);
-		g.setStroke(new BasicStroke(2));
-		for(Line l: cushions) {
-			g.drawLine((int)l.x1+scaledBuffer, (int)l.y1+scaledBuffer, 
-					(int)l.x2+scaledBuffer, (int)l.y2+scaledBuffer);
-		}
-		
-		// TODO remove this rendering
-		for(Pocket p: pockets) {
-			p.render(g, scaledBuffer);
-		}
+//		
+//		g.setColor(Color.ORANGE);
+//		g.setStroke(new BasicStroke(2));
+//		for(Line l: cushions) {
+//			g.drawLine((int)l.x1+scaledBuffer, (int)l.y1+scaledBuffer, 
+//					(int)l.x2+scaledBuffer, (int)l.y2+scaledBuffer);
+//		}
+//		
+//		// TODO remove this rendering
+//		for(Pocket p: pockets) {
+//			p.render(g, scaledBuffer);
+//		}
 		
 		for(Ball b: balls) {
 			b.render(g, scaledBuffer);
@@ -433,8 +438,9 @@ public class Table extends Widget {
 		
 		if(cuePlacement && cueBallPlacement != null) {
 			g.setColor(Ball.colours[0]);
-			Pointf cpoint = toTable(cueBallPlacement);
-			g.fillOval((int)(cpoint.x-Circle.DEFAULT_BALL_RADIUS), (int)(cpoint.y-Circle.DEFAULT_BALL_RADIUS), 
+			Pointf cpoint = fromTable(cueBallPlacement);
+			g.fillOval((int)(cpoint.x-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
+					(int)(cpoint.y-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
 					(int)Circle.DEFAULT_BALL_RADIUS*2, (int)Circle.DEFAULT_BALL_RADIUS*2);
 		}
 		

@@ -2,7 +2,7 @@ package samb.com.server.info;
 
 import java.io.Serializable;
 
-import samb.client.utils.datatypes.Pointf;
+import samb.com.utils.data.Pointf;
 
 public class UpdateInfo implements Serializable {
 	/* This packet info class contains information which is used to synchronize the games
@@ -11,8 +11,9 @@ public class UpdateInfo implements Serializable {
 	 * */
 	
 	private static final long serialVersionUID = -2831208102218250201L;
-	public double vx, vy;
 	public Pointf xy;
+	public double vx, vy;
+	
 	
 	public UpdateInfo() {}
 	
