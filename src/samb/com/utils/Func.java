@@ -17,7 +17,7 @@ public class Func {
 	/* This class is a contains useful functions which can be called statically from either the host or client program */
 
 	// These FLAGS are used throughout the program, a username cannot equals any of these flags
-	public static final String[] FLAGS = new String[] {"$BOLD$", "$ITALICS$", "$PLAIN$"};
+	public static final String[] FLAGS = new String[] {"$BOLD$", "$ITALICS$", "$PLAIN$", "$BOLD NOSPACE$"};
 	
 	
 	public static String hashPassword(String name, String password) {

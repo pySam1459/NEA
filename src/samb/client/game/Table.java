@@ -280,7 +280,8 @@ public class Table extends Widget {
 					gp.setMenuTitleColours();
 					Table.turnCol = 1;
 					
-					warnMessage(String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName()));
+					String msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
+					gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
 				}
 				
 			} else if(b.col == 2) { // Yellow Ball
@@ -294,7 +295,8 @@ public class Table extends Widget {
 					gp.setMenuTitleColours();
 					Table.turnCol = 2;
 
-					warnMessage(String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName()));
+					String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
+					gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
 				}
 			}
 		}
@@ -426,21 +428,15 @@ public class Table extends Widget {
 //			g.drawLine((int)l.x1+scaledBuffer, (int)l.y1+scaledBuffer, 
 //					(int)l.x2+scaledBuffer, (int)l.y2+scaledBuffer);
 //		}
-//		
-//		// TODO remove this rendering
-//		for(Pocket p: pockets) {
-//			p.render(g, scaledBuffer);
-//		}
-		
+
 		for(Ball b: balls) {
 			b.render(g, scaledBuffer);
 		}
 		
 		if(cuePlacement && cueBallPlacement != null) {
 			g.setColor(Ball.colours[0]);
-			Pointf cpoint = fromTable(cueBallPlacement);
-			g.fillOval((int)(cpoint.x-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
-					(int)(cpoint.y-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
+			g.fillOval((int)(cueBallPlacement.x-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
+					(int)(cueBallPlacement.y-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
 					(int)Circle.DEFAULT_BALL_RADIUS*2, (int)Circle.DEFAULT_BALL_RADIUS*2);
 		}
 		

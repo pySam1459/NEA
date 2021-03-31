@@ -179,7 +179,7 @@ public class ChatBox extends Widget implements TextBoxListener {
 				g.drawString(m.from, (int)(BUFFER*1.5), y+chatSize);
 				y += chatSize*1.2;
 				
-			} if(Func.isFlag(m.from)) {
+			} if(Func.isFlag(m.from) && !"$BOLD NOSPACE$".equals(m.from)) {
 				y += chatSize;
 			}
 			
@@ -229,6 +229,7 @@ public class ChatBox extends Widget implements TextBoxListener {
 			g.setFont(chatFont);
 			break;
 		case "$BOLD$":
+		case "$BOLD NOSPACE$":
 			g.setFont(chatFontBold);
 			break;
 		case "$ITALICS":
