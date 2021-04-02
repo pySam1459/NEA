@@ -188,14 +188,15 @@ public class Table extends Widget {
 	private void endTurn() {
 		// This method is called at the end of a player's turn
 		// It will handle any fouls/losses and turn switches
-		
-		if(!Table.collisions) { // If the cue ball didn't collide, a foul has occurred
-			warnMessage(String.format("FOUL: No ball was struck by %s", turnName));
-			foul(Foul.noHit);
-			
-		} else if(Table.wrongCollision) { // If the cue ball collided with the wrong colour ball
-			warnMessage(String.format("FOUL: %s struck the wrong colour ball", turnName));
-			foul(Foul.wrongHit);
+		if(foul == null) {
+			if(!Table.collisions) { // If the cue ball didn't collide, a foul has occurred
+				warnMessage(String.format("FOUL: No ball was struck by %s", turnName));
+				foul(Foul.noHit);
+				
+			} else if(Table.wrongCollision) { // If the cue ball collided with the wrong colour ball
+				warnMessage(String.format("FOUL: %s struck the wrong colour ball", turnName));
+				foul(Foul.wrongHit);
+			}
 		}
 		
 		if((!potted || foul != null) && tuc != TableUseCase.practicing) {
@@ -233,7 +234,7 @@ public class Table extends Widget {
 		switch(foul) {
 		case potCue: // foul, cue ball is moved afterwards
 		case wrongHit:
-			if(!self) {
+			if(!self || tuc == TableUseCase.practicing) {
 				cuePlacement = true;
 				
 			} if(cueBall != null && balls.contains(cueBall)) {
@@ -255,49 +256,50 @@ public class Table extends Widget {
 	
 	public void pocket(Ball b) {
 		// This method is called when a ball is pocketed
+		balls.remove(b);
 		
 		if(b.col == 0) { // Cue Ball
-			balls.remove(b);
-			
 			warnMessage(String.format("FOUL: %s potted the Cue ball", turnName));
 			foul(Foul.potCue);
 			
 		} else if (b.col == 3) { // 8 Ball
-			warnMessage(String.format("LOSS: %s potted the 8 ball", turnName));
-			foul(Foul.potBlack);
+			if(getTurnScore() == 7) {
+				warnMessage(String.format("WIN: %s potted the 8 ball", turnName));
+				// win();
+				
+			} else {
+				warnMessage(String.format("LOSS: %s potted the 8 ball", turnName));
+				foul(Foul.potBlack);
+			}
 			
-		} else {
-			balls.remove(b);
+		} else if(b.col == 1) { // Red Ball
+			gp.state.red++;
+			potted = true;
+			warnMessage(String.format("%s potted a red", turnName));
 			
-			if(b.col == 1) { // Red Ball
-				gp.state.red++;
-				potted = true;
-				warnMessage(String.format("%s potted a red", turnName));
+			if(gp.state.redID == null && tuc != TableUseCase.practicing) {
+				gp.state.redID = gp.getTurnID();
+				gp.state.yellowID = gp.getNotTurnID();
+				gp.setMenuTitleColours();
+				Table.turnCol = 1;
 				
-				if(gp.state.redID == null && tuc != TableUseCase.practicing) {
-					gp.state.redID = gp.getTurnID();
-					gp.state.yellowID = gp.getNotTurnID();
-					gp.setMenuTitleColours();
-					Table.turnCol = 1;
-					
-					String msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
-					gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
-				}
-				
-			} else if(b.col == 2) { // Yellow Ball
-				gp.state.yellow++;
-				potted = true;
-				warnMessage(String.format("%s potted a yellow", turnName));
-				
-				if(gp.state.yellowID == null && tuc != TableUseCase.practicing) {
-					gp.state.yellowID = gp.getTurnID();
-					gp.state.redID = gp.getNotTurnID();
-					gp.setMenuTitleColours();
-					Table.turnCol = 2;
+				String msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
+				gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
+			}
+			
+		} else if(b.col == 2) { // Yellow Ball
+			gp.state.yellow++;
+			potted = true;
+			warnMessage(String.format("%s potted a yellow", turnName));
+			
+			if(gp.state.yellowID == null && tuc != TableUseCase.practicing) {
+				gp.state.yellowID = gp.getTurnID();
+				gp.state.redID = gp.getNotTurnID();
+				gp.setMenuTitleColours();
+				Table.turnCol = 2;
 
-					String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
-					gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
-				}
+				String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
+				gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
 			}
 		}
 	}
@@ -326,7 +328,8 @@ public class Table extends Widget {
 	}
 	
 	private void tickUpdate() {
-		// If an update Packet has been sent by the host, the update will occur here
+		// If an update Packet exists, this method will use it and update the table
+		
 		if(updateInfo != null) {
 			if(updateInfo.xy != null) {
 				Ball b = new Ball(new Circle(updateInfo.xy.x, updateInfo.xy.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
@@ -378,6 +381,10 @@ public class Table extends Widget {
 		Point p = Client.mouse.getXY();
 		return toTable(new Pointf(p.x-rect[0], p.y-rect[1]));
 		
+	}
+	
+	private int getTurnScore() {
+		return Table.turnCol == 1 ? gp.state.red : gp.state.yellow;
 	}
 	
 	private void getpos() {
