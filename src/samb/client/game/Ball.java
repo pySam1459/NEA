@@ -19,7 +19,7 @@ public class Ball extends Circle {
 	private static final long serialVersionUID = -6433658309710972703L;
 	public static final Color[] colours = new Color[] {new Color(231, 223, 193), new Color(254, 63, 32), new Color(255, 170, 0), new Color(17, 18, 20)};
 	//public static final double TABLE_FRICTION = 1, BALL_FRICTION = 1;
-	public static final double TABLE_FRICTION = 0.0075, BALL_FRICTION = 0.97, SPEED_THRESHOLD = 1;
+	public static final double TABLE_FRICTION = 0.003, BALL_FRICTION = 0.97, SPEED_THRESHOLD = 0.5;
 	private double[] NON_CUSHION_RECT;
 	
 	public List<Ball> collidedWith = new ArrayList<>();
@@ -92,11 +92,14 @@ public class Ball extends Circle {
 	public void update(int iters) {
 		// This method applies friction to the velocity and checks if the balls is still moving, or not
 		
-		if(this.vx != 0.0) {
-			this.vx = this.vx - TABLE_FRICTION*Client.dt * Math.signum(this.vx)/iters;
-		} if(this.vy != 0.0) {
-			this.vy = this.vy - TABLE_FRICTION*Client.dt * Math.signum(this.vy)/iters;
-		}
+//		if(this.vx != 0.0) {
+//			this.vx = this.vx - TABLE_FRICTION*Client.dt * Math.signum(this.vx)/iters;
+//		} if(this.vy != 0.0) {
+//			this.vy = this.vy - TABLE_FRICTION*Client.dt * Math.signum(this.vy)/iters;
+//		}
+
+		this.vx *= 1-TABLE_FRICTION*Client.dt/iters;
+		this.vy *= 1-TABLE_FRICTION*Client.dt/iters;
 		
 		if(Maths.magnitude(vx, vy) > Ball.SPEED_THRESHOLD) {
 			this.moving = true;

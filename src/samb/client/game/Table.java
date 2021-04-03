@@ -462,12 +462,12 @@ public class Table extends Widget {
 		BufferedImage img = new BufferedImage(tdim.width + scaledBuffer*2, tdim.height + scaledBuffer*2, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 //		
-//		g.setColor(Color.ORANGE);
-//		g.setStroke(new BasicStroke(2));
-//		for(Line l: cushions) {
-//			g.drawLine((int)l.x1+scaledBuffer, (int)l.y1+scaledBuffer, 
-//					(int)l.x2+scaledBuffer, (int)l.y2+scaledBuffer);
-//		}
+		g.setColor(Color.ORANGE);
+		g.setStroke(new BasicStroke(2));
+		for(Line l: cushions) {
+			g.drawLine((int)l.x1+scaledBuffer, (int)l.y1+scaledBuffer, 
+					(int)l.x2+scaledBuffer, (int)l.y2+scaledBuffer);
+		}
 
 		for(Ball b: balls) {
 			b.render(g, scaledBuffer);
@@ -515,6 +515,7 @@ public class Table extends Widget {
 			
 			
 			// Shot Line
+			g.setStroke(new BasicStroke(1));
 			final double angle = cue.angle + Math.PI;
 			start = Maths.getProjection(angle, offset, cueft);
 			end = Maths.getProjection(angle, offset + 1000, cueft);
