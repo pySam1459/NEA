@@ -35,6 +35,7 @@ public class Cue {
 		power = 0.0;
 		startDist = 0.0;
 		set = false;
+		start = null;
 		
 	}
 

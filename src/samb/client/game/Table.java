@@ -90,13 +90,17 @@ public class Table extends Widget {
 	
 	private void simulate() {
 		// Balls tick and update separately as collision equations use un-updated values
-		for(Ball b: balls) {
-			b.tick();
-			
-		} for(Ball b: balls) {
-			b.update();
-			
-		} for(Pocket p: pockets) {
+		int iters = 50;
+		for(int i=0; i<iters; i++) {
+			for(Ball b: balls) {
+				b.tick(iters);
+				
+			} for(Ball b: balls) {
+				b.update(iters);
+				
+			} 
+		}
+		for(Pocket p: pockets) {
 			p.tick();
 			
 		}
@@ -126,9 +130,6 @@ public class Table extends Widget {
 					
 				} else if(Client.mouse.left) {
 					Pointf xy = getMouseOnTable();
-					//double angle = Maths.getAngle(new Pointf(cueBall.x, cueBall.y), xy);
-//					double distance = Maths.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
-//					cue.power = cue.startDist - distance;
 					cue.power = Maths.getDis(cue.start.x, cue.start.y, xy.x, xy.y);
 					
 				} else if(!Client.mouse.left && cue.power > 2.5) {
@@ -161,7 +162,8 @@ public class Table extends Widget {
 	private void shoot() {
 		// This methods sends an update packet to the host about the new velocity of the cue ball
 		
-		double[] vel = Maths.getVelocity(cue.angle, cue.power);
+		double k = 0.1;
+		double[] vel = Maths.getVelocity(cue.angle, cue.power*k);
 		Packet p = createUpdate(vel);
 		
 		if(tuc == TableUseCase.playing) {

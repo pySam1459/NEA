@@ -87,7 +87,7 @@ public class Maths {
 	
 	public static double[] getVelocity(double angle, double power) {
 		// Returns the velocity of the cue ball, given the cue's power and angle
-		double constant = 0.1;
+		double constant = 0.15;
 		return new double[] {
 				-power * Math.cos(angle) * constant,
 				-power * Math.sin(angle) * constant

@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import samb.client.main.Client;
 import samb.client.utils.Maths;
 import samb.com.utils.Circle;
 import samb.com.utils.data.Line;
@@ -18,7 +19,7 @@ public class Ball extends Circle {
 	private static final long serialVersionUID = -6433658309710972703L;
 	public static final Color[] colours = new Color[] {new Color(231, 223, 193), new Color(254, 63, 32), new Color(255, 170, 0), new Color(17, 18, 20)};
 	//public static final double TABLE_FRICTION = 1, BALL_FRICTION = 1;
-	public static final double TABLE_FRICTION = 0.976, BALL_FRICTION = 0.85, SPEED_THRESHOLD = 1;
+	public static final double TABLE_FRICTION = 0.0075, BALL_FRICTION = 0.97, SPEED_THRESHOLD = 1;
 	private double[] NON_CUSHION_RECT;
 	
 	public List<Ball> collidedWith = new ArrayList<>();
@@ -34,16 +35,16 @@ public class Ball extends Circle {
 		
 	}
 	
-	public void tick() {
-		move();
+	public void tick(int iters) {
+		move(iters);
 		collisionCushions();
 		collisionBalls();
 		
 	}
 	
-	public void move() {
-		this.x += this.vx;
-		this.y += this.vy;
+	public void move(int iters) {
+		this.x += this.vx*Client.dt/iters;
+		this.y += this.vy*Client.dt/iters;
 		
 	}
 	
@@ -88,11 +89,14 @@ public class Ball extends Circle {
 		}
 	}
 	
-	public void update() {
+	public void update(int iters) {
 		// This method applies friction to the velocity and checks if the balls is still moving, or not
 		
-		this.vx *= TABLE_FRICTION;
-		this.vy *= TABLE_FRICTION;
+		if(this.vx != 0.0) {
+			this.vx = this.vx - TABLE_FRICTION*Client.dt * Math.signum(this.vx)/iters;
+		} if(this.vy != 0.0) {
+			this.vy = this.vy - TABLE_FRICTION*Client.dt * Math.signum(this.vy)/iters;
+		}
 		
 		if(Maths.magnitude(vx, vy) > Ball.SPEED_THRESHOLD) {
 			this.moving = true;
