@@ -23,7 +23,7 @@ public class Client extends BaseProcessor implements Runnable {
 	 * This is where all incoming DatagramPackets from the Host will be handled and directed to their respective area.
 	 * */
 	
-	public static final double TPS = 60.0;
+	public static final double TPS = 500.0;
 	private volatile boolean running = false;
 	private Thread mainThread;
 	
@@ -157,10 +157,7 @@ public class Client extends BaseProcessor implements Runnable {
 			break;
 			
 		case stopGame:
-			// This case stops a game and returns the user back to the menu page
-			if(!pm.isId("MenuPage")) {
-				pm.changePage(new MenuPage());
-			}
+			
 			break;
 		
 		case spectate:

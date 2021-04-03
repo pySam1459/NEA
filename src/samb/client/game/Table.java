@@ -19,8 +19,10 @@ import samb.com.server.info.Foul;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.Message;
 import samb.com.server.info.UpdateInfo;
+import samb.com.server.info.Win;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
+import samb.com.server.packet.UHeader;
 import samb.com.utils.Circle;
 import samb.com.utils.data.Dimf;
 import samb.com.utils.data.Line;
@@ -79,16 +81,24 @@ public class Table extends Widget {
 	public void tick() {
 		tickUpdate();
 		aim();
-		checkNewAim();
-		getpos();
 		
+		getpos(); // TODO REMOVE FOR DEV PURPOSES
+		
+		simulate();
+		checkNewAim();
+	}
+	
+	private void simulate() {
 		// Balls tick and update separately as collision equations use un-updated values
 		for(Ball b: balls) {
 			b.tick();
+			
 		} for(Ball b: balls) {
 			b.update();
+			
 		} for(Pocket p: pockets) {
 			p.tick();
+			
 		}
 	}
 	
@@ -106,6 +116,7 @@ public class Table extends Widget {
 				if(!cue.set) {
 					Pointf xy = getMouseOnTable();
 					cue.angle = Maths.getAngle(new Pointf(cueBall.x, cueBall.y), xy);
+					cue.start = xy;
 	
 					// If the user wants this angle
 					if(Client.mouse.left && Client.mouse.forleft < 2) {
@@ -116,8 +127,9 @@ public class Table extends Widget {
 				} else if(Client.mouse.left) {
 					Pointf xy = getMouseOnTable();
 					//double angle = Maths.getAngle(new Pointf(cueBall.x, cueBall.y), xy);
-					double distance = Maths.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
-					cue.power = cue.startDist - distance;
+//					double distance = Maths.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
+//					cue.power = cue.startDist - distance;
+					cue.power = Maths.getDis(cue.start.x, cue.start.y, xy.x, xy.y);
 					
 				} else if(!Client.mouse.left && cue.power > 2.5) {
 					shoot();
@@ -131,7 +143,7 @@ public class Table extends Widget {
 				
 				if(Client.mouse.left && Client.mouse.forleft < 2) {
 					Packet p = new Packet(Header.updateGame);
-					p.updateInfo = new UpdateInfo(cueBallPlacement);
+					p.updateInfo = new UpdateInfo(UHeader.placement, cueBallPlacement);
 					
 					if(tuc == TableUseCase.playing) {
 						Client.getClient().server.send(p);
@@ -199,10 +211,15 @@ public class Table extends Widget {
 			}
 		}
 		
+		if(foul != null) {
+			dealWithFoul(this.foul, turn);
+		}
+		
 		if((!potted || foul != null) && tuc != TableUseCase.practicing) {
 			// Swap turns
 			this.turn = !turn;
 			this.turnName = gp.getTurnName();
+			
 			
 			if(Table.turnCol != 0) {
 				Table.turnCol = turnCol == 1 ? 2 : 1;
@@ -212,10 +229,8 @@ public class Table extends Widget {
 		Table.collisions = false;
 		Table.wrongCollision = false;
 		potted = false;
+		this.foul = null;
 		
-		if(foul != null) {
-			dealWithFoul(this.foul, !turn);
-		}
 	}
 	
 	private void warnMessage(String msg) {
@@ -247,10 +262,14 @@ public class Table extends Widget {
 			break;
 			
 		case potBlack:  // loss
+			if(self) {
+				Packet p = new Packet(Header.stopGame);
+				p.updateInfo = new UpdateInfo(UHeader.win, Win.pottedBlack, gp.getTurnID());
+				Client.getClient().server.send(p);
+			}
 			break;
 			
 		}
-		this.foul = null;
 	}
 	
 	
@@ -329,33 +348,45 @@ public class Table extends Widget {
 	
 	private void tickUpdate() {
 		// If an update Packet exists, this method will use it and update the table
-		
 		if(updateInfo != null) {
-			if(updateInfo.xy != null) {
-				Ball b = new Ball(new Circle(updateInfo.xy.x, updateInfo.xy.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
-				balls.add(b);
-				cueBall = b;
-				
-			} else {
+			switch(updateInfo.header) {
+			case velocity:
 				cueBall.vx = updateInfo.vx;
 				cueBall.vy = updateInfo.vy;
 				cueBall.moving = true;
 				
 				allowAim = false;
 				doCheck = true;
-			}
+				break;
+				
+			case placement:
+				Ball b = new Ball(new Circle(updateInfo.xy.x, updateInfo.xy.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
+				balls.add(b);
+				cueBall = b;
+				break;
+				
+			case win:
+				endGame(updateInfo.win, updateInfo.winner);
+				break;
 			
+			}
 			updateInfo = null;
-		} 
+		}
 	}
 	
 	public Packet createUpdate(double[] vel) {
 		// This method creates an update Packet, sends the velocity of the cue ball
 		
 		Packet p = new Packet(Header.updateGame);
-		p.updateInfo = new UpdateInfo(vel[0], vel[1]);
+		p.updateInfo = new UpdateInfo(UHeader.velocity, vel[0], vel[1]);
 		
 		return p;
+	}
+	
+	
+	private void endGame(Win win, String winner) {
+		
+		
 	}
 	
 	

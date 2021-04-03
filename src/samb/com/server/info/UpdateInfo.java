@@ -2,6 +2,7 @@ package samb.com.server.info;
 
 import java.io.Serializable;
 
+import samb.com.server.packet.UHeader;
 import samb.com.utils.data.Pointf;
 
 public class UpdateInfo implements Serializable {
@@ -11,19 +12,31 @@ public class UpdateInfo implements Serializable {
 	 * */
 	
 	private static final long serialVersionUID = -2831208102218250201L;
+	public UHeader header;
 	public Pointf xy;
 	public double vx, vy;
+	public Win win;
+	public String winner;
 	
+	public UpdateInfo(UHeader header) {
+		this.header = header;
+	}
 	
-	public UpdateInfo() {}
-	
-	public UpdateInfo(Pointf p) {
+	public UpdateInfo(UHeader header, Pointf p) {
+		this.header = header;
 		this.xy = p;
 	}
 	
-	public UpdateInfo(double vx, double vy) {
+	public UpdateInfo(UHeader header, double vx, double vy) {
+		this.header = header;
 		this.vx = vx;
 		this.vy = vy;
+	}
+	
+	public UpdateInfo(UHeader header, Win win, String winner) {
+		this.header = header;
+		this.win = win;
+		this.winner = winner;
 	}
 
 }

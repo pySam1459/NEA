@@ -18,7 +18,7 @@ public class Ball extends Circle {
 	private static final long serialVersionUID = -6433658309710972703L;
 	public static final Color[] colours = new Color[] {new Color(231, 223, 193), new Color(254, 63, 32), new Color(255, 170, 0), new Color(17, 18, 20)};
 	//public static final double TABLE_FRICTION = 1, BALL_FRICTION = 1;
-	public static final double TABLE_FRICTION = 0.974, BALL_FRICTION = 0.85, SPEED_THRESHOLD = 1;
+	public static final double TABLE_FRICTION = 0.976, BALL_FRICTION = 0.85, SPEED_THRESHOLD = 1;
 	private double[] NON_CUSHION_RECT;
 	
 	public List<Ball> collidedWith = new ArrayList<>();
@@ -57,11 +57,11 @@ public class Ball extends Circle {
 				if(Maths.lineInBall(this, l)) {
 					if(l.x1 == l.x2) {
 						this.vx *= -1;
-						this.x = this.x > l.x1 ? l.x1+r : l.x1-r;
+						this.x = this.x > l.x1 ? l.x1+r+1 : l.x1-r-1;
 						
 					} else if(l.y1 == l.y2) {
 						this.vy *= -1;
-						this.y = this.y > l.y1 ? l.y1+r : l.y1-r;
+						this.y = this.y > l.y1 ? l.y1+r+1 : l.y1-r-1;
 						
 					} else {
 						Maths.ballCollisionLine(this, l);
