@@ -14,7 +14,6 @@ import samb.client.main.Window;
 import samb.client.page.widget.Widget;
 import samb.client.utils.Consts;
 import samb.client.utils.ImageLoader;
-import samb.client.utils.Line;
 import samb.client.utils.Maths;
 import samb.com.server.info.Foul;
 import samb.com.server.info.GameInfo;
@@ -24,6 +23,7 @@ import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Circle;
 import samb.com.utils.data.Dimf;
+import samb.com.utils.data.Line;
 import samb.com.utils.data.Pointf;
 import samb.com.utils.enums.TableUseCase;
 

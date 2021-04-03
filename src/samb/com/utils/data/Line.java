@@ -1,4 +1,4 @@
-package samb.client.utils;
+package samb.com.utils.data;
 
 public class Line {
 

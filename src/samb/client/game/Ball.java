@@ -5,9 +5,9 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import samb.client.utils.Line;
 import samb.client.utils.Maths;
 import samb.com.utils.Circle;
+import samb.com.utils.data.Line;
 
 public class Ball extends Circle {
 	/* An object of this subclass represents a single ball on the pool table

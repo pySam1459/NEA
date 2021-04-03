@@ -2,6 +2,7 @@ package samb.client.utils;
 
 import samb.client.game.Ball;
 import samb.com.utils.Circle;
+import samb.com.utils.data.Line;
 import samb.com.utils.data.Pointf;
 
 public class Maths {
