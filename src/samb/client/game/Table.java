@@ -49,9 +49,9 @@ public class Table extends Widget {
 	public TableUseCase tuc;
 	public boolean turn = false;
 	private String turnName = "";
-	private boolean cuePlacement=false, doCheck = false, allowAim = true, potted=false;
-	public static boolean collisions = false, wrongCollision = false;
-	public static int turnCol = 0;
+	private boolean simulate=true, cuePlacement=false, doCheck = false, allowAim = true, potted=false;
+	public boolean hasCollided = false, wrongFirstCollision = false;
+	public int turnCol = 0;
 	private Foul foul;
 	
 	private Cue cue;
@@ -88,33 +88,43 @@ public class Table extends Widget {
 		checkNewAim();
 	}
 	
-	private void simulate() {
-		// Balls tick and update separately as collision equations use un-updated values
-		// The for loop is used to reduce the distance travelled by the balls per 'move method'
-		//   so that the collisions are more realistic and tha balls don't 'teleport' past a boundary or another ball
-		for(int i=0; i<Consts.FINE_TUNE_ITERS; i++) {
-			for(Ball b: balls) {
-				b.tick();
+	
+	// Tick Methods
+	private void tickUpdate() {
+		// If an update Packet exists, this method will use it and update the table
+		if(updateInfo != null) {
+			switch(updateInfo.header) {
+			case velocity:
+				cueBall.vx = updateInfo.vx;
+				cueBall.vy = updateInfo.vy;
+				cueBall.moving = true;
 				
-			} for(Ball b: balls) {
-				b.update();
+				allowAim = false;
+				doCheck = true;
+				break;
 				
-			} 
-		}
-		for(Pocket p: pockets) {
-			p.tick();
+			case placement:
+				Ball b = new Ball(new Circle(updateInfo.xy.x, updateInfo.xy.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
+				balls.add(b);
+				cueBall = b;
+				break;
+				
+			case win:
+				endGame(updateInfo.win, updateInfo.winner);
+				break;
 			
+			}
+			updateInfo = null;
 		}
 	}
 	
 	
-	// Game Play Methods
 	private void aim() {
 		// This method controls how the user aims the cue, 
 		//   first getting an angle "set", then changing the "power" and finally shooting
 		
 		if(tuc != TableUseCase.spectating) {
-			cue.show = (tuc == TableUseCase.practicing || turn) && allowAim && !cuePlacement;
+			cue.show = (tuc == TableUseCase.practicing || turn) && allowAim && !cuePlacement && simulate;
 
 			if(cue.show) {
 				if(!cue.set) {
@@ -132,13 +142,13 @@ public class Table extends Widget {
 					Pointf xy = getMouseOnTable();
 					cue.power = Maths.getDis(cue.start.x, cue.start.y, xy.x, xy.y);
 					
-				} else if(!Client.getMouse().left && cue.power > 2.5) {
+				} else if(!Client.getMouse().left && cue.power > 5) {
 					shoot();
 					
 				} else {
 					cue.halfReset();
-
 				}
+				
 			} else if(cuePlacement) {
 				// If a foul{potCue, wrongHit} has occurred, the opposition is allowed to placed the cue on the table
 				cueBallPlacement = getMouseOnTable();
@@ -163,8 +173,7 @@ public class Table extends Widget {
 	private void shoot() {
 		// This methods sends an update packet to the host about the new velocity of the cue ball
 		
-		double k = 0.1;
-		double[] vel = Maths.getVelocity(cue.angle, cue.power*k);
+		double[] vel = Maths.getVelocity(cue.angle, cue.power);
 		Packet p = createUpdate(vel);
 		
 		if(tuc == TableUseCase.playing) {
@@ -172,11 +181,29 @@ public class Table extends Widget {
 			
 		} else if(tuc == TableUseCase.practicing) {
 			updateInfo = p.updateInfo;
-			
 		}
 		
 		cue.reset();
-		
+	}
+	
+	
+	private void simulate() {
+		// Balls tick and update separately as collision equations use un-updated values
+		// The for loop is used to reduce the distance travelled by the balls per 'move method'
+		//   so that the collisions are more realistic and tha balls don't 'teleport' past a boundary or another ball
+		for(int i=0; i<Consts.FINE_TUNE_ITERS; i++) {
+			for(Ball b: balls) {
+				b.tick();
+				
+			} for(Ball b: balls) {
+				b.update();
+				
+			} 
+		}
+		for(Pocket p: pockets) {
+			p.tick();
+			
+		}
 	}
 	
 	private void checkNewAim() {
@@ -193,7 +220,7 @@ public class Table extends Widget {
 			} 
 			
 			allowAim = newAim;
-			if(allowAim) { // Turn ends
+			if(allowAim && simulate) { // Turn ends
 				endTurn();
 				doCheck = false;
 			}
@@ -204,11 +231,11 @@ public class Table extends Widget {
 		// This method is called at the end of a player's turn
 		// It will handle any fouls/losses and turn switches
 		if(foul == null) {
-			if(!Table.collisions) { // If the cue ball didn't collide, a foul has occurred
+			if(!hasCollided) { // If the cue ball didn't collide, a foul has occurred
 				warnMessage(String.format("FOUL: No ball was struck by %s", turnName));
 				foul(Foul.noHit);
 				
-			} else if(Table.wrongCollision) { // If the cue ball collided with the wrong colour ball
+			} else if(wrongFirstCollision) { // If the cue ball collided with the wrong colour ball
 				warnMessage(String.format("FOUL: %s struck the wrong colour ball", turnName));
 				foul(Foul.wrongHit);
 			}
@@ -224,34 +251,40 @@ public class Table extends Widget {
 			this.turnName = gp.getTurnName();
 			
 			
-			if(Table.turnCol != 0) {
-				Table.turnCol = turnCol == 1 ? 2 : 1;
+			if(turnCol != 0) {
+				turnCol = turnCol == 1 ? 2 : 1;
 			}
 		}
 
-		Table.collisions = false;
-		Table.wrongCollision = false;
+		hasCollided = false;
+		wrongFirstCollision = false;
 		potted = false;
 		this.foul = null;
 		
 	}
 	
-	private void warnMessage(String msg) {
-		gp.addChat(new Message(msg, "$BOLD$"));
+	public void endGame(Win win, String winner) {
+		simulate = false;
+		gp.endGame(win, winner);
 		
 	}
 	
-	public static boolean isWrongCollision(Ball b) {
-		// This method is called by a ball
+	
+	// Fouls
+	public void checkCollisionFoul(Ball b) {
+		// This method is called by a ball when it has collided with another ball
 		
-		if(!Table.collisions) {
-			if(b.col == 3) {
-				
-			} else if(Table.turnCol != b.col && Table.turnCol != 0){
-				return true;
+		if(!hasCollided) {
+			if(b.col == 3) { // hit black ball first
+				if(getTurnScore() != 7) {
+					wrongFirstCollision = true;
+				}
+			} else if(turnCol != b.col && turnCol != 0){
+				wrongFirstCollision = true;
 			}
 		}
-		return false;
+		
+		hasCollided = true;
 	} 
 	
 	private void foul(Foul foul) {
@@ -306,7 +339,7 @@ public class Table extends Widget {
 				gp.state.redID = gp.getTurnID();
 				gp.state.yellowID = gp.getNotTurnID();
 				gp.setMenuTitleColours();
-				Table.turnCol = 1;
+				turnCol = 1;
 				
 				String msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
 				gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
@@ -321,7 +354,7 @@ public class Table extends Widget {
 				gp.state.yellowID = gp.getTurnID();
 				gp.state.redID = gp.getNotTurnID();
 				gp.setMenuTitleColours();
-				Table.turnCol = 2;
+				turnCol = 2;
 
 				String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
 				gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
@@ -353,39 +386,11 @@ public class Table extends Widget {
 		}
 	}
 	
-	
-	// Synchronisation methods
+	 
+	// Update Methods
 	public void update(UpdateInfo upinfo) {
 		this.updateInfo = upinfo;
 		
-	}
-	
-	private void tickUpdate() {
-		// If an update Packet exists, this method will use it and update the table
-		if(updateInfo != null) {
-			switch(updateInfo.header) {
-			case velocity:
-				cueBall.vx = updateInfo.vx;
-				cueBall.vy = updateInfo.vy;
-				cueBall.moving = true;
-				
-				allowAim = false;
-				doCheck = true;
-				break;
-				
-			case placement:
-				Ball b = new Ball(new Circle(updateInfo.xy.x, updateInfo.xy.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
-				balls.add(b);
-				cueBall = b;
-				break;
-				
-			case win:
-				endGame(updateInfo.win, updateInfo.winner);
-				break;
-			
-			}
-			updateInfo = null;
-		}
 	}
 	
 	public Packet createUpdate(double[] vel) {
@@ -398,9 +403,11 @@ public class Table extends Widget {
 	}
 	
 	
-	public void endGame(Win win, String winner) {
+	private void warnMessage(String msg) {
+		if(simulate) {
+			gp.addChat(new Message(msg, "$BOLD$"));
 		
-		
+		}
 	}
 	
 	
@@ -429,7 +436,7 @@ public class Table extends Widget {
 	}
 	
 	private int getTurnScore() {
-		return Table.turnCol == 1 ? gp.state.red : gp.state.yellow;
+		return turnCol == 1 ? gp.state.red : gp.state.yellow;
 	}
 	
 	private void getpos() {
@@ -623,7 +630,7 @@ public class Table extends Widget {
 	}
 	
 	// Object Getter
-	public Table getTable() {
+	public static Table getTable() {
 		return Table.thisTable;
 	}
 

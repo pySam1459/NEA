@@ -7,6 +7,7 @@ import samb.client.main.Client;
 import samb.client.main.Window;
 import samb.client.page.Page;
 import samb.client.page.widget.ChatBox;
+import samb.client.page.widget.EndScreen;
 import samb.client.page.widget.GameMenu;
 import samb.client.page.widget.Text;
 import samb.client.utils.ImageLoader;
@@ -49,6 +50,9 @@ public class GamePage extends Page {
 		this.chat = new ChatBox(new int[] {3*Window.dim.width/4+buffer, Window.dim.height/2-buffer*2, 
 				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
 		add("chat", chat);
+		
+		EndScreen endScreen = new EndScreen(new int[] {});
+		add("endScreen", endScreen);
 	}
 	
 	
@@ -128,8 +132,10 @@ public class GamePage extends Page {
 		return p;
 	}
 	
-	public void endGame(Win win, String winner) {
-		table.endGame(win, winner);
+	public void endGame(Win win, String winnerId) {
+		EndScreen es = (EndScreen) get("endScreen");
+		String winner = info.u1.id.equals(winnerId) ? info.u1.username : info.u2.username;
+		es.reveal(win, winner);
 		
 	}
 	

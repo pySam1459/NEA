@@ -36,6 +36,7 @@ public class GameManager {
 		this.games = new HashMap<>();
 		this.parts = new HashMap<>();
 		this.updators = new HashMap<>();
+		this.updateLink = new HashMap<>();
 		
 		this.host = h;
 	}
@@ -174,7 +175,9 @@ public class GameManager {
 	public void removeUser(String id) {
 		// This method removes a user from an updator list and a game (if they are a player in a game)
 		
-		updateLink.get(id).remove(id);
+		if(updateLink.containsKey(id)) {
+			updateLink.get(id).remove(id);
+		}
 		
 		if(inGame(id)) {
 			String gId = parts.get(id);

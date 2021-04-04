@@ -45,10 +45,10 @@ public class Maths {
 			double ney = (b2.y - b1.y) / di;
 			double p = (b1.vx * nex + b1.vy * ney - b2.vx * nex - b2.vy * ney);
 			
-			b1.vx = (b1.vx - p * nex) * Ball.BALL_FRICTION;
-			b1.vy = (b1.vy - p * ney) * Ball.BALL_FRICTION;
-			b2.vx = (b2.vx + p * nex) * Ball.BALL_FRICTION;
-			b2.vy = (b2.vy + p * ney) * Ball.BALL_FRICTION;
+			b1.vx = (b1.vx - p * nex) * Consts.BALL_FRICTION;
+			b1.vy = (b1.vy - p * ney) * Consts.BALL_FRICTION;
+			b2.vx = (b2.vx + p * nex) * Consts.BALL_FRICTION;
+			b2.vy = (b2.vy + p * ney) * Consts.BALL_FRICTION;
 
 			b1.collidedWith.add(b2);
 			return true;

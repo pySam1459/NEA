@@ -20,8 +20,7 @@ public class Ball extends Circle {
 	private static final long serialVersionUID = -6433658309710972703L;
 	public static final Color[] colours = new Color[] {new Color(231, 223, 193), new Color(254, 63, 32), new Color(255, 170, 0), new Color(17, 18, 20)};
 	//public static final double TABLE_FRICTION = 1, BALL_FRICTION = 1;
-	public static final double TABLE_FRICTION = 0.0025, BALL_FRICTION = 0.97, SPEED_THRESHOLD = 0.25;
-	private double[] NON_CUSHION_RECT;
+	private double[] NON_CUSHION_RECT; // TABLE_FRICTION = 0.0035
 	
 	public List<Ball> collidedWith = new ArrayList<>();
 	public boolean moving = false;
@@ -59,11 +58,11 @@ public class Ball extends Circle {
 			for(Line l: Table.cushions) {
 				if(Maths.lineInBall(this, l)) {
 					if(l.x1 == l.x2) {
-						this.vx *= -1;
+						this.vx *= -Consts.CUSHION_FRICTION;
 						this.x = this.x > l.x1 ? l.x1+r+1 : l.x1-r-1;
 						
 					} else if(l.y1 == l.y2) {
-						this.vy *= -1;
+						this.vy *= -Consts.CUSHION_FRICTION;
 						this.y = this.y > l.y1 ? l.y1+r+1 : l.y1-r-1;
 						
 					} else {
@@ -80,12 +79,9 @@ public class Ball extends Circle {
 		// If it has, then it will do the relevant calculations to produce the mathematically accurate reaction
 		for(Ball b: all) {
 			if(b != this) {
-				if(Maths.ballCollisionBall(this, b)) {
-					if(Table.isWrongCollision(b)) {
-						Table.wrongCollision = true;
-					}
+				if(Maths.ballCollisionBall(this, b) && this.col == 0) {
+					Table.getTable().checkCollisionFoul(b);
 					
-					Table.collisions = true;
 				}
 			}
 		}
@@ -93,11 +89,14 @@ public class Ball extends Circle {
 	
 	public void update() {
 		// This method applies friction to the velocity and checks if the balls is still moving, or not
+		double friction = Consts.TABLE_FRICTION*Client.dt/(Consts.FINE_TUNE_ITERS*Maths.magnitude(vx, vy));
 
-		this.vx *= 1-TABLE_FRICTION*Client.dt/Consts.FINE_TUNE_ITERS;
-		this.vy *= 1-TABLE_FRICTION*Client.dt/Consts.FINE_TUNE_ITERS;
+		if(friction < 1) {
+			this.vx *= 1-friction;
+			this.vy *= 1-friction;
+		}
 		
-		if(Maths.magnitude(vx, vy) > Ball.SPEED_THRESHOLD) {
+		if(Maths.magnitude(vx, vy) > Consts.SPEED_THRESHOLD) {
 			// Checks whether the ball is 'moving' (moving faster enough to be seen to be moving)
 			this.moving = true;
 			
