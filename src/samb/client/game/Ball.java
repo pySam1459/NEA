@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import samb.client.main.Client;
+import samb.client.utils.Consts;
 import samb.client.utils.Maths;
 import samb.com.utils.Circle;
 import samb.com.utils.data.Line;
@@ -13,13 +14,13 @@ import samb.com.utils.data.Line;
 public class Ball extends Circle {
 	/* An object of this subclass represents a single ball on the pool table
 	 * This class handles: movement, collision detection + action, rendering for a single ball
-	 * NOTE: The 'Func' class handles most of the collision mathematics 
+	 * NOTE: The 'Maths' class handles most of the collision mathematics 
 	 * */
 	
 	private static final long serialVersionUID = -6433658309710972703L;
 	public static final Color[] colours = new Color[] {new Color(231, 223, 193), new Color(254, 63, 32), new Color(255, 170, 0), new Color(17, 18, 20)};
 	//public static final double TABLE_FRICTION = 1, BALL_FRICTION = 1;
-	public static final double TABLE_FRICTION = 0.003, BALL_FRICTION = 0.97, SPEED_THRESHOLD = 0.5;
+	public static final double TABLE_FRICTION = 0.0025, BALL_FRICTION = 0.97, SPEED_THRESHOLD = 0.25;
 	private double[] NON_CUSHION_RECT;
 	
 	public List<Ball> collidedWith = new ArrayList<>();
@@ -35,16 +36,17 @@ public class Ball extends Circle {
 		
 	}
 	
-	public void tick(int iters) {
-		move(iters);
+	public void tick() {
+		move();
 		collisionCushions();
 		collisionBalls();
 		
 	}
 	
-	public void move(int iters) {
-		this.x += this.vx*Client.dt/iters;
-		this.y += this.vy*Client.dt/iters;
+	public void move() {
+		// This method adds the velocity onto the x,y position of the ball
+		this.x += this.vx*Client.dt/Consts.FINE_TUNE_ITERS;
+		this.y += this.vy*Client.dt/Consts.FINE_TUNE_ITERS;
 		
 	}
 	
@@ -79,7 +81,7 @@ public class Ball extends Circle {
 		for(Ball b: all) {
 			if(b != this) {
 				if(Maths.ballCollisionBall(this, b)) {
-					if(!Table.collisions && Table.turnCol != b.col && Table.turnCol != 0) { // Check for foul
+					if(Table.isWrongCollision(b)) {
 						Table.wrongCollision = true;
 					}
 					
@@ -89,19 +91,14 @@ public class Ball extends Circle {
 		}
 	}
 	
-	public void update(int iters) {
+	public void update() {
 		// This method applies friction to the velocity and checks if the balls is still moving, or not
-		
-//		if(this.vx != 0.0) {
-//			this.vx = this.vx - TABLE_FRICTION*Client.dt * Math.signum(this.vx)/iters;
-//		} if(this.vy != 0.0) {
-//			this.vy = this.vy - TABLE_FRICTION*Client.dt * Math.signum(this.vy)/iters;
-//		}
 
-		this.vx *= 1-TABLE_FRICTION*Client.dt/iters;
-		this.vy *= 1-TABLE_FRICTION*Client.dt/iters;
+		this.vx *= 1-TABLE_FRICTION*Client.dt/Consts.FINE_TUNE_ITERS;
+		this.vy *= 1-TABLE_FRICTION*Client.dt/Consts.FINE_TUNE_ITERS;
 		
 		if(Maths.magnitude(vx, vy) > Ball.SPEED_THRESHOLD) {
+			// Checks whether the ball is 'moving' (moving faster enough to be seen to be moving)
 			this.moving = true;
 			
 		} else {
@@ -114,6 +111,8 @@ public class Ball extends Circle {
 	}
 	
 	public void render(Graphics2D g, int off) {		
+		// Renders the ball
+		
 		g.setColor(colours[col]);
 		g.fillOval((int)(x-r)+off, (int)(y-r)+off, (int)(r*2), (int)(r*2));
 

@@ -45,6 +45,7 @@ public class Table extends Widget {
 	private static Pointf bxy;
 	public static final Line[] cushions = getCushions();
 	
+	private static Table thisTable;
 	public TableUseCase tuc;
 	public boolean turn = false;
 	private String turnName = "";
@@ -62,12 +63,11 @@ public class Table extends Widget {
 	
 	private Pocket[] pockets;
 	
-	private Client client;
 	private GamePage gp;
 
-	public Table(Client client, GamePage gp) {
+	public Table(GamePage gp) {
 		super(calculateRect(3*Window.dim.width/4));
-		this.client = client;
+		Table.thisTable = this;
 		this.gp = gp;
 		
 		this.cue = new Cue();
@@ -90,13 +90,14 @@ public class Table extends Widget {
 	
 	private void simulate() {
 		// Balls tick and update separately as collision equations use un-updated values
-		int iters = 50;
-		for(int i=0; i<iters; i++) {
+		// The for loop is used to reduce the distance travelled by the balls per 'move method'
+		//   so that the collisions are more realistic and tha balls don't 'teleport' past a boundary or another ball
+		for(int i=0; i<Consts.FINE_TUNE_ITERS; i++) {
 			for(Ball b: balls) {
-				b.tick(iters);
+				b.tick();
 				
 			} for(Ball b: balls) {
-				b.update(iters);
+				b.update();
 				
 			} 
 		}
@@ -109,7 +110,6 @@ public class Table extends Widget {
 	
 	// Game Play Methods
 	private void aim() {
-		// TODO might consider showing cue to spectators/other player
 		// This method controls how the user aims the cue, 
 		//   first getting an angle "set", then changing the "power" and finally shooting
 		
@@ -123,7 +123,7 @@ public class Table extends Widget {
 					cue.start = xy;
 	
 					// If the user wants this angle
-					if(Client.getMouse().left && Client.getMouse().forleft < 2) {
+					if(Client.getMouse().left && Client.getMouse().forleft < 2) { // if single left click
 						cue.set = true;
 						cue.startDist = Maths.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
 					}
@@ -140,6 +140,7 @@ public class Table extends Widget {
 
 				}
 			} else if(cuePlacement) {
+				// If a foul{potCue, wrongHit} has occurred, the opposition is allowed to placed the cue on the table
 				cueBallPlacement = getMouseOnTable();
 				
 				if(Client.getMouse().left && Client.getMouse().forleft < 2) {
@@ -167,7 +168,7 @@ public class Table extends Widget {
 		Packet p = createUpdate(vel);
 		
 		if(tuc == TableUseCase.playing) {
-			client.server.send(p);
+			Client.getClient().server.send(p);
 			
 		} else if(tuc == TableUseCase.practicing) {
 			updateInfo = p.updateInfo;
@@ -240,6 +241,19 @@ public class Table extends Widget {
 		
 	}
 	
+	public static boolean isWrongCollision(Ball b) {
+		// This method is called by a ball
+		
+		if(!Table.collisions) {
+			if(b.col == 3) {
+				
+			} else if(Table.turnCol != b.col && Table.turnCol != 0){
+				return true;
+			}
+		}
+		return false;
+	} 
+	
 	private void foul(Foul foul) {
 		this.foul = foul;
 		
@@ -259,18 +273,8 @@ public class Table extends Widget {
 			}
 			break;
 			
-		case potWrong:
-		case noHit: // foul, cue ball is not moved afterwards
+		default:
 			break;
-			
-		case potBlack:  // loss
-			if(self) {
-				Packet p = new Packet(Header.stopGame);
-				p.updateInfo = new UpdateInfo(UHeader.win, Win.pottedBlack, gp.getTurnID());
-				Client.getClient().server.send(p);
-			}
-			break;
-			
 		}
 	}
 	
@@ -286,11 +290,11 @@ public class Table extends Widget {
 		} else if (b.col == 3) { // 8 Ball
 			if(getTurnScore() == 7) {
 				warnMessage(String.format("WIN: %s potted the 8 ball", turnName));
-				// win();
+				win(gp.getTurnID()); // turn player wins
 				
 			} else {
 				warnMessage(String.format("LOSS: %s potted the 8 ball", turnName));
-				foul(Foul.potBlack);
+				win(gp.getNotTurnID()); // not turn player wins
 			}
 			
 		} else if(b.col == 1) { // Red Ball
@@ -322,6 +326,14 @@ public class Table extends Widget {
 				String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
 				gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
 			}
+		}
+	}
+	
+	private void win(String wid) {
+		if(turn) {
+			Packet p = new Packet(Header.updateGame);
+			p.updateInfo = new UpdateInfo(UHeader.win, Win.pottedBlack, wid);
+			Client.getClient().server.send(p);
 		}
 	}
 	
@@ -386,7 +398,7 @@ public class Table extends Widget {
 	}
 	
 	
-	private void endGame(Win win, String winner) {
+	public void endGame(Win win, String winner) {
 		
 		
 	}
@@ -492,21 +504,20 @@ public class Table extends Widget {
 			final double projectionLength = 384;
 			final double cueLength = 256;
 			final double offset = Ball.DEFAULT_BALL_RADIUS*1.5;
-			final int thickness = 4;
 			
 			Pointf cueft = fromTable(new Pointf(cueBall.x, cueBall.y));
 			cueft.x += rect[0];
 			cueft.y += rect[1];
 			
-			// Line 1
+			// Line 1 Handle
 			double[] start = Maths.getProjection(cue.angle, cue.power/2 + offset, cueft);
 			double[] end = Maths.getProjection(cue.angle, cue.power/2 + projectionLength + offset, cueft);
 			
-			g.setStroke(new BasicStroke(thickness));
+			g.setStroke(Consts.cueStroke);
 			g.setColor(Color.GRAY);
 			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);
 			
-			// Line 2
+			// Line 2 Cue 'barrel'
 			start = Maths.getProjection(cue.angle, cue.power/2 + offset, cueft);
 			end = Maths.getProjection(cue.angle, cue.power/2 + cueLength + offset, cueft);
 			
@@ -514,8 +525,8 @@ public class Table extends Widget {
 			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);
 			
 			
-			// Shot Line
-			g.setStroke(new BasicStroke(2));
+			// Shot Line Projection
+			g.setStroke(Consts.cueProjectionStroke);
 			final double angle = cue.angle + Math.PI;
 			start = Maths.getProjection(angle, offset, cueft);
 			end = Maths.getProjection(angle, offset + 1000, cueft);
@@ -609,6 +620,11 @@ public class Table extends Widget {
 			new Line(0, 81, 0, 942),
 			new Line(0, 942, -25, 966)
 		};
+	}
+	
+	// Object Getter
+	public Table getTable() {
+		return Table.thisTable;
 	}
 
 }

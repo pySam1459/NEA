@@ -13,6 +13,7 @@ import samb.client.utils.ImageLoader;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
 import samb.com.server.info.Message;
+import samb.com.server.info.Win;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.utils.Func;
@@ -29,20 +30,16 @@ public class GamePage extends Page {
 	private GameMenu menu;
 	private ChatBox chat;
 	
-	private Client client;
-	
 	public GamePage() {
 		super("GamePage");
-		this.client = Client.getClient();
 		
 		initWidgets();
-		
 	}
 	
 	
 	// Inits
 	private void initWidgets() {
-		this.table = new Table(client, this);
+		this.table = new Table(this);
 		add("table", table);
 		
 		int buffer = 8;
@@ -73,7 +70,7 @@ public class GamePage extends Page {
 		
 		setGameInfo(gi);
 		table.rack(gi);
-		table.setUseCase(gi, client.udata.id);
+		table.setUseCase(gi, Client.getClient().udata.id);
 		chat.setUseCase(gi.tuc);
 		
 		this.state = state;
@@ -89,7 +86,7 @@ public class GamePage extends Page {
 	
 	public void pooling() {
 		Packet p = new Packet(Header.joinPool);
-		client.server.send(p);
+		Client.getClient().server.send(p);
 		
 		menu.unshowPlayers();
 		menu.showPlayer1AsUsername();
@@ -129,6 +126,11 @@ public class GamePage extends Page {
 		p.gameInfo.balls = table.getCircles();
 		
 		return p;
+	}
+	
+	public void endGame(Win win, String winner) {
+		table.endGame(win, winner);
+		
 	}
 	
 	

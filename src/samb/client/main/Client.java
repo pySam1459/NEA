@@ -8,6 +8,7 @@ import samb.client.page.LoginPage;
 import samb.client.page.MenuPage;
 import samb.client.page.PageManager;
 import samb.client.server.Server;
+import samb.client.utils.Consts;
 import samb.client.utils.UserData;
 import samb.client.utils.inputs.Keyboard;
 import samb.client.utils.inputs.Mouse;
@@ -24,7 +25,7 @@ public class Client extends BaseProcessor implements Runnable {
 	 * */
 	
 	public static final double TPS = 120.0;
-	public static double dt = 800.0 / TPS;
+	public static double dt = Consts.DT_CONST / TPS;
 	private volatile boolean running = false;
 	private Thread mainThread;
 	
@@ -158,7 +159,10 @@ public class Client extends BaseProcessor implements Runnable {
 			break;
 			
 		case stopGame:
-			
+			if(pm.isId("GamePage")) {
+				pm.changePage(new MenuPage());
+				
+			}
 			break;
 		
 		case spectate:

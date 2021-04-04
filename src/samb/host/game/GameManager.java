@@ -6,8 +6,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import samb.com.database.UserInfo;
 import samb.com.server.info.GameInfo;
+import samb.com.server.info.UpdateInfo;
+import samb.com.server.info.Win;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
+import samb.com.server.packet.UHeader;
 import samb.com.utils.enums.TableUseCase;
 import samb.host.main.Host;
 
@@ -19,11 +22,12 @@ public class GameManager {
 	 * The parts map links a user to a game, key value pair being (key: user id, value: game id)
 	 * */
 	
-	private HashMap<String, Game> games;
-	private HashMap<String, String> parts;
-	private HashMap<String, CopyOnWriteArrayList<String>> updators;
+	private HashMap<String, Game> games;                              // {gameID, Game Object}
+	private HashMap<String, String> parts;                            // {uID, gameID}
+	private HashMap<String, CopyOnWriteArrayList<String>> updators;   // {gameID, updators list}
+	private HashMap<String, CopyOnWriteArrayList<String>> updateLink; // {uID, updators list}
 	// The class 'CopyOnWriteArrayList' is a list which deals with any concurrency issues which may arise
-	// For example, if you remove an element from the list during an iteration of that list
+	// (For example, if you remove an element from the list during an iteration of that list)
 	// In a regular list, this would produce an error, but a COWAL deals with this abstractly
 	
 	private Host host;
@@ -46,9 +50,14 @@ public class GameManager {
 		parts.put(u1, id);
 		parts.put(u2, id);
 		
-		updators.put(id, new CopyOnWriteArrayList<String>());
+		CopyOnWriteArrayList<String> cowal = new CopyOnWriteArrayList<>();
+		updators.put(id, cowal);
 		updators.get(id).add(u1);
 		updators.get(id).add(u2);
+		
+		updateLink.put(u1, cowal);
+		updateLink.put(u2, cowal);
+		
 		
 		Packet p = new Packet(Header.newGame);
 		p.gameInfo = g;
@@ -77,6 +86,7 @@ public class GameManager {
 		// Once a player has replied, the spectate can watch the match
 		// TODO Check if gi != null
 		updators.get(gi.id).add(spec);
+		updateLink.put(spec, updators.get(gi.id));
 		
 		Packet p = new Packet(Header.spectate);
 		p.gameInfo = gi;
@@ -94,7 +104,6 @@ public class GameManager {
 		Game g = games.get(gId);
 		
 		if(g == null) {
-			// handle abandonment error?
 			return;
 		}
 		
@@ -107,6 +116,13 @@ public class GameManager {
 			} else {
 				// If the user is not online, remove them from the updators list
 				updators.get(gId).remove(uid);
+			}
+		}
+		
+		if(p.updateInfo != null) {
+			if(p.updateInfo.header == UHeader.win) {
+				endGame(g.id);
+				
 			}
 		}
 	}
@@ -130,10 +146,13 @@ public class GameManager {
 	}
 	
 	public void endGame(String gId) {
-		// This method finalises a result of a game, updates statistics and removes the game
-		// TODO update statistics, etc
-		removeGame(gId);
+		// This method ends a game, updates statistics and removes the game
 		
+		if(games.get(gId).winnerId != null) {
+			// TODO update statistics, etc
+		}
+		
+		removeGame(gId);
 	}
 	
 	public void removeGame(String gId) {
@@ -145,17 +164,28 @@ public class GameManager {
 		parts.remove(g.u2.id);
 		games.remove(gId);
 		
+		for(String id: updators.get(gId)) {
+			updateLink.remove(id);
+		}
 		updators.remove(gId);
 		
 	}
 	
 	public void removeUser(String id) {
-		// This method is implicitly called by the command line, to check if a user is in a game before removing them
+		// This method removes a user from an updator list and a game (if they are a player in a game)
+		
+		updateLink.get(id).remove(id);
+		
 		if(inGame(id)) {
 			String gId = parts.get(id);
-			games.get(gId).abandoner = id;
-			endGame(gId);
+			Game g = games.get(gId);
 			
+			Packet p = new Packet(Header.updateGame);
+			p.updateInfo = new UpdateInfo(UHeader.win, Win.forfeit, g.getOppId(id));
+			host.um.get(g.getOppId(id)).send(p);
+			
+			g.winnerId = g.getOppId(id);
+			endGame(gId);
 		}
 	}
 	
