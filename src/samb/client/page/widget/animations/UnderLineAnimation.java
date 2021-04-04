@@ -23,7 +23,7 @@ public class UnderLineAnimation extends WidgetAnimation {
 
 	@Override
 	public void tick() {
-		hover = inRect(Client.mouse.getXY());
+		hover = inRect(Client.getMouse().getXY());
 		if(hover) {
 			if(prog < 100) {
 				prog += speed; // increases alpha of underline

@@ -69,7 +69,7 @@ public class Button extends Widget {
 	}
 	
 	private void checkHover() {
-		hover = inRect(Client.mouse.getXY());
+		hover = inRect(Client.getMouse().getXY());
 
 	}
 	
@@ -77,7 +77,7 @@ public class Button extends Widget {
 		// This method checks whether the user has pressed the button, if so it called the onClick method for each ButtonListener
 		
 		if(hover) {
-			if(Client.mouse.left) {
+			if(Client.getMouse().left) {
 				if(!held) {
 					for(ButtonListener bl: bls) {
 						bl.onClick(this);
@@ -96,7 +96,7 @@ public class Button extends Widget {
 		// if so it called the onRelease method for each ButtonListener
 		
 		if(hover && held) {
-			if(!Client.mouse.left && Client.mouse.prevLeft) {
+			if(!Client.getMouse().left && Client.getMouse().prevLeft) {
 				held = false;
 				for(ButtonListener bl: bls) {
 					bl.onRelease(this);

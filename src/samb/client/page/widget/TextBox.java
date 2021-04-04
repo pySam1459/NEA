@@ -55,7 +55,7 @@ public class TextBox extends Widget implements KeyListener {
 		ti = new TextInfo("", new Font("Inter", Font.PLAIN, (int)(rect[3]*0.45)), TEXT_COLOUR);
 		hideTi = new TextInfo("", new Font("Inter", Font.PLAIN, (int)(rect[3]*0.45)), TEXT_COLOUR);
 		
-		Client.window.addKeyListener(this);
+		Client.getWindow().addKeyListener(this);
 		this.listeners = new ArrayList<>();
 		
 	}
@@ -86,8 +86,8 @@ public class TextBox extends Widget implements KeyListener {
 	
 	private void checkSelected() {
 		// Checks if the user selected the textbox
-		if(Client.mouse.left && Client.mouse.forleft < 2) {
-			Point xy = Client.mouse.getXY();
+		if(Client.getMouse().left && Client.getMouse().forleft < 2) {
+			Point xy = Client.getMouse().getXY();
 			if(inRect(xy)) {
 				selected = true;
 				cursorPos = getCursorPos(xy);
@@ -127,7 +127,7 @@ public class TextBox extends Widget implements KeyListener {
 				
 			case KeyEvent.VK_LEFT:
 				if(cursorPos > 0) {
-					if(Client.keyboard.get(KeyEvent.VK_CONTROL)) {
+					if(Client.getKeyboard().get(KeyEvent.VK_CONTROL)) {
 						cursorPos = 0;
 					} else {
 						cursorPos--;
@@ -137,7 +137,7 @@ public class TextBox extends Widget implements KeyListener {
 				
 			case KeyEvent.VK_RIGHT:
 				if(cursorPos < str.length()) {
-					if(Client.keyboard.get(KeyEvent.VK_CONTROL)) {
+					if(Client.getKeyboard().get(KeyEvent.VK_CONTROL)) {
 						cursorPos = str.length();
 					} else {
 						cursorPos++;

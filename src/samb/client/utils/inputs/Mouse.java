@@ -18,7 +18,7 @@ public class Mouse implements MouseListener {
 	private Point p1, p2;
 	
 	public Mouse() {
-		Client.window.addMouseListener(this);
+		Client.getWindow().addMouseListener(this);
 		
 	}
 
@@ -43,7 +43,7 @@ public class Mouse implements MouseListener {
 	public Point getXY() {
 		// This method returns the current (x, y) co-ords of the mouse in the window 
 		try {
-			p1 = Client.window.getLocationOnScreen();
+			p1 = Client.getWindow().getLocationOnScreen();
 			p2 = MouseInfo.getPointerInfo().getLocation();
 			return new Point(p2.x-p1.x, p2.y-p1.y);
 			

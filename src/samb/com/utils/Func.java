@@ -66,15 +66,15 @@ public class Func {
 		// 0-white, 1-red, 2-yellow, 3-black
 		int[] cols = new int[] {1, 1, 2, 2, 3, 1, 1, 2, 1, 2, 2, 2, 1, 2, 1}; // Order of balls
 		
-		arr.add(new Circle(dim.width/4, dim.height/2, 0, 0, r, 0));
+		arr.add(new Circle(dim.width/4-2, dim.height/2, 0, 0, r, 0));
 		
-		double x = 3*dim.width/4 - r*6;
+		double x = 3*dim.width/4 - r*5.5;
 		double y;
 		int count = 0;
-		for(int j=0; j<5; j++) {
+		for(int j=0; j<5; j++) {  // j<5
 			x += Math.sqrt(3)/2 * (r*2+4);
 			y = dim.height/2 - j*(r*2+4)/2;
-			for(int i=0; i<j+1; i++) {
+			for(int i=0; i<j+1; i++) { // i < j+1
 				arr.add(new Circle(x, y, r, cols[count]));
 				y += r*2 +1;
 				count++;

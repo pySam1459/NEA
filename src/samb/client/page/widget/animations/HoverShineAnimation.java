@@ -27,7 +27,7 @@ public class HoverShineAnimation extends WidgetAnimation {
 
 	@Override
 	public void tick() {
-		hover = inRect(Client.mouse.getXY());
+		hover = inRect(Client.getMouse().getXY());
 		
 		if((hover && progress < progmax) || (!hover && progress > 0)) {
 			progress += speed;

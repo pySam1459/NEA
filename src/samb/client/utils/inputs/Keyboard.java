@@ -19,7 +19,7 @@ public class Keyboard extends ArrayList<Boolean> implements KeyListener {
 			
 		}
 		
-		Client.window.addKeyListener(this);
+		Client.getWindow().addKeyListener(this);
 	}
 
 	@Override

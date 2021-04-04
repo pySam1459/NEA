@@ -32,7 +32,7 @@ public class BoxFocusAnimation extends WidgetAnimation {
 
 	@Override
 	public void tick() {
-		hover = inRect(Client.mouse.getXY());
+		hover = inRect(Client.getMouse().getXY());
 		if(hover) {
 			if(focus > 0) {
 				focus -= 7; // shrinks the box

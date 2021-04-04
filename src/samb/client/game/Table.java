@@ -123,16 +123,16 @@ public class Table extends Widget {
 					cue.start = xy;
 	
 					// If the user wants this angle
-					if(Client.mouse.left && Client.mouse.forleft < 2) {
+					if(Client.getMouse().left && Client.getMouse().forleft < 2) {
 						cue.set = true;
 						cue.startDist = Maths.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
 					}
 					
-				} else if(Client.mouse.left) {
+				} else if(Client.getMouse().left) {
 					Pointf xy = getMouseOnTable();
 					cue.power = Maths.getDis(cue.start.x, cue.start.y, xy.x, xy.y);
 					
-				} else if(!Client.mouse.left && cue.power > 2.5) {
+				} else if(!Client.getMouse().left && cue.power > 2.5) {
 					shoot();
 					
 				} else {
@@ -142,7 +142,7 @@ public class Table extends Widget {
 			} else if(cuePlacement) {
 				cueBallPlacement = getMouseOnTable();
 				
-				if(Client.mouse.left && Client.mouse.forleft < 2) {
+				if(Client.getMouse().left && Client.getMouse().forleft < 2) {
 					Packet p = new Packet(Header.updateGame);
 					p.updateInfo = new UpdateInfo(UHeader.placement, cueBallPlacement);
 					
@@ -411,7 +411,7 @@ public class Table extends Widget {
 	
 	private Pointf getMouseOnTable() {
 		// Returns the mouse's XY on the table
-		Point p = Client.mouse.getXY();
+		Point p = Client.getMouse().getXY();
 		return toTable(new Pointf(p.x-rect[0], p.y-rect[1]));
 		
 	}
@@ -421,7 +421,7 @@ public class Table extends Widget {
 	}
 	
 	private void getpos() {
-		if(Consts.DEV_SHOW_MOUSE_POS && Client.mouse.left && !Client.mouse.prevLeft) {
+		if(Consts.DEV_SHOW_MOUSE_POS && Client.getMouse().left && !Client.getMouse().prevLeft) {
 			System.out.println(getMouseOnTable());
 		
 		}
@@ -515,7 +515,7 @@ public class Table extends Widget {
 			
 			
 			// Shot Line
-			g.setStroke(new BasicStroke(1));
+			g.setStroke(new BasicStroke(2));
 			final double angle = cue.angle + Math.PI;
 			start = Maths.getProjection(angle, offset, cueft);
 			end = Maths.getProjection(angle, offset + 1000, cueft);

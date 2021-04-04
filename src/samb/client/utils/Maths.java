@@ -1,6 +1,7 @@
 package samb.client.utils;
 
 import samb.client.game.Ball;
+import samb.client.main.Client;
 import samb.com.utils.Circle;
 import samb.com.utils.data.Line;
 import samb.com.utils.data.Pointf;
@@ -37,7 +38,7 @@ public class Maths {
 		// If they have, it will calculate the new velocities of each and update them
 		
 		if(ball2(b1, b2) && !b1.collidedWith.contains(b2)) {
-			moveApart(b1, b2);
+			double ds = moveApart(b1, b2);
 			
 			double di = getDis(b1.x, b1.y, b2.x, b2.y);
 			double nex = (b2.x - b1.x) / di;
@@ -49,13 +50,15 @@ public class Maths {
 			b2.vx = (b2.vx + p * nex) * Ball.BALL_FRICTION;
 			b2.vy = (b2.vy + p * ney) * Ball.BALL_FRICTION;
 			
+			moveLittle(b1, b2, ds);
+			
 			b1.collidedWith.add(b2);
 			return true;
 		}
 		return false;
 	}
 	
-	public static void moveApart(Ball b1, Ball b2) {
+	public static void moveApartOLD(Ball b1, Ball b2) {
 		// Unlike in reality, when the 2 balls collide, they pass over eachother
 		// Therefore, to correct this in simulations, we must separate them so that they don't pass over eachother
 		
@@ -67,6 +70,27 @@ public class Maths {
 		b1.y = my + b1.r * (b1.y - b2.y) / d;
 		b2.x = mx + b2.r * (b2.x - b1.x) / d;
 		b2.y = my + b2.r * (b2.y - b1.y) / d;
+	}
+	
+	private static double moveApart(Ball b1, Ball b2) {
+		double d0 = getDis(b1.x, b1.y, b2.x, b2.y);
+		double dt_ = Client.dt/100.0;
+		double d1 = getDis(b1.x-b1.vx*dt_, b1.y-b1.vy*dt_, b2.x-b2.vx*dt_, b2.y-b2.vy*dt_);
+		double ds = (b1.r + b2.r - d0) * dt_ / (d1 - d0);
+		
+		b1.x -= b1.vx * ds;
+		b1.y -= b1.vy * ds;
+		b2.x -= b2.vx * ds;
+		b2.y -= b2.vy * ds;
+		
+		return ds;
+	}
+	
+	private static void moveLittle(Ball b1, Ball b2, double ds) {
+		b1.x += b1.vx * (Client.dt - ds);
+		b1.y += b1.vy * (Client.dt - ds);
+		b2.x += b2.vx * (Client.dt - ds);
+		b2.y += b2.vy * (Client.dt - ds);
 		
 	}
 	

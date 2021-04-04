@@ -33,9 +33,9 @@ public class Client extends BaseProcessor implements Runnable {
 	public UserData udata;
 	
 	private static Client thisClient;
-	public static Window window;
-	public static Mouse mouse;
-	public static Keyboard keyboard;
+	private static Window window;
+	private static Mouse mouse;
+	private static Keyboard keyboard;
 	
 	
 	public Client() {
@@ -249,12 +249,25 @@ public class Client extends BaseProcessor implements Runnable {
 		}
 	}
 	
+	// Getters
 	public static Client getClient() {
 		// A little trick I learnt from reading the Minecraft source code was to set a static variable to the main class instance
 		// Therefore, the main class instance does not need to be passed as a parameter but instead is returned by 'Client.getClient()'
-		return thisClient;
-		
+		return Client.thisClient;
 	}
+	
+	public static Window getWindow() {
+		return Client.window;
+	}
+	
+	public static Mouse getMouse() {
+		return Client.mouse;
+	}
+	
+	public static Keyboard getKeyboard() {
+		return Client.keyboard;
+	}
+	
 	
 	public static void main(String[] args) {
 		// This is the main function, called when the program starts, creating a new Client instance
