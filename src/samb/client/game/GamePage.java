@@ -27,9 +27,11 @@ public class GamePage extends Page {
 
 	public GameInfo info;
 	public GameState state;
+	
 	private Table table;
 	private GameMenu menu;
 	private ChatBox chat;
+	private EndScreen endScreen;
 	
 	public GamePage() {
 		super("GamePage");
@@ -51,7 +53,8 @@ public class GamePage extends Page {
 				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
 		add("chat", chat);
 		
-		EndScreen endScreen = new EndScreen(new int[] {});
+		endScreen = new EndScreen(new int[] {3*Window.dim.width/8 - Window.dim.height/6, 
+						Window.dim.height/3, Window.dim.height/3, Window.dim.height/3});
 		add("endScreen", endScreen);
 	}
 	
@@ -134,8 +137,7 @@ public class GamePage extends Page {
 	
 	public void endGame(Win win, String winnerId) {
 		EndScreen es = (EndScreen) get("endScreen");
-		String winner = info.u1.id.equals(winnerId) ? info.u1.username : info.u2.username;
-		es.reveal(win, winner);
+		es.reveal(win, Client.getClient().udata.id.equals(winnerId));
 		
 	}
 	
@@ -207,6 +209,7 @@ public class GamePage extends Page {
 		
 		menu.render(g);
 		renderWidgets(g);
+		endScreen.render(g);
 		
 		return img;
 	

@@ -24,6 +24,8 @@ public class Game extends GameInfo {
 
 		this.balls = Func.createDefaultBalls(tDim, Circle.DEFAULT_BALL_RADIUS);
 		this.state = new GameState();
+		state.red = 6;
+		state.yellow = 6;
 		
 		setElos();
 		

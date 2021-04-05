@@ -8,5 +8,6 @@ public class GameState implements Serializable {
 	
 	public String redID, yellowID;
 	public int red=0, yellow=0;
+	public boolean redBlack=false, yellowBlack=false;
 
 }

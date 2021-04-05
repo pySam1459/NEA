@@ -15,8 +15,8 @@ import samb.com.server.info.GameInfo;
 
 public class GameMenu extends Widget {
 
-	private final Color BACKGROUND_COLOR = new Color(64, 81, 77, 127);
-	private final Color BORDER_COLOR = new Color(58, 75, 72, 200);
+	public static final Color BACKGROUND_COLOR = new Color(64, 81, 77, 127);
+	public static final Color BORDER_COLOR = new Color(58, 75, 72, 200);
 	private final BasicStroke SCORE_OUTLINE = new BasicStroke(3);
 	
 	public static final Color RED = new Color(254, 63, 32, 192);
@@ -218,8 +218,10 @@ public class GameMenu extends Widget {
 			Text t = (Text) gp.get("title2");
 			int y = t.rect[1] + t.rect[3] + buffer*6;
 
-			_renderIndividualScore(g, Client.getClient().udata.gameState.red, false, r, y, buffer, RED);
-			_renderIndividualScore(g, Client.getClient().udata.gameState.yellow, false, r, y+r*2+buffer*2, buffer, YELLOW);
+			_renderIndividualScore(g, Client.getClient().udata.gameState.red, 
+					Client.getClient().udata.gameState.redBlack, r, y, buffer, RED);
+			_renderIndividualScore(g, Client.getClient().udata.gameState.yellow, 
+					Client.getClient().udata.gameState.yellowBlack, r, y+r*2+buffer*2, buffer, YELLOW);
 			
 		}
 	}

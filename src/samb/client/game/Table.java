@@ -321,13 +321,16 @@ public class Table extends Widget {
 			foul(Foul.potCue);
 			
 		} else if (b.col == 3) { // 8 Ball
-			if(getTurnScore() == 7) {
+			if(getTurnScore() >= 7) {
+				if(turnCol == 1) { gp.state.redBlack = true; }
+				else if(turnCol == 2) { gp.state.yellowBlack=true; }
+				
 				warnMessage(String.format("WIN: %s potted the 8 ball", turnName));
-				win(gp.getTurnID()); // turn player wins
+				win(gp.getTurnID(), Win.pottedAll); // turn player wins
 				
 			} else {
 				warnMessage(String.format("LOSS: %s potted the 8 ball", turnName));
-				win(gp.getNotTurnID()); // not turn player wins
+				win(gp.getNotTurnID(), Win.pottedBlack); // not turn player wins
 			}
 			
 		} else if(b.col == 1) { // Red Ball
@@ -343,6 +346,10 @@ public class Table extends Widget {
 				
 				String msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
 				gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
+			} 
+			if(turnCol != b.col) {
+				foul(Foul.potWrong);
+				warnMessage(String.format("FOUL: %s potted the wrong colour", turnName));
 			}
 			
 		} else if(b.col == 2) { // Yellow Ball
@@ -359,13 +366,18 @@ public class Table extends Widget {
 				String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
 				gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
 			}
+			if(turnCol != b.col) {
+				foul(Foul.potWrong);
+				warnMessage(String.format("FOUL: %s potted the wrong colour", turnName));
+				
+			}
 		}
 	}
 	
-	private void win(String wid) {
+	private void win(String wid, Win win) {
 		if(turn) {
 			Packet p = new Packet(Header.updateGame);
-			p.updateInfo = new UpdateInfo(UHeader.win, Win.pottedBlack, wid);
+			p.updateInfo = new UpdateInfo(UHeader.win, win, wid);
 			Client.getClient().server.send(p);
 		}
 	}
