@@ -36,7 +36,7 @@ public class Server extends BaseServer {
 		while(!allow) {
 			try {
 				// TODO change for the future
-				this.HOST_IP = InetAddress.getByName("192.168.1.178");
+				this.HOST_IP = InetAddress.getByName("134.209.178.224");
 				this.HOST_PORT = 5303;
 				
 				this.PORT = new Random().nextInt(60535)+5000;  // +5000 so only ports 5000 < PORT < 65535 are chosen, since most ports below 5000 are more commonly used
