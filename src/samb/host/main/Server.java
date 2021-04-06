@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
+import samb.client.utils.Consts;
 import samb.com.server.BaseProcessor;
 import samb.com.server.BaseServer;
 import samb.com.server.packet.Packet;
@@ -15,7 +16,6 @@ public class Server extends BaseServer {
 	/* This class is a subclass of the abstract BaseServer class
 	 * A specific DatagramSocket port is used so that Players know which port to send their packets to
 	 * */
-	private final String SIP = "192.168.1.178";
 
 	public Server(BaseProcessor processor) {
 		super(processor);
@@ -56,7 +56,7 @@ public class Server extends BaseServer {
 		this.PORT = port;
 		processor.startThread();
 		super.start();
-		System.out.printf("Server has started, listening on  %s:%d\n", SIP, PORT);
+		System.out.printf("Server has started, listening on  %s:%d\n", Consts.HOST_IP, PORT);
 	}
 	
 	public void stop() {

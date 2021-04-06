@@ -47,6 +47,9 @@ public class Consts {
 	public static final BasicStroke cueProjectionStroke = new BasicStroke(2);
 	
 	
+	// Server constants
+	public static String HOST_IP = "134.209.178.224";
+	
 	// Dev section, TODO remove in release
 	public static boolean DEV_SHOW_MOUSE_POS = false;
 	

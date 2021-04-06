@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.Random;
 
 import samb.client.main.Client;
+import samb.client.utils.Consts;
 import samb.com.server.BaseServer;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
@@ -36,7 +37,7 @@ public class Server extends BaseServer {
 		while(!allow) {
 			try {
 				// TODO change for the future
-				this.HOST_IP = InetAddress.getByName("134.209.178.224");
+				this.HOST_IP = InetAddress.getByName(Consts.HOST_IP);
 				this.HOST_PORT = 5303;
 				
 				this.PORT = new Random().nextInt(60535)+5000;  // +5000 so only ports 5000 < PORT < 65535 are chosen, since most ports below 5000 are more commonly used
@@ -57,14 +58,11 @@ public class Server extends BaseServer {
 		
 		p.id = client.udata.id;
 		byte[] data = PacketFactory.getBytes(p);
-		if(data.length > 4096) { // TODO remove
-			System.out.println(data.length + " " + p.header.toString());
-		}
 		sendPacket = new DatagramPacket(data, data.length, HOST_IP, HOST_PORT);
 		
 		try {
 			socket.send(sendPacket);
-			
+			System.out.printf("Sent Packet %s  - %s:%d, \n", p.header.toString(), sendPacket.getAddress().toString(), sendPacket.getPort());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
