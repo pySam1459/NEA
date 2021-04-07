@@ -58,8 +58,9 @@ public class GamePage extends Page implements ButtonListener {
 		add("chat", chat);
 		
 		// Shown after a win/loss
-		retobut = new Button(new int[] {Window.dim.width/3, Window.dim.height/2, 
-				Window.dim.height/5, Window.dim.height/7}, "Return To Menu");
+		retobut = new Button(new int[] {3*Window.dim.width/8 -Window.dim.height/10, 
+				Window.dim.height/2+Window.dim.height/24, 
+				Window.dim.height/5, Window.dim.height/12}, "Return To Menu");
 		retobut.id = "retobut";
 		retobut.HIDDEN = true;
 		retobut.addListener(this);

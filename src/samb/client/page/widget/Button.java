@@ -49,7 +49,7 @@ public class Button extends Widget {
 	private void resizeText() {
 		// This method auto resizes the text in a button (if its too long)
 		int s = ti.getSize();
-		while(tiDim.width > rect[2]) {
+		while(tiDim.width > rect[2]*0.8) {
 			ti.setSize(--s);
 			this.tiDim = ti.dim;
 			

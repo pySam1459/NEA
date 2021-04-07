@@ -10,6 +10,7 @@ import samb.com.server.BaseProcessor;
 import samb.com.server.BaseServer;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
+import samb.com.utils.Config;
 
 public class Server extends BaseServer {
 	/* This class is a subclass of the abstract BaseServer class
@@ -55,7 +56,7 @@ public class Server extends BaseServer {
 		this.PORT = port;
 		processor.startThread();
 		super.start();
-		System.out.printf("Server has started, listening on  %s:%d\n", HOST_SIP, PORT);
+		System.out.printf("Server has started, listening on  %s:%d\n", (String)Config.get("HOST_IP"), PORT);
 	}
 	
 	public void stop() {

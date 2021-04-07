@@ -82,11 +82,11 @@ public class EndScreen extends Widget {
 	private String byWhat(Win win) {
 		switch(win) {
 		case pottedBlack: 
-			return "Opponent Potted The Black";
+			return "By Potting The Black Early";
 		case pottedAll: 
-			return "By Potting All Your Balls";
+			return "By Potting All Balls";
 		case forfeit: 
-			return "Your Opponent Forfeited";
+			return "By Forfeit";
 		default: 
 			return "";
 		}

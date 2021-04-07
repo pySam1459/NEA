@@ -12,6 +12,7 @@ import samb.client.main.Client;
 import samb.com.server.BaseServer;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
+import samb.com.utils.Config;
 
 public class Server extends BaseServer {
 	/* This class is a subclass of the abstract BaseServer class
@@ -33,7 +34,7 @@ public class Server extends BaseServer {
 		boolean allow = false;
 		while(!allow) {
 			try {
-				this.HOST_IP = InetAddress.getByName(HOST_SIP);
+				this.HOST_IP = InetAddress.getByName((String)Config.get("HOST_IP"));
 				this.HOST_PORT = 5303;
 				
 				this.PORT = new Random().nextInt(60535)+5000;  // +5000 so only ports 5000 < PORT < 65535 are chosen, since most ports below 5000 are more commonly used

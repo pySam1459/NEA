@@ -51,7 +51,7 @@ public class PageManager {
 			g.drawImage(prevPageImg, xoff-Window.dim.width, 0, null);
 		}
 		
-		g.drawImage(curPage.getRender(), xoff, 0, null);
+		g.drawImage(curPage.img, xoff, 0, null);
 	}
 	
 	public void changePage(Page newPage) {

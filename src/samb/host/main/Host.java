@@ -11,6 +11,7 @@ import samb.com.server.BaseProcessor;
 import samb.com.server.packet.Error;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
+import samb.com.utils.Config;
 import samb.com.utils.Func;
 import samb.host.database.FriendsDBManager;
 import samb.host.database.LoginCredentials;
@@ -42,6 +43,7 @@ public class Host extends BaseProcessor implements Runnable {
 		LoginCredentials.loadCredentials();
 		UserDBManager.start();
 		StatsDBManager.start();
+		Config.loadConfig();
 		
 		this.um = new UserManager();
 		this.gm = new GameManager(this);

@@ -20,8 +20,6 @@ public abstract class BaseServer implements Runnable {
 	protected int PORT, HOST_PORT;
 	
 	private final int BUFFER_LENGTH = 4096;
-	//public String HOST_SIP = "134.209.178.224";
-	public String HOST_SIP = "192.168.1.178";
 	
 	private Thread listenThread;
 	private volatile boolean listening = false;

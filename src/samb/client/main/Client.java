@@ -17,6 +17,7 @@ import samb.com.server.BaseProcessor;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
+import samb.com.utils.Config;
 import samb.com.utils.Func;
 
 public class Client extends BaseProcessor implements Runnable {
@@ -41,6 +42,7 @@ public class Client extends BaseProcessor implements Runnable {
 	
 	public Client() {
 		Client.thisClient = this;
+		Config.loadConfig();
 		
 		this.server = new Server();
 		Client.window = new Window();
@@ -57,7 +59,7 @@ public class Client extends BaseProcessor implements Runnable {
 	}
 	
 	private void tick() {
-		// This method is called $Client.TPS$ per second
+		// This method is called $TPS per second
 		// Any objects which require 'updating', ie balls moving, widget animations, etc
 		//    will be called in this method
 
@@ -177,6 +179,7 @@ public class Client extends BaseProcessor implements Runnable {
 			
 			
 		case chat:
+			// This case receives a chat message and adds it to the players chatbox
 			if(pm.isId("GamePage")) {
 				gp = (GamePage) pm.get();
 				gp.addChat(p.message);

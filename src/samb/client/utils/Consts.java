@@ -32,13 +32,13 @@ public class Consts {
 	
 	// Maths Constants
 	// These constants are hard coded as they have been fine tuned to give a good playing experience
-	public static final double DT_CONST = 800.0;        // dt = DT_CONST / TPS
+	public static final double DT_CONST = 400.0;        // dt = DT_CONST / TPS
 	public static final double VELOCITY_POWER = 0.0175; // constant multiplied by cue.power when calculating velocity
 	public static final int FINE_TUNE_ITERS = 50;       // number of smaller iterations of ball movement
 	
-	public static final double TABLE_FRICTION = 0.01; // Friction applied to ball per tick of movement
-	public static final double BALL_FRICTION = 0.97;    // Friction applied to ball in a collision with a ball
-	public static final double CUSHION_FRICTION = 0.95; // Friction applied to ball in a collision with a cushion
+	public static final double TABLE_FRICTION = 0.011; // Friction applied to ball per tick of movement
+	public static final double BALL_FRICTION = 0.95;    // Friction applied to ball in a collision with a ball
+	public static final double CUSHION_FRICTION = 0.8; // Friction applied to ball in a collision with a cushion
 	public static final double SPEED_THRESHOLD = 0.35;  // Lowest |V| a ball can have to be 'moving'
 
 	
