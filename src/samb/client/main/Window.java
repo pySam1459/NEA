@@ -28,7 +28,7 @@ public class Window extends Canvas {
 	
 	private JFrame frame;
 	
-	public Window(Client client) {
+	public Window() {
 		this.frame = new JFrame(TITLE);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize();
@@ -39,7 +39,7 @@ public class Window extends Canvas {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent w) {
-				client.stop();
+				Client.getClient().stop();
 				
 			}
 		});

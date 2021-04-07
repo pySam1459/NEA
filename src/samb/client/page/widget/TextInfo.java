@@ -61,7 +61,7 @@ public class TextInfo {
 	
 	public void setSize(int size) {
 		this.font = new Font(font.getFontName(), font.getStyle(), size);
-		this.calculateDims(-1);
+		this.dim = calculateDims(-1);
 		
 	}
 	

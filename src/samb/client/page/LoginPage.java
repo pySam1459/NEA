@@ -49,7 +49,8 @@ public class LoginPage extends Page implements ButtonListener {
 		// A widget object is instantiated and any extra attributes are assigned
 		// The widgets object will then be added to the page and the ticking/rendering will be handled by the Page super class
 		
-		add("LoginTitle", new Text("Login In", new int[] {Window.dim.width/4, 64, Window.dim.width/4, 128}, Consts.INTER.deriveFont(Font.PLAIN, 72), Consts.PAL1));
+		add("LoginTitle", new Text("Login In", new int[] {Window.dim.width/4, 64, Window.dim.width/4, 128}, 
+				Consts.INTER.deriveFont(Font.PLAIN, 72), Consts.PAL1));
 		
 		int buffer = 16;
 		int w=512, h=72;
@@ -63,7 +64,7 @@ public class LoginPage extends Page implements ButtonListener {
 		lPassword.addAnimation(new BoxFocusAnimation(lPassword.rect, true));
 		add("LoginPassword", lPassword);
 		
-		lButton = new Button(new int[] {xoff+w/2-w/3, yoff+h*4+buffer*11, (int)(w/1.5), 96}, "Login In", null);
+		lButton = new Button(new int[] {xoff+w/2-w/3, yoff+h*4+buffer*11, (int)(w/1.5), 96}, "Login In");
 		lButton.addListener(this);
 		add("LoginInBut", lButton);
 		
@@ -76,7 +77,8 @@ public class LoginPage extends Page implements ButtonListener {
 	private void initSignUp() {
 		// This method initializes all the widgets for the signup side
 		
-		add("SignUpTitle", new Text("Sign Up", new int[] {Window.dim.width/2, 64, Window.dim.width/4, 128}, Consts.INTER.deriveFont(Font.PLAIN, 72), Consts.PAL1));
+		add("SignUpTitle", new Text("Sign Up", new int[] {Window.dim.width/2, 64, Window.dim.width/4, 128}, 
+				Consts.INTER.deriveFont(Font.PLAIN, 72), Consts.PAL1));
 		
 		int buffer = 16;
 		int w=512, h=72;
@@ -86,7 +88,8 @@ public class LoginPage extends Page implements ButtonListener {
 		sUsername.addAnimation(new BoxFocusAnimation(sUsername.rect, true));
 		add("SignupUsername", sUsername);
 		
-		sInvUsername = new Text("Username is already taken", new int[] {xoff+buffer, yoff+h-4, w, 24}, new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
+		sInvUsername = new Text("Username is already taken", new int[] {xoff+buffer, yoff+h-4, w, 24}, 
+				new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
 		sInvUsername.HIDDEN = true;
 		sInvUsername.CENTERED = false;
 		add("SignupInvalidUsername", sInvUsername);
@@ -95,7 +98,8 @@ public class LoginPage extends Page implements ButtonListener {
 		sEmail.addAnimation(new BoxFocusAnimation(sEmail.rect, true));
 		add("SignupEmail", sEmail);
 		
-		sInvEmail = new Text("Invalid Email", new int[] {xoff+buffer, yoff+h*2+buffer*2-4, w, 24}, new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
+		sInvEmail = new Text("Invalid Email", new int[] {xoff+buffer, yoff+h*2+buffer*2-4, w, 24}, 
+				new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
 		sInvEmail.HIDDEN = true;
 		sInvEmail.CENTERED = false;
 		add("SignupInvalidEmail", sInvEmail);
@@ -110,16 +114,18 @@ public class LoginPage extends Page implements ButtonListener {
 		sRePassword.addAnimation(new BoxFocusAnimation(sRePassword.rect, true));
 		add("SignupRePassword", sRePassword);
 		
-		sInvPassword = new Text("Passwords are different", new int[] {xoff+buffer, yoff+h*4+buffer*6-4, w, 24}, new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
+		sInvPassword = new Text("Passwords are different", new int[] {xoff+buffer, yoff+h*4+buffer*6-4, w, 24}, 
+				new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
 		sInvPassword.HIDDEN = true;
 		sInvPassword.CENTERED = false;
 		add("SignupInvalidPasswords", sInvPassword);
 				
-		sButton = new Button(new int[] {xoff+w/2-w/3, yoff+h*4+buffer*11, (int)(w/1.5), 96}, "Sign Up", null);
+		sButton = new Button(new int[] {xoff+w/2-w/3, yoff+h*4+buffer*11, (int)(w/1.5), 96}, "Sign Up");
 		sButton.addListener(this);
 		add("SignUpBut", sButton);
 		
-		sInvDets = new Text("Invalid Details", new int[] {xoff, yoff+h*4+buffer*17+4, w, 24}, new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
+		sInvDets = new Text("Invalid Details", new int[] {xoff, yoff+h*4+buffer*17+4, w, 24}, 
+				new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
 		sInvDets.HIDDEN = true;
 		add("SignupInvalidDets", sInvDets);
 		
@@ -196,7 +202,8 @@ public class LoginPage extends Page implements ButtonListener {
 		if(valid) {
 			// Here we send a packet to the host server with our sign up details
 			Packet p = new Packet(Header.signup);
-			p.loginInfo = new LoginInfo(sUsername.getText(), sEmail.getText(), Func.hashPassword(sUsername.getText(), sPassword.getText()));
+			p.loginInfo = new LoginInfo(sUsername.getText(), 
+					sEmail.getText(), Func.hashPassword(sUsername.getText(), sPassword.getText()));
 			
 			Client.getClient().server.send(p);
 			
@@ -243,12 +250,9 @@ public class LoginPage extends Page implements ButtonListener {
 		Graphics2D g = getBlankCanvas();
 		g.drawImage(ImageLoader.getBackground(), 0, 0, Window.dim.width, Window.dim.height, null);
 		
-//		g.setColor(Consts.BACKGROUND_COLOUR);
-//		g.fillRect(0, 0, dim.width, dim.height);
-		
 		g.setColor(Consts.DARK_PAL1);
 		g.setStroke(new BasicStroke(4));
-		g.drawLine(dim.width/2, 16, dim.width/2, dim.height-32);
+		g.drawLine(Window.dim.width/2, 16, Window.dim.width/2, Window.dim.height-32);
 		
 		renderWidgets(g);  // renders widgets
 		return img;

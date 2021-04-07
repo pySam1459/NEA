@@ -9,7 +9,6 @@ import java.net.UnknownHostException;
 import java.util.Random;
 
 import samb.client.main.Client;
-import samb.client.utils.Consts;
 import samb.com.server.BaseServer;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
@@ -20,11 +19,9 @@ public class Server extends BaseServer {
 	 * */
 	
 	private DatagramPacket sendPacket;
-	private Client client;
 
-	public Server(Client client) {
-		super(client);
-		this.client = client;
+	public Server() {
+		super(Client.getClient());
 		
 	}
 
@@ -36,8 +33,7 @@ public class Server extends BaseServer {
 		boolean allow = false;
 		while(!allow) {
 			try {
-				// TODO change for the future
-				this.HOST_IP = InetAddress.getByName(Consts.HOST_IP);
+				this.HOST_IP = InetAddress.getByName(HOST_SIP);
 				this.HOST_PORT = 5303;
 				
 				this.PORT = new Random().nextInt(60535)+5000;  // +5000 so only ports 5000 < PORT < 65535 are chosen, since most ports below 5000 are more commonly used
@@ -56,13 +52,12 @@ public class Server extends BaseServer {
 		// Since the client only sends packets to the host, 1 method is required for any packet to be sent
 		// The client id is also added so that the host knows who the packet was sent by
 		
-		p.id = client.udata.id;
+		p.id = Client.getClient().udata.id;
 		byte[] data = PacketFactory.getBytes(p);
 		sendPacket = new DatagramPacket(data, data.length, HOST_IP, HOST_PORT);
 		
 		try {
 			socket.send(sendPacket);
-			System.out.printf("Sent Packet %s  - %s:%d, \n", p.header.toString(), sendPacket.getAddress().toString(), sendPacket.getPort());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

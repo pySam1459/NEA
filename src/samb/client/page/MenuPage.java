@@ -39,25 +39,25 @@ public class MenuPage extends Page implements ButtonListener {
 		int butW = 384, butH = 129, yoff=156;
 		Color backColor = new Color(24, 231, 204, 128);
 		Button but;
-		but = new Button(new int[] {buffer*5, yoff + butH, butW, butH}, "Join Pool", null);
+		but = new Button(new int[] {buffer*5, yoff + butH, butW, butH}, "Join Pool");
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
 		but.addListener(this);
 		add("jpButton", but);
 		
-		but = new Button(new int[] {buffer*6 + butW, yoff + butH, butW, butH}, "Spectate", null);
+		but = new Button(new int[] {buffer*6 + butW, yoff + butH, butW, butH}, "Spectate");
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
 		but.addListener(this);
 		add("specButton", but);
 		
-		but = new Button(new int[] {buffer*5, yoff+butH*2 + buffer, butW, butH}, "Invite Player", null);
+		but = new Button(new int[] {buffer*5, yoff+butH*2 + buffer, butW, butH}, "Invite Player");
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
 		but.addListener(this);
 		add("invButton", but);
 		
-		but = new Button(new int[] {buffer*6 + butW, yoff+butH*2 + buffer, butW, butH}, "Practice", null);
+		but = new Button(new int[] {buffer*6 + butW, yoff+butH*2 + buffer, butW, butH}, "Practice");
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
 		but.addListener(this);

@@ -36,7 +36,7 @@ public class Consts {
 	public static final double VELOCITY_POWER = 0.0175; // constant multiplied by cue.power when calculating velocity
 	public static final int FINE_TUNE_ITERS = 50;       // number of smaller iterations of ball movement
 	
-	public static final double TABLE_FRICTION = 0.0075; // Friction applied to ball per tick of movement
+	public static final double TABLE_FRICTION = 0.01; // Friction applied to ball per tick of movement
 	public static final double BALL_FRICTION = 0.97;    // Friction applied to ball in a collision with a ball
 	public static final double CUSHION_FRICTION = 0.95; // Friction applied to ball in a collision with a cushion
 	public static final double SPEED_THRESHOLD = 0.35;  // Lowest |V| a ball can have to be 'moving'
@@ -46,9 +46,6 @@ public class Consts {
 	public static final BasicStroke cueStroke = new BasicStroke(4);
 	public static final BasicStroke cueProjectionStroke = new BasicStroke(2);
 	
-	
-	// Server constants
-	public static String HOST_IP = "134.209.178.224";
 	
 	// Dev section, TODO remove in release
 	public static boolean DEV_SHOW_MOUSE_POS = false;

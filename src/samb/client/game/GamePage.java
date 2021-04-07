@@ -5,11 +5,14 @@ import java.awt.image.BufferedImage;
 
 import samb.client.main.Client;
 import samb.client.main.Window;
+import samb.client.page.MenuPage;
 import samb.client.page.Page;
+import samb.client.page.widget.Button;
 import samb.client.page.widget.ChatBox;
 import samb.client.page.widget.EndScreen;
 import samb.client.page.widget.GameMenu;
 import samb.client.page.widget.Text;
+import samb.client.page.widget.listeners.ButtonListener;
 import samb.client.utils.ImageLoader;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
@@ -20,7 +23,7 @@ import samb.com.server.packet.Packet;
 import samb.com.utils.Func;
 import samb.com.utils.enums.TableUseCase;
 
-public class GamePage extends Page {
+public class GamePage extends Page implements ButtonListener {
 	/* This page is where the user will play/spectate/practice their games
 	 * The main 3 widgets are the Table, GameMenu and ChatBox
 	 * */
@@ -32,6 +35,7 @@ public class GamePage extends Page {
 	private GameMenu menu;
 	private ChatBox chat;
 	private EndScreen endScreen;
+	private Button retobut;
 	
 	public GamePage() {
 		super("GamePage");
@@ -53,9 +57,20 @@ public class GamePage extends Page {
 				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
 		add("chat", chat);
 		
+		// Shown after a win/loss
+		retobut = new Button(new int[] {Window.dim.width/3, Window.dim.height/2, 
+				Window.dim.height/5, Window.dim.height/7}, "Return To Menu");
+		retobut.id = "retobut";
+		retobut.HIDDEN = true;
+		retobut.addListener(this);
+		
 		endScreen = new EndScreen(new int[] {3*Window.dim.width/8 - Window.dim.height/6, 
-						Window.dim.height/3, Window.dim.height/3, Window.dim.height/3});
-		add("endScreen", endScreen);
+						Window.dim.height/3, Window.dim.height/3, Window.dim.height/3},
+						retobut);
+		endScreen.id = "endScreen";
+		endScreen.HIDDEN = true;
+		
+		
 	}
 	
 	
@@ -63,7 +78,10 @@ public class GamePage extends Page {
 	@Override
 	public void tick() {
 		menu.tick();
+		
 		tickWidgets();
+		endScreen.tick();
+		retobut.tick();
 		
 		getRender();
 		
@@ -136,9 +154,22 @@ public class GamePage extends Page {
 	}
 	
 	public void endGame(Win win, String winnerId) {
-		EndScreen es = (EndScreen) get("endScreen");
-		es.reveal(win, Client.getClient().udata.id.equals(winnerId));
+		// This method starts to reveal the endScreen
+		endScreen.reveal(win, Client.getClient().udata.id.equals(winnerId));
+		retobut.HIDDEN = false;
 		
+	}
+	
+	// Return To Menu button listener methods
+	@Override
+	public void onClick(Button b) {}
+
+	@Override
+	public void onRelease(Button b) {
+		if(b.id.equals("retobut")) {
+			Client.getClient().pm.changePage(new MenuPage());
+			
+		}
 	}
 	
 	
@@ -209,6 +240,7 @@ public class GamePage extends Page {
 		
 		menu.render(g);
 		renderWidgets(g);
+		
 		endScreen.render(g);
 		
 		return img;

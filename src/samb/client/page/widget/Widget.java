@@ -15,7 +15,7 @@ public abstract class Widget {
 	public String id;
 	public int[] rect;
 	
-	protected boolean HIDDEN = false;
+	public boolean HIDDEN = false;
 	
 	protected List<WidgetAnimation> anims;
 	

@@ -2,7 +2,7 @@
 
 To use one of the jar files, copy/cut and past the jar file into the parent directory (with src, lib, res, ...)
 Then run the executable, either by double clicking, or running
-	```bash
+	```
 	java -jar X.jar
 	```
 	
@@ -24,7 +24,7 @@ FLUSH PRIVILEGES;
 
 '$password' can be up to you.
 A file 'res/misc/sqlCredentials.cred' is to be made containing:
-```text
+```
 admin
 $password
 ```
@@ -33,7 +33,7 @@ Otherwise, "Error loading SQL Database Credentials" will be displayed.
 ### firewall
 Host.jar uses the port 5303.
 For linux, this command should be run:
-```bash
+```
 ufw allow 5303
 ```
 
@@ -46,13 +46,13 @@ Once you have executed Host.jar, a login should appear in the console.
 The login credentials are 'admin', 'password'
 
 For the first time running, 2 commands should be run:
-```bash
+```
 db create users
 db create stats
 ```
 
 Then, to start the server:
-```bash
+```
 server start
 ```
 

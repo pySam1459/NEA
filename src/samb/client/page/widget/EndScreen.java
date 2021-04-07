@@ -16,17 +16,18 @@ public class EndScreen extends Widget {
 	 * */
 	
 	private BufferedImage img;
-	private float opacity = 0.0f, maxOpacity = 0.75f;
-	private long timer = 0, revealPeriod = 10;
+	private float opacity = 0.0f, maxOpacity = 0.85f;
+	private long timer = 0, revealPeriod = 8;
 	
 	private Font titleFont, byWhatFont;
+	private Button retoBut;
 
-	public EndScreen(int[] rect) {
+	public EndScreen(int[] rect, Button retoBut) {
 		super(rect);
-		this.HIDDEN = true;
+		this.retoBut = retoBut;
 	
-		this.titleFont = new Font("Inter", Font.PLAIN, rect[3]/6);
-		this.byWhatFont = new Font("Inter", Font.PLAIN, rect[3]/10);
+		this.titleFont = new Font("Inter", Font.PLAIN, rect[3]/7);
+		this.byWhatFont = new Font("Inter", Font.PLAIN, rect[3]/12);
 	}
 	
 
@@ -58,11 +59,11 @@ public class EndScreen extends Widget {
 		// Background
 		int arc = 32;
 		g.setColor(GameMenu.BACKGROUND_COLOR);
-		g.fillRoundRect(0, 0, rect[2]-2, rect[3]-2, arc, arc);
+		g.fillRoundRect(2, 2, rect[2]-4, rect[3]-4, arc, arc);
 		
 		g.setColor(GameMenu.BORDER_COLOR);
-		g.setStroke(new BasicStroke(4));
-		g.drawRoundRect(0, 0, rect[2]-2, rect[3]-2, arc, arc);
+		g.setStroke(new BasicStroke(2));
+		g.drawRoundRect(2, 2, rect[2]-4, rect[3]-4, arc, arc);
 		
 		// Render title ("You Won!", "You Lost")
 		TextInfo ti = new TextInfo(amWinner ? "You Won!" : "You Lost", titleFont, amWinner ? Color.GREEN : Color.RED);
@@ -71,8 +72,8 @@ public class EndScreen extends Widget {
 		ti.render(g, xy);
 		
 		// By what
-		ti = new TextInfo(byWhat(win), byWhatFont, Consts.PAL4);
-		xy = new Point(rect[2]/2 - ti.dim.width/2, titleY + ti.dim.height);
+		ti = new TextInfo(byWhat(win), byWhatFont, Consts.PAL1);
+		xy = new Point(rect[2]/2 - ti.dim.width/2, titleY + ti.dim.height+4);
 		ti.render(g, xy);
 		
 		//setOpacity(0.0f);
@@ -98,6 +99,7 @@ public class EndScreen extends Widget {
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 				
 				g.drawImage(img, rect[0], rect[1], null);
+				retoBut.render(g);
 				
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
 			}

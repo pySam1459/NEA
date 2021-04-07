@@ -42,8 +42,8 @@ public class Client extends BaseProcessor implements Runnable {
 	public Client() {
 		Client.thisClient = this;
 		
-		this.server = new Server(this);
-		Client.window = new Window(this);
+		this.server = new Server();
+		Client.window = new Window();
 		
 		Func.loadFonts();
 		

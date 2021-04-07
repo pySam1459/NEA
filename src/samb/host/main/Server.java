@@ -6,7 +6,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-import samb.client.utils.Consts;
 import samb.com.server.BaseProcessor;
 import samb.com.server.BaseServer;
 import samb.com.server.packet.Packet;
@@ -56,7 +55,7 @@ public class Server extends BaseServer {
 		this.PORT = port;
 		processor.startThread();
 		super.start();
-		System.out.printf("Server has started, listening on  %s:%d\n", Consts.HOST_IP, PORT);
+		System.out.printf("Server has started, listening on  %s:%d\n", HOST_SIP, PORT);
 	}
 	
 	public void stop() {

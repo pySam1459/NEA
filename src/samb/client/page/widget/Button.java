@@ -31,9 +31,7 @@ public class Button extends Widget {
 	private TextInfo ti;
 	private Dimension tiDim;
 	
-	private BufferedImage background_image;
-	
-	public Button(int[] rect, String text, BufferedImage img) {
+	public Button(int[] rect, String text) {
 		super(rect);
 		
 		this.bls = new ArrayList<>();
@@ -43,8 +41,6 @@ public class Button extends Widget {
 			this.tiDim = ti.calculateDims(-1);
 			resizeText();
 			
-		} if(img != null) {
-			this.background_image = img;
 		}
 		
 		addAnimation(new BoxFocusAnimation(rect));
@@ -55,17 +51,20 @@ public class Button extends Widget {
 		int s = ti.getSize();
 		while(tiDim.width > rect[2]) {
 			ti.setSize(--s);
+			this.tiDim = ti.dim;
 			
 		}
 	}
 
 	@Override
 	public void tick() {
-		checkHover();
-		checkRelease();
-		checkPress();
-		
-		super.animTick();
+		if(!HIDDEN) {
+			checkHover();
+			checkRelease();
+			checkPress();
+			
+			super.animTick();
+		}
 	}
 	
 	private void checkHover() {
@@ -121,10 +120,7 @@ public class Button extends Widget {
 			g.setColor(SHADOW_COLOUR);
 			g.fillRect(0, rect[3]-thickness, rect[2], rect[3]);
 	
-			if(img != null) {
-				g.drawImage(background_image, 0, 0, rect[2], rect[3], null);
-				
-			} if(ti != null) {
+			if(ti != null) {
 				ti.render(g, new Point(rect[2]/2-tiDim.width/2, rect[3]/2+tiDim.height/2));
 				
 			}

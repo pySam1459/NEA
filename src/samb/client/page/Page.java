@@ -1,6 +1,5 @@
 package samb.client.page;
 
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -14,7 +13,6 @@ public abstract class Page {
 	 * */
 	
 	public String id;
-	public Dimension dim;
 	protected BufferedImage img;
 	
 	protected HashMap<String, Widget> widgets;
@@ -22,8 +20,6 @@ public abstract class Page {
 	public Page(String id) {
 		this.id = id;
 		this.widgets = new HashMap<>();
-		
-		this.dim = Window.dim;
 		
 	}
 	
@@ -43,7 +39,7 @@ public abstract class Page {
 		// This method first creates a new image to draw onto (to be rendered)
 		// secondly, it returns a Graphics2D object, which is the blank canvas, to be drawn on (hence the name)
 		
-		img = new BufferedImage(this.dim.width, this.dim.height, BufferedImage.TYPE_INT_ARGB);
+		img = new BufferedImage(Window.dim.width, Window.dim.height, BufferedImage.TYPE_INT_ARGB);
 		return (Graphics2D) img.getGraphics();
 	}
 	
@@ -55,6 +51,7 @@ public abstract class Page {
 	public abstract BufferedImage getRender();
 	
 	
+	// These methods iterate through the widgets, either ticking or rendering them
 	public void tickWidgets() {
 		widgets.forEach((String id, Widget w) -> {
 			w.tick();
