@@ -30,6 +30,14 @@ public class Maths {
 	}
 	
 	public static void ballCollisionLine(Ball b, Line l) {
+		double dx = l.x2 - l.x1;
+		double dy = l.y2 - l.y1;
+		double nmag = magnitude(dx, dy);
+		double repNMagSqr = 1.0 / (nmag * nmag);
+		double mul = l.x1 > l.x2 ? -1: 1;
+		
+		b.vx += -2*dy*(b.vx*dy - b.vy*dx)*repNMagSqr * mul;
+		b.vy += 2*dx*(b.vx*dy - b.vy*dx)*repNMagSqr * mul;
 		
 	}
 	

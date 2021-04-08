@@ -11,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import samb.client.game.Ball;
 import samb.client.utils.Consts;
 
 public class Func {
@@ -58,7 +59,7 @@ public class Func {
 		
 	}
 	
-	public static List<Circle> createDefaultBalls(Dimension dim, double r) {
+	public static List<Circle> createDefaultBalls(Dimension dim) {
 		// Creates a list containing balls in their starting positions
 		
 		List<Circle> arr = new ArrayList<>();
@@ -66,7 +67,8 @@ public class Func {
 		// 0-white, 1-red, 2-yellow, 3-black
 		int[] cols = new int[] {1, 1, 2, 2, 3, 1, 1, 2, 1, 2, 2, 2, 1, 2, 1}; // Order of balls
 		
-		arr.add(new Circle(dim.width/4-2, dim.height/2, 0, 0, r, 0));
+		double r = Ball.DEFAULT_BALL_RADIUS;
+		arr.add(new Circle(dim.width/4-2, dim.height/2, 0, 0, r+1, 0));
 		
 		double x = 3*dim.width/4 - r*5.5;
 		double y;

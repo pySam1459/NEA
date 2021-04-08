@@ -17,9 +17,11 @@ import samb.client.utils.ImageLoader;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
 import samb.com.server.info.Message;
+import samb.com.server.info.UpdateInfo;
 import samb.com.server.info.Win;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
+import samb.com.server.packet.UHeader;
 import samb.com.utils.Func;
 import samb.com.utils.enums.TableUseCase;
 
@@ -123,7 +125,7 @@ public class GamePage extends Page implements ButtonListener {
 	public void practice() {
 		GameInfo gi = new GameInfo("practice", null, null);
 		gi.tuc = TableUseCase.practicing;
-		gi.balls = Func.createDefaultBalls(gi.tDim, Ball.DEFAULT_BALL_RADIUS);
+		gi.balls = Func.createDefaultBalls(gi.tDim);
 		start(gi, new GameState());
 		
 	}
@@ -163,15 +165,25 @@ public class GamePage extends Page implements ButtonListener {
 	
 	// Return To Menu button listener methods
 	@Override
-	public void onClick(Button b) {}
-
-	@Override
-	public void onRelease(Button b) {
+	public void onClick(Button b) {
 		if(b.id.equals("retobut")) {
 			Client.getClient().pm.changePage(new MenuPage());
 			
+		} else if(b.id.equals("forbut")) {
+			if(table.tuc == TableUseCase.playing) {
+				Packet p = new Packet(Header.updateGame);
+				String winId = info.id.equals(info.u1.id) ? info.u1.id : info.u2.id;
+				p.updateInfo = new UpdateInfo(UHeader.win, Win.forfeit, winId);
+				Client.getClient().server.send(p);
+				
+			} else {
+				Client.getClient().pm.changePage(new MenuPage());
+			}
 		}
 	}
+
+	@Override
+	public void onRelease(Button b) {}
 	
 	
 	// Chat Methods

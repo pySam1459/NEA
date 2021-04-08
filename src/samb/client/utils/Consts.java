@@ -46,8 +46,4 @@ public class Consts {
 	public static final BasicStroke cueStroke = new BasicStroke(4);
 	public static final BasicStroke cueProjectionStroke = new BasicStroke(2);
 	
-	
-	// Dev section, TODO remove in release
-	public static boolean DEV_SHOW_MOUSE_POS = false;
-	
 }

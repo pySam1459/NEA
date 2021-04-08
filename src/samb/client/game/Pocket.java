@@ -1,8 +1,5 @@
 package samb.client.game;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-
 import samb.client.utils.Maths;
 import samb.com.utils.Circle;
 import samb.com.utils.data.Pointf;
@@ -23,19 +20,12 @@ public class Pocket extends Circle {
 	}
 	
 	public void tick() {
-		for(Ball b: t.getBalls()) {
+		for(Ball b: t.getBalls()) { // iterates through all balls on table
 			if(Maths.pointInCircle(new Pointf(b.x, b.y), this)) {
 				t.pocket(b);
 				
 			}
 		}
 	}
-	
-	public void render(Graphics2D g, int off) {
-		// Development and Debugging Purposes
-		
-		g.setColor(new Color(0, 0, 255, 127));
-		g.fillOval((int)(x-r)+off, (int)(y-r)+off, (int)(r*2), (int)(r*2));
-		
-	}
+
 }

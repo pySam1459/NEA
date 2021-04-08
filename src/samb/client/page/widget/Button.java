@@ -138,6 +138,8 @@ public class Button extends Widget {
 	
 	public void setText(String txt) {
 		this.ti.setText(txt);
+		this.tiDim = ti.calculateDims(-1);
+		resizeText();
 		
 	}
 

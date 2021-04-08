@@ -82,8 +82,6 @@ public class Table extends Widget {
 		tickUpdate();
 		aim();
 		
-		getpos(); // TODO REMOVE FOR DEV PURPOSES
-		
 		simulate();
 		checkNewAim();
 	}
@@ -92,6 +90,7 @@ public class Table extends Widget {
 	// Tick Methods
 	private void tickUpdate() {
 		// If an update Packet exists, this method will use it and update the table
+		
 		if(updateInfo != null) {
 			switch(updateInfo.header) {
 			case velocity:
@@ -333,48 +332,45 @@ public class Table extends Widget {
 				win(gp.getNotTurnID(), Win.pottedBlack); // not turn player wins
 			}
 			
-		} else if(b.col == 1) { // Red Ball
-			gp.state.red++;
-			potted = true;
-			warnMessage(String.format("%s potted a red", turnName));
-			
-			if(gp.state.redID == null && tuc != TableUseCase.practicing) {
-				gp.state.redID = gp.getTurnID();
-				gp.state.yellowID = gp.getNotTurnID();
-				gp.setMenuTitleColours();
-				turnCol = 1;
+		} else {
+			if(b.col == 1) { // Red Ball
+				gp.state.red++; // increase score
+				potted = true;
+				warnMessage(String.format("%s potted a red", turnName));
 				
-				String msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
-				gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
-			} 
-			if(turnCol != b.col) {
+				if(gp.state.redID == null && tuc != TableUseCase.practicing) {
+					gp.state.redID = gp.getTurnID(); // Sets who's got what colour
+					gp.state.yellowID = gp.getNotTurnID();
+					gp.setMenuTitleColours();
+					turnCol = 1; // what colour is the player who's turn it is, is
+					
+					String msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
+					gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
+				} 
+				
+			} else if(b.col == 2) { // Yellow Ball
+				gp.state.yellow++;
+				potted = true;
+				warnMessage(String.format("%s potted a yellow", turnName));
+				
+				if(gp.state.yellowID == null && tuc != TableUseCase.practicing) {
+					gp.state.yellowID = gp.getTurnID();
+					gp.state.redID = gp.getNotTurnID();
+					gp.setMenuTitleColours();
+					turnCol = 2;
+	
+					String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
+					gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
+				}
+			} if(turnCol != b.col) {
 				foul(Foul.potWrong);
 				warnMessage(String.format("FOUL: %s potted the wrong colour", turnName));
-			}
-			
-		} else if(b.col == 2) { // Yellow Ball
-			gp.state.yellow++;
-			potted = true;
-			warnMessage(String.format("%s potted a yellow", turnName));
-			
-			if(gp.state.yellowID == null && tuc != TableUseCase.practicing) {
-				gp.state.yellowID = gp.getTurnID();
-				gp.state.redID = gp.getNotTurnID();
-				gp.setMenuTitleColours();
-				turnCol = 2;
-
-				String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
-				gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
-			}
-			if(turnCol != b.col) {
-				foul(Foul.potWrong);
-				warnMessage(String.format("FOUL: %s potted the wrong colour", turnName));
-				
 			}
 		}
 	}
 	
 	private void win(String wid, Win win) {
+		// This method is called when a win is 'detected', an update is sent to the host
 		if(turn) {
 			Packet p = new Packet(Header.updateGame);
 			p.updateInfo = new UpdateInfo(UHeader.win, win, wid);
@@ -449,13 +445,6 @@ public class Table extends Widget {
 	
 	private int getTurnScore() {
 		return turnCol == 1 ? gp.state.red : gp.state.yellow;
-	}
-	
-	private void getpos() {
-		if(Consts.DEV_SHOW_MOUSE_POS && Client.getMouse().left && !Client.getMouse().prevLeft) {
-			System.out.println(getMouseOnTable());
-		
-		}
 	}
 	
 	
@@ -637,7 +626,7 @@ public class Table extends Widget {
 			
 			new Line(-25, 54, 0, 81),
 			new Line(0, 81, 0, 942),
-			new Line(0, 942, -25, 966)
+			new Line(0, 942, -25, 966),
 		};
 	}
 	

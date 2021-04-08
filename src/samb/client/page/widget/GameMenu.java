@@ -12,6 +12,7 @@ import samb.client.main.Client;
 import samb.client.page.widget.animations.LoadingDotsAnimation;
 import samb.client.utils.Consts;
 import samb.com.server.info.GameInfo;
+import samb.com.utils.enums.TableUseCase;
 
 public class GameMenu extends Widget {
 
@@ -22,8 +23,9 @@ public class GameMenu extends Widget {
 	public static final Color RED = new Color(254, 63, 32, 192);
 	public static final Color YELLOW = new Color(255, 170, 0, 192);
 	
+	private final int buffer = 4;
+	
 	private GamePage gp;
-	//private GameInfo gi;
 	
 	public GameMenu(int[] rect, GamePage gp) {
 		super(rect);
@@ -36,7 +38,7 @@ public class GameMenu extends Widget {
 	private void initMenuWidgets() {
 		// This method initialises menu widgets
 		
-		int titleSize = 28, buffer=4, eloSize=16;
+		int titleSize = 28, eloSize=16;
 		Text title1 = new Text("???", new int[] {rect[0]+buffer*6, rect[1]+buffer*2, rect[2]-buffer*8, titleSize},
 				Consts.INTER.deriveFont(Font.PLAIN, titleSize), Consts.PAL1);
 		title1.HIDDEN = false;
@@ -74,6 +76,12 @@ public class GameMenu extends Widget {
 														rect[2]/4, titleSize});
 		loading.addAnimation(new LoadingDotsAnimation(loading.rect));
 		gp.add("loading", loading);
+		
+		Button forbut = new Button(new int[] {rect[0]+buffer*6, (int)(rect[1]+titleSize*4+buffer*22+Ball.DEFAULT_BALL_RADIUS*1.6), 
+				rect[2]-buffer*16, titleSize*2}, "");
+		forbut.HIDDEN = true;
+		forbut.addListener(gp);
+		gp.add("forbut", forbut);
 		
 	}
 
@@ -121,6 +129,10 @@ public class GameMenu extends Widget {
 			break;
 			
 		}
+		
+		((Button) gp.get("forbut")).setText(gi.tuc == TableUseCase.playing ? "Forfeit" : "Return To Menu");
+		((Button) gp.get("forbut")).HIDDEN = false;
+		
 	}
 	
 	// These methods show different arrangements of title and elo widgets dependent on the TableUseCase
@@ -192,14 +204,12 @@ public class GameMenu extends Widget {
 		BufferedImage img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		
-		int buffer = 8;
-		
 		g.setColor(BACKGROUND_COLOR);
-		g.fillRoundRect(buffer/2, buffer/2, rect[2]-buffer, rect[3]-buffer, buffer, buffer);
+		g.fillRoundRect(buffer, buffer, rect[2]-buffer*2, rect[3]-buffer*2, buffer*2, buffer*2);
 		
 		g.setStroke(new BasicStroke(2));
 		g.setColor(BORDER_COLOR);
-		g.drawRoundRect(buffer/2, buffer/2, rect[2]-buffer, rect[3]-buffer, buffer, buffer);
+		g.drawRoundRect(buffer, buffer, rect[2]-buffer*2, rect[3]-buffer*2, buffer*2, buffer*2);
 		
 		renderScores(g);
 		
@@ -212,16 +222,15 @@ public class GameMenu extends Widget {
 		// Renders the scores of the players
 		
 		if(Client.getClient().udata.gameInfo != null) {
-			int buffer = 8;
 			int r = (int) (Ball.DEFAULT_BALL_RADIUS*0.8);
 			
 			Text t = (Text) gp.get("title2");
-			int y = t.rect[1] + t.rect[3] + buffer*6;
+			int y = t.rect[1] + t.rect[3] + buffer*12;
 
 			_renderIndividualScore(g, Client.getClient().udata.gameState.red, 
-					Client.getClient().udata.gameState.redBlack, r, y, buffer, RED);
+					Client.getClient().udata.gameState.redBlack, r, y, buffer*2, RED);
 			_renderIndividualScore(g, Client.getClient().udata.gameState.yellow, 
-					Client.getClient().udata.gameState.yellowBlack, r, y+r*2+buffer*2, buffer, YELLOW);
+					Client.getClient().udata.gameState.yellowBlack, r, y+r*2+buffer*4, buffer*2, YELLOW);
 			
 		}
 	}

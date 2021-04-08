@@ -4,7 +4,6 @@ import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.UHeader;
-import samb.com.utils.Circle;
 import samb.com.utils.Func;
 import samb.host.database.StatsDBManager;
 import samb.host.database.UserDBManager;
@@ -22,7 +21,7 @@ public class Game extends GameInfo {
 	public Game(String id, String u1, String u2) {
 		super(id, UserDBManager.getUI(u1), UserDBManager.getUI(u2));
 
-		this.balls = Func.createDefaultBalls(tDim, Circle.DEFAULT_BALL_RADIUS);
+		this.balls = Func.createDefaultBalls(tDim);
 		this.state = new GameState();
 //		state.red = 6;
 //		state.yellow = 6;
