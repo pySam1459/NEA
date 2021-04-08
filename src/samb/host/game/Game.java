@@ -2,7 +2,6 @@ package samb.host.game;
 
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
-import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.UHeader;
 import samb.com.utils.Func;
