@@ -35,18 +35,19 @@ public class Host extends BaseProcessor implements Runnable {
 	
 	public boolean online = false;
 	
+	private static Host thisHost;
 	public Server server;
 	public UserManager um;
 	public GameManager gm;
 	
 	public Host() {
+		Host.thisHost = this;
 		LoginCredentials.loadCredentials();
 		UserDBManager.start();
 		StatsDBManager.start();
 		Config.loadConfig();
 		
 		this.um = new UserManager();
-		this.gm = new GameManager(this);
 		
 		FriendsDBManager.start(um);
 		start();
@@ -125,11 +126,13 @@ public class Host extends BaseProcessor implements Runnable {
 		}
 		switch(args[1]) {
 		case "start":
+			this.gm = new GameManager();
 			startServer(args);
 			online = true;
 			break;
 			
 		case "stop":
+			gm.close();
 			server.stop();
 			this.server = null;
 			System.out.println("Server has Stopped!");
@@ -483,7 +486,7 @@ public class Host extends BaseProcessor implements Runnable {
 			
 		
 		case joinPool:
-			// TODO join pool
+			gm.pool.add(p.id);
 			break;
 		
 			
@@ -580,6 +583,11 @@ public class Host extends BaseProcessor implements Runnable {
 		UserDBManager.close();
 		StatsDBManager.close();
 		FriendsDBManager.close();
+	}
+	
+	// Little trick to get Host instance from static object
+	public static Host getHost() {
+		return thisHost;
 	}
 
 	public static void main(String[] args) {

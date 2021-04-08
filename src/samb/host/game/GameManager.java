@@ -29,15 +29,15 @@ public class GameManager {
 	// (For example, if you remove an element from the list during an iteration of that list)
 	// In a regular list, this would produce an error, but a COWAL deals with this abstractly
 	
-	private Host host;
+	public Pool pool;
 	
-	public GameManager(Host h) {
+	public GameManager() {
 		this.games = new HashMap<>();
 		this.parts = new HashMap<>();
 		this.updators = new HashMap<>();
 		this.updateLink = new HashMap<>();
 		
-		this.host = h;
+		this.pool = new Pool(this);
 	}
 	
 	public void newGame(String u1, String u2) {
@@ -64,21 +64,21 @@ public class GameManager {
 		p.gameInfo.tuc = TableUseCase.playing; // Only for the players
 		p.gameState = g.state;
 		
-		host.um.get(u1).send(p);
+		Host.getHost().um.get(u1).send(p);
 		
 		p.gameInfo.first = false;
-		host.um.get(u2).send(p);
+		Host.getHost().um.get(u2).send(p);
 		
 	}
 	
 	public void queueSpectate(String uToSpec, String spec) {
 		// Since the game state must be requested from a player, the spectator must wait for them to reply
-		host.um.get(spec).waiting = true;
+		Host.getHost().um.get(spec).waiting = true;
 		
 		Packet p = new Packet(Header.getUpdateGame);
 		p.spec = spec;
 		
-		host.um.get(uToSpec).send(p);
+		Host.getHost().um.get(uToSpec).send(p);
 		
 	}
 	
@@ -96,7 +96,8 @@ public class GameManager {
 		up.header = Header.spectate;
 		up.gameInfo.tuc = TableUseCase.spectating; // Only for spectators
 		
-		host.um.get(up.spec).send(up);
+		Host.getHost().um.get(up.spec).waiting = false;
+		Host.getHost().um.get(up.spec).send(up);
 		
 	}
 	
@@ -114,8 +115,8 @@ public class GameManager {
 		g.update(p);
 		
 		for(String uid: updators.get(gId)) {
-			if(host.um.isOnline(uid)) {
-				host.um.get(uid).send(p);
+			if(Host.getHost().um.isOnline(uid)) {
+				Host.getHost().um.get(uid).send(p);
 				
 			} else {
 				// If the user is not online, remove them from the updators list
@@ -141,7 +142,7 @@ public class GameManager {
 		
 		Packet p = new Packet(Header.stopGame);
 		for(String id: updators.get(gId)) {
-			host.um.get(id).send(p);
+			Host.getHost().um.get(id).send(p);
 			
 		}
 
@@ -188,12 +189,13 @@ public class GameManager {
 			
 			Packet p = new Packet(Header.updateGame);
 			p.updateInfo = new UpdateInfo(UHeader.win, Win.forfeit, g.getOppId(id));
-			host.um.get(g.getOppId(id)).send(p);
+			Host.getHost().um.get(g.getOppId(id)).send(p);
 			
 			g.winnerId = g.getOppId(id);
 			endGame(gId);
 		}
 	}
+	
 	
 	public boolean inGame(String uid) {
 		return parts.containsKey(uid);
@@ -207,6 +209,24 @@ public class GameManager {
 			return g.u1.id.equals(uid) ? g.u2.id : g.u1.id;
 		}
 		return null;
+	}
+	
+	public void close() {
+		pool.stop();
+		games.forEach((String gid, Game g) -> {
+			Packet p = new Packet(Header.stopGame);
+			for(String id: updators.get(gid)) {
+				Host.getHost().um.get(id).send(p);
+				
+			}
+			
+			removeGame(gid);
+		});
+		
+		games.clear();
+		parts.clear();
+		updators.clear();
+		updateLink.clear();
 	}
 
 }

@@ -5,6 +5,7 @@ import java.net.InetAddress;
 
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
+import samb.host.database.StatsDBManager;
 import samb.host.main.Host;
 
 public class User {
@@ -13,6 +14,7 @@ public class User {
 	private int port;
 
 	public String id, username;
+	public int elo;
 	
 	public boolean waiting;
 	
@@ -24,6 +26,7 @@ public class User {
 		
 		this.id = p.id;
 		this.username = p.loginInfo.username;
+		this.elo = StatsDBManager.getElo(id);
 		
 		this.h = h;
 	}
@@ -32,6 +35,10 @@ public class User {
 		byte[] data = PacketFactory.getBytes(p);
 		h.server.send(new DatagramPacket(data, data.length, addr, port));
 		
+	}
+	
+	public void updateElo() {
+		this.elo = StatsDBManager.getElo(id);
 	}
 	
 }
