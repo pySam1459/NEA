@@ -17,6 +17,7 @@ import samb.client.utils.ImageLoader;
 import samb.client.utils.Maths;
 import samb.com.server.info.Foul;
 import samb.com.server.info.GameInfo;
+import samb.com.server.info.GameState;
 import samb.com.server.info.Message;
 import samb.com.server.info.UpdateInfo;
 import samb.com.server.info.Win;
@@ -49,9 +50,9 @@ public class Table extends Widget {
 	public TableUseCase tuc;
 	public boolean turn = false;
 	private String turnName = "";
-	private boolean simulate=true, cuePlacement=false, doCheck = false, allowAim = true, potted=false;
+	private boolean simulate=true, cuePlacement=false, allowPlacement=true,
+			doCheck = false, allowAim = true, potted=false;
 	public boolean hasCollided = false, wrongFirstCollision = false;
-	public int turnCol = 0;
 	private Foul foul;
 	
 	private Cue cue;
@@ -64,11 +65,13 @@ public class Table extends Widget {
 	private Pocket[] pockets;
 	
 	private GamePage gp;
+	private GameState state;
 
 	public Table(GamePage gp) {
 		super(calculateRect(3*Window.dim.width/4));
 		Table.thisTable = this;
 		this.gp = gp;
+		this.state = gp.state;
 		
 		this.cue = new Cue();
 		this.balls = new ArrayList<>();
@@ -151,8 +154,9 @@ public class Table extends Widget {
 			} else if(cuePlacement) {
 				// If a foul{potCue, wrongHit} has occurred, the opposition is allowed to placed the cue on the table
 				cueBallPlacement = getMouseOnTable();
+				allowPlacement = checkAllowPlacement();
 				
-				if(Client.getMouse().left && Client.getMouse().forleft < 2) {
+				if(Client.getMouse().left && Client.getMouse().forleft < 2 && allowPlacement) {
 					Packet p = new Packet(Header.updateGame);
 					p.updateInfo = new UpdateInfo(UHeader.placement, cueBallPlacement);
 					
@@ -250,8 +254,8 @@ public class Table extends Widget {
 			this.turnName = gp.getTurnName();
 			
 			
-			if(turnCol != 0) {
-				turnCol = turnCol == 1 ? 2 : 1;
+			if(state.turnCol != 0) {
+				state.turnCol = state.turnCol == 1 ? 2 : 1;
 			}
 		}
 
@@ -268,6 +272,25 @@ public class Table extends Widget {
 		
 	}
 	
+	private boolean checkAllowPlacement() {
+		Pointf p = cueBallPlacement;
+		double r = Ball.DEFAULT_BALL_RADIUS+1;
+		Circle c = new Circle(p.x, p.y, r, 0);
+		
+		if(p.x < r || p.x > tdim.width-r || p.y < r || p.y > tdim.height-r) {
+			return false;
+		}
+		for(Ball b: balls) {
+			if(Maths.circle2(b, c)) {
+				return false;
+				
+			}
+		}
+		
+		
+		return true;
+	}
+	
 	
 	// Fouls
 	public void checkCollisionFoul(Ball b) {
@@ -278,7 +301,7 @@ public class Table extends Widget {
 				if(getTurnScore() != 7) {
 					wrongFirstCollision = true;
 				}
-			} else if(turnCol != b.col && turnCol != 0){
+			} else if(state.turnCol != b.col && state.turnCol != 0){
 				wrongFirstCollision = true;
 			}
 		}
@@ -321,8 +344,8 @@ public class Table extends Widget {
 			
 		} else if (b.col == 3) { // 8 Ball
 			if(getTurnScore() >= 7) {
-				if(turnCol == 1) { gp.state.redBlack = true; }
-				else if(turnCol == 2) { gp.state.yellowBlack=true; }
+				if(state.turnCol == 1) { gp.state.redBlack = true; }
+				else if(state.turnCol == 2) { gp.state.yellowBlack=true; }
 				
 				warnMessage(String.format("WIN: %s potted the 8 ball", turnName));
 				win(gp.getTurnID(), Win.pottedAll); // turn player wins
@@ -342,7 +365,7 @@ public class Table extends Widget {
 					gp.state.redID = gp.getTurnID(); // Sets who's got what colour
 					gp.state.yellowID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
-					turnCol = 1; // what colour is the player who's turn it is, is
+					state.turnCol = 1; // what colour is the player who's turn it is, is
 					
 					String msg = String.format("Therefore %s's colour is red and %s's colour is yellow", turnName, gp.getNotTurnName());
 					gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
@@ -357,12 +380,12 @@ public class Table extends Widget {
 					gp.state.yellowID = gp.getTurnID();
 					gp.state.redID = gp.getNotTurnID();
 					gp.setMenuTitleColours();
-					turnCol = 2;
+					state.turnCol = 2;
 	
 					String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
 					gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
 				}
-			} if(turnCol != b.col) {
+			} if(state.turnCol != b.col) {
 				foul(Foul.potWrong);
 				warnMessage(String.format("FOUL: %s potted the wrong colour", turnName));
 			}
@@ -444,7 +467,7 @@ public class Table extends Widget {
 	}
 	
 	private int getTurnScore() {
-		return turnCol == 1 ? gp.state.red : gp.state.yellow;
+		return state.turnCol == 1 ? gp.state.red : gp.state.yellow;
 	}
 	
 	
@@ -498,6 +521,13 @@ public class Table extends Widget {
 			g.fillOval((int)(cueBallPlacement.x-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
 					(int)(cueBallPlacement.y-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
 					(int)Circle.DEFAULT_BALL_RADIUS*2, (int)Circle.DEFAULT_BALL_RADIUS*2);
+			
+			if(!allowPlacement) {
+				g.setColor(new Color(255, 0, 0, 127));
+				g.fillOval((int)(cueBallPlacement.x-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
+						(int)(cueBallPlacement.y-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
+						(int)Circle.DEFAULT_BALL_RADIUS*2, (int)Circle.DEFAULT_BALL_RADIUS*2);
+			}
 		}
 		
 		return img;
@@ -537,7 +567,7 @@ public class Table extends Widget {
 			g.setStroke(Consts.cueProjectionStroke);
 			final double angle = cue.angle + Math.PI;
 			start = Maths.getProjection(angle, offset, cueft);
-			end = Maths.getProjection(angle, offset + 1000, cueft);
+			end = Maths.getProjection(angle, offset + 1500, cueft);
 			
 			g.setColor(new Color(127, 127, 127, 127));
 			g.drawLine((int)start[0], (int)start[1], (int)end[0], (int)end[1]);
@@ -588,6 +618,14 @@ public class Table extends Widget {
 			turn = false;
 		}
 		turnName = gp.getTurnName();
+	}
+	
+	public void setState(GameState state) {
+		this.state = state;
+		
+		if(state.turnCol != 0) {
+			gp.setMenuTitleColours();
+		}
 	}
 	
 	// These methods are at the bottom as they take up space and look ugly

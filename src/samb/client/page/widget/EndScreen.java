@@ -26,8 +26,8 @@ public class EndScreen extends Widget {
 		super(rect);
 		this.retoBut = retoBut;
 	
-		this.titleFont = new Font("Inter", Font.PLAIN, rect[3]/7);
-		this.byWhatFont = new Font("Inter", Font.PLAIN, rect[3]/12);
+		this.titleFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/7);		
+		this.byWhatFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/12);		
 	}
 	
 
@@ -46,13 +46,16 @@ public class EndScreen extends Widget {
 	}
 	
 	public void reveal(Win win, boolean amWinner) {
+		// This method starts the reveal process for the endScreen widget
+		
 		createImg(win, amWinner);
 		HIDDEN = false;
 		timer = System.currentTimeMillis();
-	
 	}
 	
 	private void createImg(Win win, boolean amWinner) {
+		// This method creates the endScreen widget image, called only once
+		
 		img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		
@@ -73,13 +76,14 @@ public class EndScreen extends Widget {
 		
 		// By what
 		ti = new TextInfo(byWhat(win), byWhatFont, Consts.PAL1);
-		xy = new Point(rect[2]/2 - ti.dim.width/2, titleY + ti.dim.height+4);
+		xy = new Point(rect[2]/2 - ti.dim.width/2, titleY + ti.dim.height+8);
 		ti.render(g, xy);
 		
 		//setOpacity(0.0f);
 	}
 	
 	private String byWhat(Win win) {
+		// Returns the 'by What' text based on the 'win'
 		switch(win) {
 		case pottedBlack: 
 			return "By Potting The Black Early";
@@ -94,8 +98,10 @@ public class EndScreen extends Widget {
 
 	@Override
 	public void render(Graphics2D g) {
+		// Renders the endScreen
 		if(!HIDDEN) {
 			if(img != null) {
+				// Sets the transparency of the endScreen to 'opacity'
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 				
 				g.drawImage(img, rect[0], rect[1], null);

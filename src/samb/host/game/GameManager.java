@@ -5,7 +5,6 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import samb.com.database.UserInfo;
-import samb.com.server.info.GameInfo;
 import samb.com.server.info.UpdateInfo;
 import samb.com.server.info.Win;
 import samb.com.server.packet.Header;
@@ -83,17 +82,21 @@ public class GameManager {
 		
 	}
 	
-	public void addSpectate(String spec, GameInfo gi) {
+	public void addSpectate(Packet up) {
 		// Once a player has replied, the spectate can watch the match
 		// TODO Check if gi != null
-		updators.get(gi.id).add(spec);
-		updateLink.put(spec, updators.get(gi.id));
+		if(up.gameInfo == null) {
+			System.out.println("Error occured when adding spectator");
+			return;
+		}
 		
-		Packet p = new Packet(Header.spectate);
-		p.gameInfo = gi;
-		p.gameInfo.tuc = TableUseCase.spectating; // Only for spectators
+		updators.get(up.gameInfo.id).add(up.spec);
+		updateLink.put(up.spec, updators.get(up.gameInfo.id));
 		
-		host.um.get(spec).send(p);
+		up.header = Header.spectate;
+		up.gameInfo.tuc = TableUseCase.spectating; // Only for spectators
+		
+		host.um.get(up.spec).send(up);
 		
 	}
 	

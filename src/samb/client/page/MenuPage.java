@@ -31,6 +31,8 @@ public class MenuPage extends Page implements ButtonListener {
 	}
 	
 	private void initWidgets() {
+		// This method initializes widgets
+		
 		int buffer = 32;
 		Text unTitle = new Text(Client.getClient().udata.userInfo.username, new int[] {buffer*5, 64, Window.dim.width/2, 100}, Consts.INTER.deriveFont(Font.PLAIN, 96), Consts.PAL1);
 		unTitle.CENTERED = false;
@@ -67,6 +69,7 @@ public class MenuPage extends Page implements ButtonListener {
 	
 	@Override
 	public void onClick(Button b) {
+		// This method listeners for any button clicks on this page
 		GamePage gp;
 		switch(b.id) {
 		case "jpButton":
@@ -94,6 +97,7 @@ public class MenuPage extends Page implements ButtonListener {
 	}
 	
 	private void requestStats() {
+		// Requests statistics from host
 		Packet p = new Packet(Header.getStats);
 		Client.getClient().server.send(p);
 		

@@ -495,7 +495,7 @@ public class Host extends BaseProcessor implements Runnable {
 		case getUpdateGame:
 			// This case adds a spectator to a game with the gameInfo received from a player of that game
 			if(um.isOnline(p.spec)) {
-				gm.addSpectate(p.spec, p.gameInfo);
+				gm.addSpectate(p);
 				
 			}
 			break;

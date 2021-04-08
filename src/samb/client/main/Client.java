@@ -102,6 +102,7 @@ public class Client extends BaseProcessor implements Runnable {
 			if(p.loginInfo.authorized) {
 				udata.id = p.id;
 				udata.userInfo = new UserInfo(p.id, p.loginInfo.username);
+				System.out.println(p.loginInfo.username);
 				pm.changePage(new MenuPage());
 				
 			} else {

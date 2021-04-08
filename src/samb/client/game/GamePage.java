@@ -96,9 +96,10 @@ public class GamePage extends Page implements ButtonListener {
 		// This method starts a new game
 		menu.unshowLoading();
 		
-		setGameInfo(gi);
+		setGame(gi, state);
 		table.rack(gi);
 		table.setUseCase(gi, Client.getClient().udata.id);
+		table.setState(state);
 		chat.setUseCase(gi.tuc);
 		
 		this.state = state;
@@ -138,10 +139,12 @@ public class GamePage extends Page implements ButtonListener {
 		
 	}
 	
-	public void setGameInfo(GameInfo gi) {
+	public void setGame(GameInfo gi, GameState state) {
+		// This method sets the game's state (and info)
 		if(gi != null) {
 			this.info = gi;
 			Client.getClient().udata.gameInfo = gi;
+			Client.getClient().udata.gameState = state;
 			menu.setInfo(info);
 			
 		}
@@ -149,9 +152,11 @@ public class GamePage extends Page implements ButtonListener {
 	
 	
 	public Packet getUpdate() {
+		// Returns a packet of all the info required to send a copy/update of the game
 		Packet p = new Packet(Header.updateGame);
 		p.gameInfo = info;
 		p.gameInfo.balls = table.getCircles();
+		p.gameState = state;
 		
 		return p;
 	}
@@ -166,17 +171,17 @@ public class GamePage extends Page implements ButtonListener {
 	// Return To Menu button listener methods
 	@Override
 	public void onClick(Button b) {
-		if(b.id.equals("retobut")) {
+		if(b.id.equals("retobut")) { // Return to Menu button on endScreen
 			Client.getClient().pm.changePage(new MenuPage());
 			
-		} else if(b.id.equals("forbut")) {
+		} else if(b.id.equals("forbut")) { // Forfeit button on gameMenu Widget
 			if(table.tuc == TableUseCase.playing) {
 				Packet p = new Packet(Header.updateGame);
 				String winId = info.id.equals(info.u1.id) ? info.u1.id : info.u2.id;
 				p.updateInfo = new UpdateInfo(UHeader.win, Win.forfeit, winId);
 				Client.getClient().server.send(p);
 				
-			} else {
+			} else { // if you are spectating/practicing, return to menu
 				Client.getClient().pm.changePage(new MenuPage());
 			}
 		}
