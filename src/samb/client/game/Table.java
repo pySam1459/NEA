@@ -385,7 +385,7 @@ public class Table extends Widget {
 					String msg = String.format("Therefore %s's colour is yellow and %s's colour is red", turnName, gp.getNotTurnName());
 					gp.addChat(new Message(msg, "$BOLD NOSPACE$"));
 				}
-			} if(state.turnCol != b.col) {
+			} if(state.turnCol != b.col && state.turnCol != 0 && tuc != TableUseCase.practicing) {
 				foul(Foul.potWrong);
 				warnMessage(String.format("FOUL: %s potted the wrong colour", turnName));
 			}

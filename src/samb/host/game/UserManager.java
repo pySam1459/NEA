@@ -2,6 +2,8 @@ package samb.host.game;
 
 import java.util.HashMap;
 
+import samb.host.database.UserDBManager;
+
 public class UserManager {
 	
 	private HashMap<String, User> users;
@@ -14,11 +16,13 @@ public class UserManager {
 	
 	public void add(User u) {
 		this.users.put(u.id, u);
+		UserDBManager.setOnline(u.id, true);
 		
 	}
 	
 	public void remove(String id) {
 		this.users.remove(id);
+		UserDBManager.setOnline(id, false);
 		
 	}
 	
@@ -29,6 +33,11 @@ public class UserManager {
 	
 	public boolean isOnline(String id) {
 		return users.containsKey(id);
+		
+	}
+	
+	public void close() {
+		this.users.clear();
 		
 	}
 

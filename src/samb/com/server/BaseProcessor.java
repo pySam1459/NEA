@@ -19,6 +19,7 @@ public abstract class BaseProcessor {
 	
 	public BaseProcessor() {
 		this.queue = new LinkedBlockingQueue<>();
+		
 	}
 	
 	public void add(DatagramPacket packet) {
@@ -39,7 +40,7 @@ public abstract class BaseProcessor {
 	
 	public void startThread() {
 		// Starts the Thread, the process Thread is defined as a lambda function
-		// since the Runnable interface causes issues between subclasses and this abstract super class
+		//   since the Runnable interface causes issues between subclasses and this abstract super class
 		
 		processing = true;
 		processThread = new Thread(() -> {
@@ -61,9 +62,10 @@ public abstract class BaseProcessor {
 	
 	public void stopThread() {
 		// Stops the Thread
-		processing = false;
-		processThread.interrupt();
-		
+		if(processThread != null) {
+			processing = false;
+			processThread.interrupt();
+		}
 	}
 	
 }

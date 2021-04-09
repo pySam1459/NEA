@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 
 public abstract class BaseServer implements Runnable {
 	/* This abstract class handles events regarding the receiving of incoming DatagramPackets from the Internet.
@@ -36,7 +37,7 @@ public abstract class BaseServer implements Runnable {
 	
 	@Override
 	public void run() {
-		// This method is called when the listenThread is insantiated
+		// This method is called when the listenThread is started
 		
 		DatagramPacket recvPacket;
 		byte[] buffer = new byte[BUFFER_LENGTH];
@@ -49,7 +50,8 @@ public abstract class BaseServer implements Runnable {
 				processor.add(recvPacket);      // The newly received DatagramPacket is handed of to the Processor object
 				buffer = new byte[BUFFER_LENGTH];
 				
-			} catch (IOException e) {
+			} catch (SocketException e) {}
+			catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -71,6 +73,8 @@ public abstract class BaseServer implements Runnable {
 		if(listenThread != null) {
 			listening = false;
 			listenThread.interrupt();
+		} if(!socket.isClosed()) {
+			socket.close();
 		}
 	}
 

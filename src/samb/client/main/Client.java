@@ -162,6 +162,7 @@ public class Client extends BaseProcessor implements Runnable {
 			break;
 			
 		case stopGame:
+			// This case returns from a gamepage to the menupage
 			if(pm.isId("GamePage")) {
 				pm.changePage(new MenuPage());
 				

@@ -73,13 +73,19 @@ public class UserDBManager {
 		
 	}
 	
+	public static boolean getOnline(String id) {
+		String query = String.format("SELECT * FROM users WHERE id='%s'", id);
+		List<UserInfo> arr = executeQuery(query);
+		return arr.size() > 0 ? arr.get(0).online : null;
+	}
+	
 	public static void display(String orderby) {
 		// This method displays 
 		
 		String query = String.format("SELECT * FROM users ORDER BY %s;", orderby);  // Gets all UserInfo ordered by argument orderby
 		List<UserInfo> arr = executeQuery(query);
 		
-		String[] columnNames = new String[] {"Username", "Email", "ID", "Password"};  // column names
+		String[] columnNames = new String[] {"Username", "Email", "ID", "Password", "Online"};  // column names
 		int[] maxChars = new int[columnNames.length];  
 		for(int i=0; i<columnNames.length; i++) { maxChars[i] = columnNames[i].length(); };
 		
@@ -93,10 +99,14 @@ public class UserDBManager {
 			_displayUserInfo(ui, maxChars);
 		}
 		
-		System.out.println(border);
-		
+		System.out.println(border);	
 	}
 	
+	public static boolean exists(String field, String data) {
+		String query = String.format("SELECT * FROM users WHERE %s='%s';", field, data);
+		return executeQuery(query).size() > 0;
+	}
+
 	
 	// Update Methods
 	public static boolean createTable() {
@@ -104,7 +114,8 @@ public class UserDBManager {
 		String update = "CREATE TABLE users (id VARCHAR(36) PRIMARY KEY,"
 										  + "username VARCHAR(20),"
 										  + "email VARCHAR(64),"
-										  + "password VARCHAR(64));";  // The passwords kept in the db will have been hashed (SHA-256) and salted
+										  + "password VARCHAR(64),"
+										  + "online BOOLEAN);";  // The passwords kept in the db will have been hashed (SHA-256) and salted
 		//return executeUpdate(update);
 		
 		// Testing purposes
@@ -128,7 +139,7 @@ public class UserDBManager {
 	}
 	
 	public static boolean addUser(UserInfo ui) {
-		String update = String.format("INSERT INTO users VALUES ('%s', '%s', '%s', '%s');", ui.id, ui.username, ui.email, ui.password);
+		String update = String.format("INSERT INTO users VALUES ('%s', '%s', '%s', '%s', FALSE);", ui.id, ui.username, ui.email, ui.password);
 		return executeUpdate(update);
 	}
 	
@@ -151,6 +162,11 @@ public class UserDBManager {
 		UserInfo ui = getUIFromName(name);
 		return ui != null;
 		
+	}
+	
+	public static boolean setOnline(String id, boolean online) {
+		String update = String.format("UPDATE users SET online=%b WHERE id='%s'", online, id);
+		return executeUpdate(update);
 	}
 	
 	
@@ -195,7 +211,7 @@ public class UserDBManager {
 		List<UserInfo> data = new ArrayList<>();
 		UserInfo ui;
 		while(results.next()) {
-			ui = new UserInfo(results.getString(1), results.getString(2), results.getString(3), results.getString(4));
+			ui = new UserInfo(results.getString(1), results.getString(2), results.getString(3), results.getString(4), results.getBoolean(5));
 			data.add(ui);
 			
 		}
@@ -205,6 +221,7 @@ public class UserDBManager {
 	
 	public static void close() {
 		try {
+			conn.commit();
 			conn.close();
 			
 		} catch(SQLException e) {
@@ -220,6 +237,7 @@ public class UserDBManager {
 		if(ui.email.length() > maxChars[1]) { maxChars[1] = ui.email.length(); }
 		if(ui.id.length() > maxChars[2]) { maxChars[2] = ui.id.length(); }
 		if(ui.password.length() > maxChars[3]) { maxChars[3] = ui.password.length(); }
+		if((ui.online?4:5) > maxChars[4]) {maxChars[4] = ui.online?4:5;} // {True: False}
 		
 	}
 	
@@ -240,7 +258,7 @@ public class UserDBManager {
 	}
 	
 	private static void _displayUserInfo(UserInfo ui, int[] maxChars) {
-		_displayRow(new String[] {ui.username, ui.email, ui.id, ui.password}, maxChars);
+		_displayRow(new String[] {ui.username, ui.email, ui.id, ui.password, Boolean.toString(ui.online)}, maxChars);
 		
 	}
 	

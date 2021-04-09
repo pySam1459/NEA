@@ -13,6 +13,11 @@ public class Friend implements Serializable {
 		
 	}
 	
+	public Friend(String id, String username) {
+		this.id = id;
+		this.username = username;
+	}
+	
 	public Friend(String id, String username, boolean online) {
 		this.id = id;
 		this.username = username;

@@ -5,6 +5,7 @@ public enum Error {
 
 	invalidDetails,
 	usernameTaken,
-	emailTaken;
+	emailTaken,
+	alreadyOnline;
 	
 }

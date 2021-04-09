@@ -9,14 +9,25 @@ public class UserInfo implements Serializable {
 	private static final long serialVersionUID = -1335445462934410453L;
 	public String id, username, email, password;
 	public int elo;
-
+	public boolean online;
+	
 	public UserInfo() {}
+	
+	public UserInfo(String id, String username, String email, String password, boolean online) {
+		this.id = id;
+		this.username = username;
+		this.email = email;
+		this.password = password;
+		this.online = online;
+		
+	}
 	
 	public UserInfo(String id, String username, String email, String password) {
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.password = password;
+		this.online = false;
 		
 	}
 	

@@ -1,7 +1,6 @@
 package samb.host.main;
 
 import java.net.DatagramPacket;
-import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -33,7 +32,7 @@ public class Host extends BaseProcessor implements Runnable {
 	private Thread commandThread;
 	public Scanner input;
 	
-	public boolean online = false;
+	public boolean online = false, shutdown = false;
 	
 	private static Host thisHost;
 	public Server server;
@@ -45,11 +44,10 @@ public class Host extends BaseProcessor implements Runnable {
 		LoginCredentials.loadCredentials();
 		UserDBManager.start();
 		StatsDBManager.start();
+		FriendsDBManager.start();
 		Config.loadConfig();
 		
-		this.um = new UserManager();
-		
-		FriendsDBManager.start(um);
+		addShutdownHook();
 		start();
 		
 	}
@@ -126,6 +124,7 @@ public class Host extends BaseProcessor implements Runnable {
 		}
 		switch(args[1]) {
 		case "start":
+			this.um = new UserManager();
 			this.gm = new GameManager();
 			startServer(args);
 			online = true;
@@ -133,8 +132,10 @@ public class Host extends BaseProcessor implements Runnable {
 			
 		case "stop":
 			gm.close();
+			um.close();
 			server.stop();
 			this.server = null;
+			
 			System.out.println("Server has Stopped!");
 			online = false;
 			break;
@@ -441,41 +442,15 @@ public class Host extends BaseProcessor implements Runnable {
 		// Received Packets are handled here, their Header is used to identify where the data is needed in the program
 		
 		Packet p = PacketFactory.toPacket(packet.getData());
-		UserInfo ui;
 		switch(p.header) {
 		case login:
 			// This case either authorizes the login of a user, or sends back an invalid details error
-			ui = UserDBManager.getUIFromName(p.loginInfo.username);
-			if(ui != null) {
-				if(ui.password.equals(p.loginInfo.password)) {
-					p.id = ui.id;
-					loginUser(p, packet);
-					return;
-				}
-			}
-			
-			p.loginInfo.authorized = false;
-			p.loginInfo.err = Error.invalidDetails;
-			server.sendTo(p, packet.getAddress(), packet.getPort());
+			loginCase(p, packet);
 			break;
 			
 		case signup:
 			// This case either signs up the user (storing their details and generating an id), or sends back an error
-			ui = UserDBManager.getUIFromName(p.loginInfo.username);
-			if(ui == null) {
-				String query = String.format("SELECT * FROM users WHERE email='%s';", p.loginInfo.email);
-				List<UserInfo> us = UserDBManager.executeQuery(query);
-				if(us.size() == 0) {
-					if(!Func.isFlag(p.loginInfo.username)) {
-						signupUser(p, packet);
-						return;
-						
-					} else {p.loginInfo.err = Error.usernameTaken; }
-				} else { p.loginInfo.err = Error.emailTaken; }
-			} else { p.loginInfo.err = Error.usernameTaken; }
-			
-			p.loginInfo.authorized = false;
-			server.sendTo(p, packet.getAddress(), packet.getPort());
+			signupCase(p, packet);
 			break;
 			
 		case leave:
@@ -486,12 +461,14 @@ public class Host extends BaseProcessor implements Runnable {
 			
 		
 		case joinPool:
+			// This case adds the user to the game pool, for matchmaking
 			gm.pool.add(p.id);
 			break;
 		
 			
 		case updateGame:
-			// This case receives an update from a user about a new game state, updates the internal game state and sends update packets to the updators
+			// This case receives an update from a user about a new game state, 
+			//   updates the internal game state and sends update packets to the updators
 			gm.update(p);
 			break;
 			
@@ -500,6 +477,14 @@ public class Host extends BaseProcessor implements Runnable {
 			if(um.isOnline(p.spec)) {
 				gm.addSpectate(p);
 				
+			}
+			break;
+			
+		case chat:
+			// This case sends the chat of a player to their opposition
+			String oid = gm.getOpposition(p.id);
+			if(oid != null) {
+				um.get(oid).send(p);
 			}
 			break;
 			
@@ -515,17 +500,8 @@ public class Host extends BaseProcessor implements Runnable {
 		case getFriends:
 			// This case sends back a user's friends list
 			if(um.isOnline(p.id)) {
-				p.friendsInfo.friends = p.friendsInfo.areOnline ? FriendsDBManager.getAllOnline(p.id) : FriendsDBManager.getAll(p.id);
+				p.friendsInfo.friends = FriendsDBManager.getAllOnline(p.id);
 				um.get(p.id).send(p);
-			}
-			break;
-			
-			
-		case chat:
-			// This case sends the chat of a player to their opposition
-			String oid = gm.getOpposition(p.id);
-			if(oid != null) {
-				um.get(oid).send(p);
 			}
 			break;
 		
@@ -534,8 +510,28 @@ public class Host extends BaseProcessor implements Runnable {
 		}
 	}
 	
+	private void loginCase(Packet p, DatagramPacket packet) {
+		// This method checks the authenticity of a users credentials, and either logins in or rejects the user
+		
+		UserInfo ui = UserDBManager.getUIFromName(p.loginInfo.username);
+		if(ui != null) { // valid user
+			if(!ui.online) { // is not already online
+				if(ui.password.equals(p.loginInfo.password)) { // correct password hash
+					p.id = ui.id;
+					loginUser(p, packet);
+					return;
+					
+				} else { p.loginInfo.err = Error.invalidDetails; }
+			} else { p.loginInfo.err = Error.alreadyOnline; }
+		} else { p.loginInfo.err = Error.invalidDetails; }
+		
+		p.loginInfo.authorized = false;
+		server.sendTo(p, packet.getAddress(), packet.getPort());
+	}
+	
 	private void loginUser(Packet p, DatagramPacket packet) {
-		// This method is called by the "case login", which creates a user object and sends an authorizing packet to the user
+		// This method is called by the "case login", 
+		//   which creates a user object and authorizes the user to join
 		User u = new User(this, p, packet);
 		um.add(u);
 		
@@ -545,8 +541,26 @@ public class Host extends BaseProcessor implements Runnable {
 		
 	}
 	
+	private void signupCase(Packet p, DatagramPacket packet) {
+		// This method checks the uniqueness and validity of the users credentials,
+		//   signing them up, or rejecting them
+		if(!UserDBManager.exists("username", p.loginInfo.username)) {
+			if(!UserDBManager.exists("email", p.loginInfo.email)) {
+				if(!Func.isFlag(p.loginInfo.username)) {
+					signupUser(p, packet);
+					return;
+					
+				} else {p.loginInfo.err = Error.usernameTaken; }
+			} else { p.loginInfo.err = Error.emailTaken; }
+		} else { p.loginInfo.err = Error.usernameTaken; }
+		
+		p.loginInfo.authorized = false;
+		server.sendTo(p, packet.getAddress(), packet.getPort());
+	}
+	
 	private void signupUser(Packet p, DatagramPacket packet) {
-		// This method is called by the "case signup", which generates an ID, adds the user's dtails the the database and sends an authorizing packet to the user
+		// This method is called by the "case signup", which generates an ID, 
+		//   adds the user's details the the database and authorizes the user to sign up
 		p.id = UUID.randomUUID().toString();
 		
 		UserInfo ui = new UserInfo(p.id, p.loginInfo.username, p.loginInfo.email, p.loginInfo.password);
@@ -566,6 +580,7 @@ public class Host extends BaseProcessor implements Runnable {
 	// Host start/stop
 	public synchronized void start() {
 		// Start Command Line
+		shutdown = false;
 		commanding = true;
 		commandThread = new Thread(this, "Command Line Thread");
 		commandThread.start();
@@ -583,6 +598,19 @@ public class Host extends BaseProcessor implements Runnable {
 		UserDBManager.close();
 		StatsDBManager.close();
 		FriendsDBManager.close();
+		shutdown = true;
+	}
+	
+	public void addShutdownHook() {
+		// This method adds a shutdown hook, if the program is exited, this function will be called
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+		    public void run() {
+		        if(!shutdown) {
+		        	stop();
+		        	
+		        }
+		    }
+		}));
 	}
 	
 	// Little trick to get Host instance from static object

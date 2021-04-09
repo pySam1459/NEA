@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import samb.com.database.Friend;
-import samb.host.game.UserManager;
 
 
 public class FriendsDBManager {
@@ -22,14 +21,12 @@ public class FriendsDBManager {
 	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 
 	private static Connection conn;
-	private static UserManager um;
 	
 	// Initialisation methods
-	public static void start(UserManager um) {
+	public static void start() {
 		try {
 			initDatabase();
 			connectToDatabase();
-			FriendsDBManager.um = um;
 			
 		} catch(SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
@@ -49,36 +46,19 @@ public class FriendsDBManager {
 	}
 	
 	// Query Methods
-	/* Unfortunately, to get all the relevant information about the friends requires querying the Users table for every friend,
-	*  and checking with the UserManager.isOnline for every friend.
-	*  This seems like it could be a bottleneck if there are lots of users, but for now its acceptable
-	*/
 	public static List<Friend> getAll(String id) {
-		String query = String.format("SELECT * FROM Friends_%s;", clean(id));
-		List<Friend> friends = executeQuery(query);
-		
-		for(Friend f: friends) {
-			f.online = um.isOnline(id);
-			f.username = UserDBManager.getUI(id).username;
-		}
-		return friends;
+		String tName = "Friends_" + clean(id);  // Selecting, friend id, friend username, and friend online status
+		String query = String.format("SELECT %s.id, users.username, users.online FROM %s JOIN users ON users.id = %s.id;", tName, tName, tName);
+		return executeQuery(query);
 		
 	}
 	
 	public static List<Friend> getAllOnline(String id) {
-		String query = String.format("SELECT * FROM Friends_%s;", clean(id));
-		List<Friend> friends = executeQuery(query);
-		List<Friend> onlineFriends = new ArrayList<>();
-		
-		for(Friend f: friends) {
-			f.online = um.isOnline(id);
-			if(f.online) {
-				f.username = UserDBManager.getUI(id).username;				
-				onlineFriends.add(f);
-				
-			}
-		}
-		return onlineFriends;
+		String tName = "Friends_" + clean(id);
+		String query = String.format("SELECT %s.id, users.username, users.online "
+				+ "FROM %s WHERE users.online = TRUE JOIN users ON users.id = %s.id;", tName, tName, tName);
+		return executeQuery(query);
+
 	}
 	
 	
@@ -145,7 +125,7 @@ public class FriendsDBManager {
 		List<Friend> data = new ArrayList<>();
 		Friend f;
 		while(results.next()) {
-			f = new Friend(results.getString(1));
+			f = new Friend(results.getString(1), results.getString(2), results.getBoolean(3));
 			data.add(f);
 		}
 		
@@ -155,6 +135,7 @@ public class FriendsDBManager {
 	
 	public static void close() {
 		try {
+			conn.commit();
 			conn.close();
 			
 		} catch(SQLException e) {

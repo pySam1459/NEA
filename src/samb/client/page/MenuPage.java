@@ -47,23 +47,13 @@ public class MenuPage extends Page implements ButtonListener {
 		but.addListener(this);
 		add("jpButton", but);
 		
-		but = new Button(new int[] {buffer*6 + butW, yoff + butH, butW, butH}, "Spectate");
-		but.addAnimation(new HoverShineAnimation(but.rect));
-		but.BACKGROUND_COLOR = backColor;
-		but.addListener(this);
-		add("specButton", but);
-		
-		but = new Button(new int[] {buffer*5, yoff+butH*2 + buffer, butW, butH}, "Invite Player");
-		but.addAnimation(new HoverShineAnimation(but.rect));
-		but.BACKGROUND_COLOR = backColor;
-		but.addListener(this);
-		add("invButton", but);
-		
-		but = new Button(new int[] {buffer*6 + butW, yoff+butH*2 + buffer, butW, butH}, "Practice");
+		but = new Button(new int[] {buffer*6 + butW, yoff + butH, butW, butH}, "Practice");
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
 		but.addListener(this);
 		add("pracButton", but);
+
+		
 		
 	}
 	
@@ -76,12 +66,6 @@ public class MenuPage extends Page implements ButtonListener {
 			gp = new GamePage();
 			Client.getClient().pm.changePage(gp);
 			gp.pooling();
-			break;
-			
-		case "specButton":
-			break;
-			
-		case "invButton":
 			break;
 			
 		case "pracButton":
