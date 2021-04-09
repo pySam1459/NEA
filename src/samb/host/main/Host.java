@@ -592,6 +592,8 @@ public class Host extends BaseProcessor implements Runnable {
 			commanding = false;
 			commandThread.interrupt();
 		} if(server != null) {
+			gm.close();
+			um.close();
 			server.stop();
 		}
 		

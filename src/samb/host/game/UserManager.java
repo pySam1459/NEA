@@ -37,6 +37,7 @@ public class UserManager {
 	}
 	
 	public void close() {
+		UserDBManager.setAllOffline();
 		this.users.clear();
 		
 	}

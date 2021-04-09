@@ -74,7 +74,7 @@ public class UserDBManager {
 	}
 	
 	public static boolean getOnline(String id) {
-		String query = String.format("SELECT * FROM users WHERE id='%s'", id);
+		String query = String.format("SELECT * FROM users WHERE id='%s';", id);
 		List<UserInfo> arr = executeQuery(query);
 		return arr.size() > 0 ? arr.get(0).online : null;
 	}
@@ -165,8 +165,12 @@ public class UserDBManager {
 	}
 	
 	public static boolean setOnline(String id, boolean online) {
-		String update = String.format("UPDATE users SET online=%b WHERE id='%s'", online, id);
+		String update = String.format("UPDATE users SET online=%b WHERE id='%s';", online, id);
 		return executeUpdate(update);
+	}
+	
+	public static boolean setAllOffline() {
+		return executeUpdate("UPDATE users SET online=FALSE;");
 	}
 	
 	
@@ -221,7 +225,6 @@ public class UserDBManager {
 	
 	public static void close() {
 		try {
-			conn.commit();
 			conn.close();
 			
 		} catch(SQLException e) {

@@ -192,7 +192,6 @@ public class StatsDBManager {
 	
 	public static void close() {
 		try {
-			conn.commit();
 			conn.close();
 			
 		} catch(SQLException e) {

@@ -135,7 +135,6 @@ public class FriendsDBManager {
 	
 	public static void close() {
 		try {
-			conn.commit();
 			conn.close();
 			
 		} catch(SQLException e) {
