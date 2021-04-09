@@ -17,6 +17,9 @@ public class Consts {
 	public static final Color INVALID_COLOUR = new Color(224, 40, 37, 200);
 	public static final Color SHADOW_COLOUR = new Color(48, 48, 48, 127);
 	
+	public static final Color MENU_BACKGROUND_COLOR = new Color(64, 81, 77, 127);
+	public static final Color MENU_BORDER_COLOR = new Color(58, 75, 72, 200);
+	
 	public static final Color PAL1 = new Color(227, 251, 247);
 	public static final Color PAL2 = new Color(24, 231, 204);
 	public static final Color PAL3 = new Color(0, 154, 159);

@@ -7,6 +7,7 @@ import java.util.UUID;
 import samb.com.database.UserInfo;
 import samb.com.database.UserStats;
 import samb.com.server.BaseProcessor;
+import samb.com.server.info.FriendsInfo;
 import samb.com.server.packet.Error;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
@@ -230,6 +231,11 @@ public class Host extends BaseProcessor implements Runnable {
 				
 			} else { System.out.println("Stats table has NOT been successfully created!"); }
 			
+		} else if("friends".equals(args[2])) {
+			if(FriendsDBManager.createAll()) {
+				System.out.println("Friend tables have been created");
+				
+			} else { System.out.println("Friend tables have NOT been successfully created!"); }
 		} else { 
 			System.out.printf("Invalid Table Name '%s'\n", args[2]); 
 		}
@@ -239,7 +245,7 @@ public class Host extends BaseProcessor implements Runnable {
 		// Drops the table specified in 3rd argument
 		
 		if("users".equals(args[2])) {
-			if(UserDBManager.dropTable()) {
+			if(UserDBManager.dropTable() && FriendsDBManager.dropAll()) {
 				System.out.println("Users table has been deleted");
 				
 			} else { System.out.println("Users table has NOT been successfully deleted!"); }
@@ -250,6 +256,11 @@ public class Host extends BaseProcessor implements Runnable {
 				
 			} else { System.out.println("Stats table has NOT been successfully deleted!"); }
 			
+		} else if("friends".equals(args[2])) {
+			if(FriendsDBManager.dropAll()) {
+				System.out.println("Friends table has been deleted");
+				
+			} else { System.out.println("Friend tables have NOT been successfully deleted!"); }
 		} else { 
 			System.out.printf("Invalid Table Name '%s'\n", args[2]); 
 		}
@@ -500,7 +511,7 @@ public class Host extends BaseProcessor implements Runnable {
 		case getFriends:
 			// This case sends back a user's friends list
 			if(um.isOnline(p.id)) {
-				p.friendsInfo.friends = FriendsDBManager.getAllOnline(p.id);
+				p.friendsInfo = new FriendsInfo(FriendsDBManager.getAllOnline(p.id));
 				um.get(p.id).send(p);
 			}
 			break;

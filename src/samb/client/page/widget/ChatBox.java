@@ -9,8 +9,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import samb.client.game.GamePage;
 import samb.client.main.Client;
+import samb.client.page.GamePage;
 import samb.client.page.widget.listeners.TextBoxListener;
 import samb.client.utils.Consts;
 import samb.com.server.info.Message;

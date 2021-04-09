@@ -3,10 +3,11 @@ package samb.client.main;
 import java.awt.Graphics2D;
 import java.net.DatagramPacket;
 
-import samb.client.game.GamePage;
+import samb.client.page.GamePage;
 import samb.client.page.LoginPage;
 import samb.client.page.MenuPage;
 import samb.client.page.PageManager;
+import samb.client.page.widget.FriendList;
 import samb.client.server.Server;
 import samb.client.utils.Consts;
 import samb.client.utils.UserData;
@@ -102,7 +103,6 @@ public class Client extends BaseProcessor implements Runnable {
 			if(p.loginInfo.authorized) {
 				udata.id = p.id;
 				udata.userInfo = new UserInfo(p.id, p.loginInfo.username);
-				System.out.println(p.loginInfo.username);
 				pm.changePage(new MenuPage());
 				
 			} else {
@@ -196,6 +196,9 @@ public class Client extends BaseProcessor implements Runnable {
 			
 		case getFriends:
 			// This case updates the udata of the user's friends
+			if(pm.isId("MenuPage")) {
+				((FriendList)((MenuPage) pm.get()).get("friendList")).setFriends(p);
+			}
 			udata.friends = p.friendsInfo;
 			break;
 		

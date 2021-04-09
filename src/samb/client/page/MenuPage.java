@@ -5,11 +5,12 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import samb.client.game.GamePage;
 import samb.client.main.Client;
 import samb.client.main.Window;
 import samb.client.page.widget.Button;
+import samb.client.page.widget.FriendList;
 import samb.client.page.widget.Text;
+import samb.client.page.widget.animations.BoxFocusAnimation;
 import samb.client.page.widget.animations.HoverShineAnimation;
 import samb.client.page.widget.listeners.ButtonListener;
 import samb.client.utils.Consts;
@@ -43,16 +44,21 @@ public class MenuPage extends Page implements ButtonListener {
 		Button but;
 		but = new Button(new int[] {buffer*5, yoff + butH, butW, butH}, "Join Pool");
 		but.addAnimation(new HoverShineAnimation(but.rect));
+		but.addAnimation(new BoxFocusAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
 		but.addListener(this);
 		add("jpButton", but);
 		
 		but = new Button(new int[] {buffer*6 + butW, yoff + butH, butW, butH}, "Practice");
 		but.addAnimation(new HoverShineAnimation(but.rect));
+		but.addAnimation(new BoxFocusAnimation(but.rect));
 		but.BACKGROUND_COLOR = backColor;
 		but.addListener(this);
 		add("pracButton", but);
 
+		FriendList fl = new FriendList(new int[] {buffer*9+2*butW, yoff, 
+				Window.dim.width-2*butW-13*buffer, Window.dim.height-10*buffer});
+		add("friendList", fl);
 		
 		
 	}

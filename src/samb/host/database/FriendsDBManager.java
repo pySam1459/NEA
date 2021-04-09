@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import samb.com.database.Friend;
+import samb.com.database.UserInfo;
 
 
 public class FriendsDBManager {
@@ -48,7 +49,9 @@ public class FriendsDBManager {
 	// Query Methods
 	public static List<Friend> getAll(String id) {
 		String tName = "Friends_" + clean(id);  // Selecting, friend id, friend username, and friend online status
-		String query = String.format("SELECT %s.id, users.username, users.online FROM %s JOIN users ON users.id = %s.id;", tName, tName, tName);
+		String query = String.format("SELECT %s.id, users.username, users.online "
+				+ "FROM %s "
+				+ "JOIN users ON %s.id = users.id;", tName, tName, tName);
 		return executeQuery(query);
 		
 	}
@@ -56,7 +59,8 @@ public class FriendsDBManager {
 	public static List<Friend> getAllOnline(String id) {
 		String tName = "Friends_" + clean(id);
 		String query = String.format("SELECT %s.id, users.username, users.online "
-				+ "FROM %s WHERE users.online = TRUE JOIN users ON users.id = %s.id;", tName, tName, tName);
+				+ "FROM %s JOIN users ON users.id = %s.id "
+				+ "WHERE users.online=TRUE;", tName, tName, tName);
 		return executeQuery(query);
 
 	}
@@ -66,26 +70,53 @@ public class FriendsDBManager {
 	public static boolean addUser(String id) {
 		String update = String.format("CREATE TABLE Friends_%s (id VARCHAR(36) PRIMARY KEY);", clean(id));
 		return executeUpdate(update);
-		
 	}
 	
 	public static boolean removeUser(String id) {
 		String update = String.format("DROP TABLE Friends_%s;", clean(id));
 		return executeUpdate(update);
-		
 	}
 	
 	public static boolean addFriend(String uId, String fId) {
 		String update = String.format("INSERT INTO Friends_%s VALUES ('%s');", clean(uId), fId);
 		return executeUpdate(update);
-		
 	}
 	
 	public static boolean removeFriend(String uId, String fId) {
 		String update = String.format("DELETE FROM Friends_%s WHERE id='%s';", clean(uId), fId);
 		return executeUpdate(update);
-		
 	}
+	
+	public static boolean createAll() {
+		List<UserInfo> uis = UserDBManager.getAll();
+		for(UserInfo ui: uis) {
+			if(!addUser(ui.id)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	public static boolean dropAll() {
+		try {
+			// This statement gathers all tables from information_schema.tables with the prefix = 'friends_'
+			String query = "SELECT table_name FROM information_schema.tables WHERE table_schema='OnlinePoolGame' AND table_name LIKE 'friends_%';";
+			Statement stmt = conn.createStatement();
+			ResultSet results = stmt.executeQuery(query);
+			
+			while(results.next()) {
+				String update = String.format("DROP TABLE %s;", results.getString(1));
+				executeUpdate(update);
+			}
+			stmt.close();
+			return true;
+			
+		} catch(SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
 	
 	public static boolean executeUpdate(String update) {
 		// This method is a general SQL Update; to be used by any other method which wants query an update

@@ -170,7 +170,7 @@ public class UserDBManager {
 	}
 	
 	public static boolean setAllOffline() {
-		return executeUpdate("UPDATE users SET online=FALSE;");
+		return executeUpdate("UPDATE users SET online=false;");
 	}
 	
 	

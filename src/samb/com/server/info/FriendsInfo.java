@@ -10,4 +10,9 @@ public class FriendsInfo implements Serializable {
 	private static final long serialVersionUID = -6950454630529384230L;
 	public List<Friend> friends;
 	
+	public FriendsInfo(List<Friend> friends) {
+		this.friends = friends;
+		
+	}
+	
 }

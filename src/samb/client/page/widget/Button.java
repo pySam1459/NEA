@@ -42,8 +42,6 @@ public class Button extends Widget {
 			resizeText();
 			
 		}
-		
-		addAnimation(new BoxFocusAnimation(rect));
 	}
 	
 	private void resizeText() {

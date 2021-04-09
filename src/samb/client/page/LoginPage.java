@@ -66,6 +66,7 @@ public class LoginPage extends Page implements ButtonListener {
 		
 		lButton = new Button(new int[] {xoff+w/2-w/3, yoff+h*4+buffer*11, (int)(w/1.5), 96}, "Login In");
 		lButton.addListener(this);
+		lButton.addAnimation(new BoxFocusAnimation(lButton.rect));
 		add("LoginInBut", lButton);
 		
 		lInvDets = new Text("Invalid Details", new int[] {xoff+w/2-w/3, yoff+h*4+buffer*17+4, (int)(w/1.5), 24}, new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
@@ -122,6 +123,7 @@ public class LoginPage extends Page implements ButtonListener {
 				
 		sButton = new Button(new int[] {xoff+w/2-w/3, yoff+h*4+buffer*11, (int)(w/1.5), 96}, "Sign Up");
 		sButton.addListener(this);
+		sButton.addAnimation(new BoxFocusAnimation(sButton.rect));
 		add("SignUpBut", sButton);
 		
 		sInvDets = new Text("Invalid Details", new int[] {xoff, yoff+h*4+buffer*17+4, w, 24}, 

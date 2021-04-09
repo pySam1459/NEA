@@ -1,5 +1,7 @@
 package samb.client.utils;
 
+import java.awt.Point;
+
 import samb.client.game.Ball;
 import samb.client.main.Client;
 import samb.com.utils.Circle;
@@ -119,7 +121,13 @@ public class Maths {
 	}
 	
 	public static boolean pointInCircle(Pointf p, Circle c) {
+		// Returns if a point is in a circle
 		return getDis(p.x, p.y, c.x, c.y) <= c.r;
+	}
+	
+	public static boolean pointInRect(Point p, int[] rect) {
+		// Returns if a point is in a circle
+		return rect[0] < p.x && p.x < rect[0]+rect[2] && rect[1] < p.y && p.y < rect[1]+rect[3];
 	}
 	
 	public static double[] getProjection(double angle, double radius, Pointf origin) {

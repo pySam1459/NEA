@@ -11,6 +11,7 @@ import java.util.List;
 
 import samb.client.main.Client;
 import samb.client.main.Window;
+import samb.client.page.GamePage;
 import samb.client.page.widget.Widget;
 import samb.client.utils.Consts;
 import samb.client.utils.ImageLoader;

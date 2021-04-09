@@ -7,17 +7,16 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import samb.client.game.Ball;
-import samb.client.game.GamePage;
 import samb.client.main.Client;
+import samb.client.page.GamePage;
 import samb.client.page.widget.animations.LoadingDotsAnimation;
+import samb.client.page.widget.animations.UnderLineAnimation;
 import samb.client.utils.Consts;
 import samb.com.server.info.GameInfo;
 import samb.com.utils.enums.TableUseCase;
 
 public class GameMenu extends Widget {
 
-	public static final Color BACKGROUND_COLOR = new Color(64, 81, 77, 127);
-	public static final Color BORDER_COLOR = new Color(58, 75, 72, 200);
 	private final BasicStroke SCORE_OUTLINE = new BasicStroke(3);
 	
 	public static final Color RED = new Color(254, 63, 32, 192);
@@ -81,6 +80,7 @@ public class GameMenu extends Widget {
 				rect[2]-buffer*16, titleSize*2}, "");
 		forbut.HIDDEN = true;
 		forbut.addListener(gp);
+		forbut.addAnimation(new UnderLineAnimation(forbut.rect));
 		gp.add("forbut", forbut);
 		
 	}
@@ -204,18 +204,23 @@ public class GameMenu extends Widget {
 		BufferedImage img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		
-		g.setColor(BACKGROUND_COLOR);
-		g.fillRoundRect(buffer, buffer, rect[2]-buffer*2, rect[3]-buffer*2, buffer*2, buffer*2);
-		
-		g.setStroke(new BasicStroke(2));
-		g.setColor(BORDER_COLOR);
-		g.drawRoundRect(buffer, buffer, rect[2]-buffer*2, rect[3]-buffer*2, buffer*2, buffer*2);
-		
+		renderBackground(g);
 		renderScores(g);
 		
 		graph.drawImage(img, rect[0], rect[1], null);
 		super.animRender(graph);
 
+	}
+	
+	private void renderBackground(Graphics2D g) {
+		// Renders the background of the menu
+		g.setColor(Consts.MENU_BACKGROUND_COLOR);
+		g.fillRoundRect(buffer, buffer, rect[2]-buffer*2, rect[3]-buffer*2, buffer*2, buffer*2);
+		
+		g.setStroke(new BasicStroke(2));
+		g.setColor(Consts.MENU_BORDER_COLOR);
+		g.drawRoundRect(buffer, buffer, rect[2]-buffer*2, rect[3]-buffer*2, buffer*2, buffer*2);
+		
 	}
 	
 	private void renderScores(Graphics2D g) {
@@ -237,6 +242,7 @@ public class GameMenu extends Widget {
 	
 	private void _renderIndividualScore(Graphics2D g, int score, boolean black, int r, int y, int buffer, Color colour) {
 		// Renders a player's score with given params
+		
 		g.setColor(colour);
 		for(int i=0; i<7; i++) {
 			if(i < score) {
