@@ -31,7 +31,7 @@ public class ImageLoader {
 	
 	
 	public static BufferedImage getBackground() {
-		String file = String.format("background2/%d.png", (int)Window.bgImgCounter);
+		String file = String.format("background/%d.png", (int)Window.bgImgCounter);
 		return get(file);
 		
 	}

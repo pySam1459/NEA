@@ -3,6 +3,9 @@ package samb.com.database;
 import java.io.Serializable;
 
 public class Friend implements Serializable {
+	/* This class contains information about a 'Friend'
+	 *   A friend instance will be created when data is selected from a 'Friend_$id' table
+	 * */
 	
 	private static final long serialVersionUID = 8937817757063002987L;
 	public String id, username;

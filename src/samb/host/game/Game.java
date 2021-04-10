@@ -44,7 +44,6 @@ public class Game extends GameInfo {
 		} if(p.updateInfo != null) {
 			if(p.updateInfo.header == UHeader.win) {
 				winnerId = p.updateInfo.winner;
-				
 			}
 		}
 	}

@@ -37,6 +37,11 @@ public class User {
 		
 	}
 	
+	
+	public void updateElo(int elo) {
+		this.elo = elo;
+	}
+	
 	public void updateElo() {
 		this.elo = StatsDBManager.getElo(id);
 	}

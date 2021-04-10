@@ -11,9 +11,11 @@ import samb.client.page.widget.ChatBox;
 import samb.client.page.widget.EndScreen;
 import samb.client.page.widget.GameMenu;
 import samb.client.page.widget.Text;
-import samb.client.page.widget.animations.UnderLineAnimation;
+import samb.client.page.widget.animations.BoxFocusAnimation;
 import samb.client.page.widget.listeners.ButtonListener;
 import samb.client.utils.ImageLoader;
+import samb.client.utils.Maths;
+import samb.com.database.UserInfo;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
 import samb.com.server.info.Message;
@@ -65,7 +67,7 @@ public class GamePage extends Page implements ButtonListener {
 				Window.dim.height/5, Window.dim.height/12}, "Return To Menu");
 		retobut.id = "retobut";
 		retobut.HIDDEN = true;
-		retobut.addAnimation(new UnderLineAnimation(retobut.rect));
+		retobut.addAnimation(new BoxFocusAnimation(retobut.rect));
 		retobut.addListener(this);
 		
 		endScreen = new EndScreen(new int[] {3*Window.dim.width/8 - Window.dim.height/6, 
@@ -164,10 +166,22 @@ public class GamePage extends Page implements ButtonListener {
 	
 	public void endGame(Win win, String winnerId) {
 		// This method starts to reveal the endScreen
+		endScreen.setDeltaElo(getEloDelta(winnerId));
 		endScreen.reveal(win, Client.getClient().udata.id.equals(winnerId));
 		retobut.HIDDEN = false;
 		
 	}
+	
+	private int getEloDelta(String wId) {
+		UserInfo loser = wId.equals(info.u1.id) ? info.u2 : info.u1;
+		int diffelo = loser.elo - getUI(wId).elo;
+		if(Client.getClient().udata.id.equals(wId)) {
+			return Maths.calculateDeltaElo(diffelo); 
+		} else {
+			return -Maths.calculateDeltaElo(diffelo);
+		}
+	}
+	
 	
 	// Return To Menu button listener methods
 	@Override
@@ -234,6 +248,10 @@ public class GamePage extends Page implements ButtonListener {
 		} else {
 			return table.turn ? info.u1.username : info.u2.username;
 		}
+	}
+	
+	public UserInfo getUI(String id) {
+		return info.u1.id.equals(id) ? info.u1 : info.u2;
 	}
 	
 	

@@ -53,7 +53,6 @@ public class StatsDBManager {
 		String query = String.format("SELECT * FROM stats WHERE id='%s';", id);
 		List<UserStats> results = executeQuery(query);
 		return results.size() == 0 ? null : results.get(0); // returns null if there is no user with id=$id in the table
-		
 	}
 	
 	public static List<UserStats> getAll() {
@@ -129,15 +128,22 @@ public class StatsDBManager {
 		return false;
 	}
 	
-	public static boolean addUser(UserStats ui) {
+	public static boolean addUser(UserStats us) {
 		String update = String.format("INSERT INTO stats VALUES ('%s', %d, %d, %d, %d, %d, %d, %d);", 
-				ui.id, ui.elo, ui.noGames, ui.noGamesWon, ui.noGamesLost, ui.noBallsPotted, ui.highestElo, ui.highestEloVictory);
+				us.id, us.elo, us.noGames, us.noGamesWon, us.noGamesLost, us.noBallsPotted, us.highestElo, us.highestEloVictory);
 		return executeUpdate(update);
 	}
 
 	public static boolean removeUser(String id) {
 		String update = String.format("DELETE FROM stats WHERE id='%s';", id);
 		return executeUpdate(update);
+	}
+	
+	public static boolean setUS(String id, UserStats us) {
+		if(removeUser(id)) {
+			return addUser(us);
+		}
+		return false;
 	}
 	
 	

@@ -8,6 +8,7 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 
+import samb.client.main.Client;
 import samb.client.utils.Consts;
 import samb.com.server.info.Win;
 
@@ -18,16 +19,18 @@ public class EndScreen extends Widget {
 	private BufferedImage img;
 	private float opacity = 0.0f, maxOpacity = 0.85f;
 	private long timer = 0, revealPeriod = 8;
+	private int deltaElo = 0;
 	
-	private Font titleFont, byWhatFont;
+	private Font titleFont, byWhatFont, eloDeltaFont;
 	private Button retoBut;
 
 	public EndScreen(int[] rect, Button retoBut) {
 		super(rect);
 		this.retoBut = retoBut;
 	
-		this.titleFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/7);		
-		this.byWhatFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/12);		
+		this.titleFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/7);
+		this.byWhatFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/12);
+		this.eloDeltaFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/12);
 	}
 	
 
@@ -61,25 +64,42 @@ public class EndScreen extends Widget {
 		
 		// Background
 		int arc = 32;
-		g.setColor(GameMenu.BACKGROUND_COLOR);
+		g.setColor(Consts.MENU_BACKGROUND_COLOR);
 		g.fillRoundRect(2, 2, rect[2]-4, rect[3]-4, arc, arc);
 		
-		g.setColor(GameMenu.BORDER_COLOR);
+		g.setColor(Consts.MENU_BORDER_COLOR);
 		g.setStroke(new BasicStroke(2));
 		g.drawRoundRect(2, 2, rect[2]-4, rect[3]-4, arc, arc);
 		
 		// Render title ("You Won!", "You Lost")
 		TextInfo ti = new TextInfo(amWinner ? "You Won!" : "You Lost", titleFont, amWinner ? Color.GREEN : Color.RED);
-		int titleY = rect[3]/4+ti.dim.height/2;
-		Point xy = new Point(rect[2]/2 - ti.dim.width/2, titleY);
+		int yoff = rect[3]/4+ti.dim.height/2;
+		Point xy = new Point(rect[2]/2 - ti.dim.width/2, yoff);
 		ti.render(g, xy);
 		
 		// By what
 		ti = new TextInfo(byWhat(win), byWhatFont, Consts.PAL1);
-		xy = new Point(rect[2]/2 - ti.dim.width/2, titleY + ti.dim.height+8);
+		xy = new Point(rect[2]/2 - ti.dim.width/2, yoff + ti.dim.height+8);
 		ti.render(g, xy);
+		yoff += ti.dim.height+8;
 		
-		//setOpacity(0.0f);
+		// Delta Elo
+		ti = getEloDeltaTextInfo();
+		xy = new Point(rect[2]/2 - ti.dim.width/2, yoff + ti.dim.height+32);
+		ti.render(g, xy);
+	}
+	
+	private TextInfo getEloDeltaTextInfo() {
+		String text;
+		Color col;
+		if(deltaElo > 0) {
+			text = Integer.toString(Client.getClient().udata.userStats.elo) + " +" + Integer.toString(deltaElo);
+			col = Color.GREEN;
+		} else {
+			text = Integer.toString(Client.getClient().udata.userStats.elo) + " " + Integer.toString(deltaElo);
+			col = Color.RED;
+		}
+		return new TextInfo(text, eloDeltaFont, col);
 	}
 	
 	private String byWhat(Win win) {
@@ -112,4 +132,8 @@ public class EndScreen extends Widget {
 		}
 	}
 
+	public void setDeltaElo(int delo) {
+		this.deltaElo = delo;
+	}
+	
 }

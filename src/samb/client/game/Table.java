@@ -395,10 +395,15 @@ public class Table extends Widget {
 	
 	private void win(String wid, Win win) {
 		// This method is called when a win is 'detected', an update is sent to the host
-		if(turn) {
+		this.state.win = win;
+		if(turn && tuc == TableUseCase.playing) {
 			Packet p = new Packet(Header.updateGame);
 			p.updateInfo = new UpdateInfo(UHeader.win, win, wid);
+			p.gameState = state;
 			Client.getClient().server.send(p);
+			
+		} else if(tuc == TableUseCase.practicing) {
+			updateInfo = new UpdateInfo(UHeader.win, win, wid);
 		}
 	}
 	

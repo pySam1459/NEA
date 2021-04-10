@@ -22,13 +22,15 @@ public class Pool implements Runnable {
 	
 	private BlockingQueue<String> queue;
 	private HashMap<Integer, CopyOnWriteArrayList<String>> bands;
-	public static final int ELO_BUFFER = 50;
-	
+	public static final int ELO_BUFFER = 100;
+
 	private GameManager gm;
+	private UserManager um;
 	private Random r;
 	
 	public Pool(GameManager gm) {
 		this.gm = gm;
+		this.um = Host.getHost().um;
 		
 		this.queue = new LinkedBlockingQueue<>();
 		this.bands = new HashMap<>();
@@ -56,9 +58,12 @@ public class Pool implements Runnable {
 	
 	private boolean match(String id) {
 		// This method matches an opponent for the user with specified id
+		if(!um.isOnline(id)) {
+			return false;
+		}
 		
-		int elo = Host.getHost().um.get(id).elo;
-		int index = elo % ELO_BUFFER;
+		int elo = um.get(id).elo;
+		int index = elo / ELO_BUFFER;
 		List<String> ids = new ArrayList<>(); // good matches
 		
 		int opElo;
@@ -66,11 +71,16 @@ public class Pool implements Runnable {
 			if(bands.get(index+di) != null) {
 				for(String opId: bands.get(index+di)) {
 					if(!opId.equals(id)) {
-						opElo = Host.getHost().um.get(opId).elo; // get opponents elo
-						
-						if(elo-ELO_BUFFER < opElo && opElo < elo+ELO_BUFFER) {
-							ids.add(opId); // adds to good matches list
+						if(um.isOnline(opId)) {
+							opElo = um.get(opId).elo; // get opponents elo
 							
+							if(elo-ELO_BUFFER < opElo && opElo < elo+ELO_BUFFER) {
+								ids.add(opId); // adds to good matches list
+								
+							}
+						} else {
+							// logged off while match making
+							remove(opId);
 						}
 					}
 				}
@@ -84,7 +94,9 @@ public class Pool implements Runnable {
 		int i = r.nextInt(ids.size()); // get a random player from good matches
 		String opId = ids.get(i);
 		
-		gm.newGame(id, opId); // create new game
+		if(um.isOnline(id) && um.isOnline(opId)) {
+			gm.newGame(id, opId); // create new game
+		}
 		
 		remove(id);
 		remove(opId); // remove from queue and bands
@@ -108,16 +120,18 @@ public class Pool implements Runnable {
 	public void remove(String id) {
 		queue.remove(id);
 		
-		int index = getIndex(id);
-		if(bands.get(index) != null) {
-			bands.get(index).remove(id);
-		
+		if(um.isOnline(id)) {
+			int index = getIndex(id);
+			if(bands.get(index) != null) {
+				bands.get(index).remove(id);
+			
+			}
 		}
 	}
 	
 	private int getIndex(String id) {
 		// Returns the band index from a player's id
-		return Host.getHost().um.get(id).elo % ELO_BUFFER;
+		return um.get(id).elo / ELO_BUFFER;
 	}
 
 	
@@ -139,6 +153,16 @@ public class Pool implements Runnable {
 			bands.clear();
 			queue.clear();
 		}
+	}
+	
+	public void showBands() {
+		bands.forEach((Integer index, CopyOnWriteArrayList<String> arr) -> {
+			System.out.print(index + " ");
+			for(String obj: arr) {
+				System.out.print(obj + ", ");
+			}
+			System.out.println();
+		});
 	}
 
 }

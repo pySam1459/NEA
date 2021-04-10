@@ -4,13 +4,17 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import samb.client.utils.Maths;
 import samb.com.database.UserInfo;
+import samb.com.database.UserStats;
 import samb.com.server.info.UpdateInfo;
 import samb.com.server.info.Win;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.UHeader;
 import samb.com.utils.enums.TableUseCase;
+import samb.host.database.StatsDBManager;
+import samb.host.database.UserDBManager;
 import samb.host.main.Host;
 
 public class GameManager {
@@ -153,8 +157,12 @@ public class GameManager {
 	public void endGame(String gId) {
 		// This method ends a game, updates statistics and removes the game
 		
-		if(games.get(gId).winnerId != null) {
-			// TODO update statistics, etc
+		Game g = games.get(gId);
+		if(g.winnerId != null) {
+			UserInfo win = UserDBManager.getUI(g.winnerId);
+			UserInfo lose = UserDBManager.getUI(g.getOppId(g.winnerId));
+			
+			updateStats(g, win, lose);
 		}
 		
 		removeGame(gId);
@@ -193,7 +201,41 @@ public class GameManager {
 			
 			g.winnerId = g.getOppId(id);
 			endGame(gId);
+			
+		} else {
+			pool.remove(id);
 		}
+	}
+	
+	private void updateStats(Game g, UserInfo win, UserInfo lose) {
+		// This method updates the player's statistics after a game
+		
+		int diffelo = lose.elo - win.elo;  // if lose.elo > win.elo => delo > 0
+		int deltaElo = Maths.calculateDeltaElo(diffelo); // change in elo
+		
+		// Current statistics
+		UserStats winS = StatsDBManager.getUS(win.id); 
+		UserStats loseS = StatsDBManager.getUS(lose.id);
+		
+		winS.updateElo(deltaElo);
+		if(loseS.elo > winS.highestEloVictory) { winS.highestEloVictory = loseS.elo; }
+		winS.noGames++;
+		winS.noGamesWon++;
+		winS.noBallsPotted += winS.id.equals(g.state.redID) ? g.state.red : g.state.yellow;
+		winS.noBallsPotted += g.state.win == Win.pottedAll ? 1 : 0; // potted the black as well
+		
+		loseS.updateElo(-deltaElo);
+		loseS.noGames++;
+		loseS.noGamesLost++;
+		loseS.noBallsPotted += loseS.id.equals(g.state.redID) ? g.state.red : g.state.yellow;
+		
+		// Update Database with new statistics
+		StatsDBManager.setUS(win.id, winS);
+		StatsDBManager.setUS(lose.id, loseS);
+		
+		Host.getHost().um.get(winS.id).updateElo(winS.elo);
+		Host.getHost().um.get(loseS.id).updateElo(loseS.elo);
+		
 	}
 	
 	

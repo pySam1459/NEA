@@ -36,6 +36,15 @@ public class UserStats implements Serializable {
 	}
 	
 	
+	public void updateElo(int deltaElo) {
+		this.elo += deltaElo;
+		if(elo > highestElo && (noGamesWon > 0 || deltaElo > 0)) { // only update highest Elo when you've won a game
+			this.highestElo = elo;
+			
+		}
+	}
+	
+	
 	public int[] toArray() {
 		return new int[] {elo, noGames, noGamesWon, noGamesLost, noBallsPotted, highestElo, highestEloVictory};
 	}

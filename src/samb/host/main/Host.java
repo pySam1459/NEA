@@ -441,6 +441,10 @@ public class Host extends BaseProcessor implements Runnable {
 			System.exit(0);
 			break;
 			
+		case "pool":
+			gm.pool.showBands();
+			break;
+			
 		default:
 			System.out.printf("Invalid Command '%s'\n", args[0]);
 		}
