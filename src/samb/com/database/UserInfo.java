@@ -9,16 +9,17 @@ public class UserInfo implements Serializable {
 	private static final long serialVersionUID = -1335445462934410453L;
 	public String id, username, email, password;
 	public int elo;
-	public boolean online;
+	public boolean online, inGame;
 	
 	public UserInfo() {}
 	
-	public UserInfo(String id, String username, String email, String password, boolean online) {
+	public UserInfo(String id, String username, String email, String password, boolean online, boolean inGame) {
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.password = password;
 		this.online = online;
+		this.inGame = inGame;
 		
 	}
 	
@@ -28,6 +29,7 @@ public class UserInfo implements Serializable {
 		this.email = email;
 		this.password = password;
 		this.online = false;
+		this.inGame = false;
 		
 	}
 	

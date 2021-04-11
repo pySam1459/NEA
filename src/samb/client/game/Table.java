@@ -254,7 +254,6 @@ public class Table extends Widget {
 			this.turn = !turn;
 			this.turnName = gp.getTurnName();
 			
-			
 			if(state.turnCol != 0) {
 				state.turnCol = state.turnCol == 1 ? 2 : 1;
 			}
@@ -274,6 +273,7 @@ public class Table extends Widget {
 	}
 	
 	private boolean checkAllowPlacement() {
+		// Checks whether the cue ball is allowed to be placed on point p
 		Pointf p = cueBallPlacement;
 		double r = Ball.DEFAULT_BALL_RADIUS+1;
 		Circle c = new Circle(p.x, p.y, r, 0);
@@ -287,7 +287,6 @@ public class Table extends Widget {
 				
 			}
 		}
-		
 		
 		return true;
 	}
@@ -393,10 +392,10 @@ public class Table extends Widget {
 		}
 	}
 	
-	private void win(String wid, Win win) {
+	public void win(String wid, Win win) {
 		// This method is called when a win is 'detected', an update is sent to the host
 		this.state.win = win;
-		if(turn && tuc == TableUseCase.playing) {
+		if((turn || win == Win.forfeit) && tuc == TableUseCase.playing) {
 			Packet p = new Packet(Header.updateGame);
 			p.updateInfo = new UpdateInfo(UHeader.win, win, wid);
 			p.gameState = state;
@@ -522,7 +521,7 @@ public class Table extends Widget {
 			b.render(g, scaledBuffer);
 		}
 		
-		if(cuePlacement && cueBallPlacement != null) {
+		if(cuePlacement && cueBallPlacement != null && simulate) {
 			g.setColor(Ball.colours[0]);
 			g.fillOval((int)(cueBallPlacement.x-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
 					(int)(cueBallPlacement.y-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
@@ -651,16 +650,16 @@ public class Table extends Widget {
 	private static Line[] getCushions() {
 		// These are the coordinates for each cushion, including pocket cushions
 		return new Line[] {
-			new Line(38, -39, 78, 0),
-			new Line(78, 0, 966, 0),
-			new Line(966, 0, 973, -29),
-			new Line(1073, -28, 1080, 0),
-			new Line(1080, 0, 1968, 0),
-			new Line(1968, 0, 2003, -35),
+			new Line(40, -39, 80, 0),
+			new Line(80, 0, 964, 0),
+			new Line(964, 0, 973, -29),
+			new Line(1075, -28, 1082, 0),
+			new Line(1082, 0, 1966, 0),
+			new Line(1966, 0, 2002, -35),
 			
-			new Line(2088, 39, 2048, 83),
-			new Line(2048, 83, 2048, 943),
-			new Line(2048, 943, 2078, 970),
+			new Line(2088, 41, 2048, 85),
+			new Line(2048, 85, 2048, 941),
+			new Line(2048, 941, 2078, 970),
 			
 			new Line(45, 1058, 82, 1023),
 			new Line(82, 1023, 967, 1023),
@@ -670,8 +669,8 @@ public class Table extends Widget {
 			new Line(1970, 1025, 2000, 1054),
 			
 			new Line(-25, 54, 0, 81),
-			new Line(0, 81, 0, 942),
-			new Line(0, 942, -25, 966),
+			new Line(0, 81, 0, 938),
+			new Line(0, 938, -25, 966)
 		};
 	}
 	

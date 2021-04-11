@@ -19,11 +19,9 @@ import samb.com.database.UserInfo;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
 import samb.com.server.info.Message;
-import samb.com.server.info.UpdateInfo;
 import samb.com.server.info.Win;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
-import samb.com.server.packet.UHeader;
 import samb.com.utils.Func;
 import samb.com.utils.enums.TableUseCase;
 
@@ -214,10 +212,7 @@ public class GamePage extends Page implements ButtonListener {
 			
 		} else if(b.id.equals("forbut")) { // Forfeit button on gameMenu Widget
 			if(table.tuc == TableUseCase.playing) {
-				Packet p = new Packet(Header.updateGame);
-				String winId = info.id.equals(info.u1.id) ? info.u1.id : info.u2.id;
-				p.updateInfo = new UpdateInfo(UHeader.win, Win.forfeit, winId);
-				Client.getClient().server.send(p);
+				table.win(getNotTurnID(), Win.forfeit);
 				
 			} else { // if you are spectating/practicing, return to menu
 				Client.getClient().pm.changePage(new MenuPage());

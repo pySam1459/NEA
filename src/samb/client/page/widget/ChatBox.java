@@ -65,11 +65,10 @@ public class ChatBox extends Widget implements TextBoxListener {
 	}
 	
 	@Override
-	public void onEnter(Widget w) {
+	public void onEnter(TextBox tb) {
 		// This method is called by a TextBox Widget when the enter key is pressed, ie when the player wants to send the message
 		
-		if(w.id.equals("enterText")) {
-			TextBox tb = (TextBox) w;
+		if(tb.id.equals("enterText")) {
 			Message m = new Message(tb.getText(), Client.getClient().udata.userInfo.username);
 			sendMessage(m); // sends the message to host, then to opposition
 			addMessage(m);  // adds the message to the chat "log" 

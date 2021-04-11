@@ -8,7 +8,6 @@ import samb.client.page.LoginPage;
 import samb.client.page.MenuPage;
 import samb.client.page.PageManager;
 import samb.client.page.widget.FriendList;
-import samb.client.page.widget.FriendProfile;
 import samb.client.server.Server;
 import samb.client.utils.Consts;
 import samb.client.utils.UserData;
@@ -95,6 +94,7 @@ public class Client extends BaseProcessor implements Runnable {
 		// the switch/case statement will direct each packet (using the header) to wherever it is needed
 		
 		LoginPage lp;
+		MenuPage mp;
 		GamePage gp;
 		
 		Packet p = PacketFactory.toPacket(packet.getData());
@@ -180,6 +180,14 @@ public class Client extends BaseProcessor implements Runnable {
 			gp.spectate(p.gameInfo, p.gameState);
 			break;
 			
+		case challenge:
+			if(pm.isId("MenuPage")) {
+				mp = (MenuPage) pm.get();
+				mp.recvChallenge(p.challengeInfo);
+				
+			}
+			break;
+			
 			
 		case chat:
 			// This case receives a chat message and adds it to the players chatbox
@@ -194,10 +202,9 @@ public class Client extends BaseProcessor implements Runnable {
 			// This case updates the udata of the user's stats
 			if(p.userStats == null) { break; }
 			if(pm.isId("MenuPage")) {
-				MenuPage mp = (MenuPage)pm.get();
+				mp = (MenuPage)pm.get();
 				if(p.friendsInfo != null) {
-					((FriendProfile) mp.get("friendProfile")).setBools(p.friendsInfo);
-					((FriendProfile) mp.get("friendProfile")).setStats(p.userStats, true);
+					mp.fp.setStats(p.userStats, true);
 					break;
 					
 				} else {
@@ -211,7 +218,7 @@ public class Client extends BaseProcessor implements Runnable {
 		case getFriends:
 			// This case updates the udata of the user's friends
 			if(pm.isId("MenuPage")) {
-				MenuPage mp = (MenuPage)pm.get();
+				mp = (MenuPage)pm.get();
 				((FriendList) mp.get("friendList")).setFriends(p);
 			}
 			break;

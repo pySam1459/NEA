@@ -8,17 +8,22 @@ import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 import samb.client.main.Client;
 import samb.client.page.widget.animations.BoxFocusAnimation;
+import samb.client.page.widget.listeners.TextBoxListener;
 import samb.client.utils.Consts;
 import samb.client.utils.Maths;
 import samb.com.database.Friend;
+import samb.com.server.info.ChallengeInfo;
+import samb.com.server.info.FriendsInfo;
+import samb.com.server.packet.FHeader;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 
-public class FriendList extends Widget implements MouseWheelListener {
+public class FriendList extends Widget implements MouseWheelListener, TextBoxListener {
 	/* This widget displays a list of all your friends
 	 * */
 	
@@ -90,15 +95,53 @@ public class FriendList extends Widget implements MouseWheelListener {
 		}		
 	}
 	
-	private void getFriends() { // Requests the friends list
+	public void getFriends() { // Requests the friends list
 		Packet p = new Packet(Header.getFriends);
+		p.friendsInfo = new FriendsInfo(FHeader.getFriends, new ArrayList<>());
 		Client.getClient().server.send(p);
 	}
 	
 	public void setFriends(Packet p) { // Sets the friends list
+		// Keep challenge info for same friends
+		if(friends != null) {
+			for(Friend f: friends) {
+				for(Friend nf: p.friendsInfo.friends) {
+					if(nf.id.equals(f.id)) {
+						nf.challenged = f.challenged;
+						nf.ci = f.ci;
+					}
+				}
+			}
+		}
+		
 		this.friends = p.friendsInfo.friends;
 		renderFriends();
 		
+	}
+	
+	public void recvChallenge(ChallengeInfo ci) {
+		for(Friend f: friends) {
+			if(f.id.equals(ci.oppId)) {
+				f.challenged = true;
+				f.ci = ci;
+				
+				if(!fp.HIDDEN && ci.oppId.equals(fp.f.id)) {
+					fp.setBools(f);
+					fp.setHidden(false);
+				}
+				break;
+			}
+		}
+	}
+	
+	
+	@Override
+	public void onEnter(TextBox tb) {
+		if("searchBox".equals(tb.id)) {
+			Packet p = new Packet(Header.getFriends);
+			p.friendsInfo = new FriendsInfo(FHeader.searchFriend, tb.getText().trim());
+			Client.getClient().server.send(p);
+		}
 	}
 
 	@Override

@@ -13,11 +13,13 @@ public class Maths {
 	 * */
 	
 	public static boolean ballInRect(Ball b, double[] rect) {
+		// Checks if a ball and a rectangle overlap
 		return b.x-b.r <= rect[0]+rect[2] && b.y-b.r <= rect[1]+rect[3] &&
 				rect[0] <= b.x+b.r && rect[1] <= b.y+b.r;
 	}
 	
 	public static boolean lineInBall(Ball b, Line l) {
+		// Checks whether a ball has collided with a line
 		double x1=l.x1-b.x, y1=l.y1-b.y, x2=l.x2-b.x, y2=l.y2-b.y;
 		
 		double dx=x2-x1, dy=y2-y1;
@@ -32,15 +34,13 @@ public class Maths {
 	}
 	
 	public static void ballCollisionLine(Ball b, Line l) {
-		double dx = l.x2 - l.x1;
-		double dy = l.y2 - l.y1;
-		double nmag = magnitude(dx, dy);
-		double repNMagSqr = 1.0 / (nmag * nmag);
-		double mul = l.x1 > l.x2 ? -1: 1;
+		// refects the incoming ball on the line
+		double theta = Math.atan((l.y2-l.y1) / (l.x2-l.x1));
+		double nx = b.vx*Math.cos(2*theta) + b.vy*Math.sin(2*theta);
+		double ny = b.vx*Math.sin(2*theta) - b.vy*Math.cos(2*theta);
 		
-		b.vx += -2*dy*(b.vx*dy - b.vy*dx)*repNMagSqr * mul;
-		b.vy += 2*dx*(b.vx*dy - b.vy*dx)*repNMagSqr * mul;
-		
+		b.vx = nx;
+		b.vy = ny;
 	}
 	
 	public static boolean ballCollisionBall(Ball b1, Ball b2) {
@@ -70,9 +70,12 @@ public class Maths {
 		// This method separates 2 overlapping balls in the direction they were moving
 		
 		double d0 = getDis(b1.x, b1.y, b2.x, b2.y);
-		double dt_ = Client.dt/100.0;
+		double dt_ = Client.dt/1000.0;
 		double d1 = getDis(b1.x-b1.vx*dt_, b1.y-b1.vy*dt_, b2.x-b2.vx*dt_, b2.y-b2.vy*dt_);
 		double ds = (b1.r + b2.r - d0) * dt_ / (d1 - d0);
+		if(d1-d0 == 0) { // catches zero division error
+			ds = 0.01;
+		}
 		
 		b1.x -= b1.vx * ds;
 		b1.y -= b1.vy * ds;

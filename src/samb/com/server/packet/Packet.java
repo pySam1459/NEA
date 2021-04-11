@@ -3,6 +3,7 @@ package samb.com.server.packet;
 import java.io.Serializable;
 
 import samb.com.database.UserStats;
+import samb.com.server.info.ChallengeInfo;
 import samb.com.server.info.FriendsInfo;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
@@ -30,6 +31,7 @@ public class Packet implements Serializable {
 	public GameState gameState;
 	public UpdateInfo updateInfo;
 	public UserStats userStats;
+	public ChallengeInfo challengeInfo;
 	public FriendsInfo friendsInfo;
 	public Message message;
 	

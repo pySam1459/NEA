@@ -12,6 +12,7 @@ public enum Header {
 	
 	joinPool,
 	spectate,
+	challenge,
 	
 	updateGame,
 	getUpdateGame,
@@ -19,6 +20,7 @@ public enum Header {
 	chat,
 	
 	getStats,
-	getFriends;
+	getFriends,
+	addFriend;
 	
 }

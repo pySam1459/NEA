@@ -7,8 +7,8 @@ import java.util.UUID;
 import samb.com.database.UserInfo;
 import samb.com.database.UserStats;
 import samb.com.server.BaseProcessor;
-import samb.com.server.info.FriendsInfo;
 import samb.com.server.packet.Error;
+import samb.com.server.packet.FHeader;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.PacketFactory;
 import samb.com.utils.Config;
@@ -181,6 +181,7 @@ public class Host extends BaseProcessor implements Runnable {
 			switch(args[1]) {
 			case "create":
 			case "delete":
+			case "setup":
 				System.out.printf("Cannot perform command '%s' as the Host is currently Online!\n", args[1]);
 				return;
 			}
@@ -332,6 +333,7 @@ public class Host extends BaseProcessor implements Runnable {
 		StatsDBManager.createTable();
 		FriendsDBManager.createAll();
 		
+		System.out.println("The Database is Setup!");
 	}
 	
 	
@@ -473,17 +475,27 @@ public class Host extends BaseProcessor implements Runnable {
 			// This case adds the user to the game pool, for matchmaking
 			gm.pool.add(p.id);
 			break;
+			
+		case spectate:
+			// This case is called by a user wanting to spectate another user
+			gm.queueSpectate(p.spec, p.id);
+			break;
+			
+		case challenge:
+			if(p.challengeInfo.accepted) {
+				if(um.isOnline(p.challengeInfo.oppId) && um.isOnline(p.id)) {
+					gm.newGame(p.challengeInfo.oppId, p.id);
+				}
+			} else {
+				gm.challenge(p);
+			}
+			break;
 		
 			
 		case updateGame:
 			// This case receives an update from a user about a new game state, 
 			//   updates the internal game state and sends update packets to the updators
 			gm.update(p);
-			break;
-			
-		case spectate:
-			// This case is called by a user wanting to spectate another user
-			gm.queueSpectate(p.spec, p.id);
 			break;
 			
 		case getUpdateGame:
@@ -493,6 +505,7 @@ public class Host extends BaseProcessor implements Runnable {
 				
 			}
 			break;
+			
 			
 		case chat:
 			// This case sends the chat of a player to their opposition
@@ -504,32 +517,26 @@ public class Host extends BaseProcessor implements Runnable {
 			
 			
 		case getStats:
-			// This case sends back the stats of a specific user
-			if(um.isOnline(p.id)) {
-				if(p.friendsInfo != null) {
-					p.userStats = StatsDBManager.getUS(p.friendsInfo.friendId);
-					p.friendsInfo.online = um.isOnline(p.friendsInfo.friendId);
-					p.friendsInfo.inGame = gm.inGame(p.friendsInfo.friendId);
-				} else {
-					p.userStats = StatsDBManager.getUS(p.id);
-				}
-				um.get(p.id).send(p);
-				
-			}
+			// This case sends back the stats of a specified user
+			getStats(p);
 			break;
 			
 		case getFriends:
-			// This case sends back a user's friends list
-			if(um.isOnline(p.id)) {
-				p.friendsInfo = new FriendsInfo(FriendsDBManager.getAllOnline(p.id));
-				um.get(p.id).send(p);
-			}
+			// This case sends back a user's friends list, or a list of users searched by the user
+			getFriends(p);
+			break;
+			
+		case addFriend:
+			// This case informs the host of a new friendship
+			FriendsDBManager.addFriend(p.id, p.friendsInfo.f.id);
+			FriendsDBManager.addFriend(p.friendsInfo.f.id, p.id);
 			break;
 		
 		default:
 			System.out.printf("Unknown Header '%s'\n", p.header.toString());
 		}
 	}
+
 	
 	private void loginCase(Packet p, DatagramPacket packet) {
 		// This method checks the authenticity of a users credentials, and either logins in or rejects the user
@@ -595,6 +602,35 @@ public class Host extends BaseProcessor implements Runnable {
 		p.loginInfo.authorized = true;
 		p.loginInfo.password = null;
 		u.send(p);
+	}
+	
+	private void getStats(Packet p) {
+		// Sends a packet containing stats information
+		if(um.isOnline(p.id)) {
+			if(p.friendsInfo != null) {
+				p.userStats = StatsDBManager.getUS(p.friendsInfo.f.id);
+				p.friendsInfo.f = FriendsDBManager.get(p.id, p.friendsInfo.f.id);
+			} else {
+				p.userStats = StatsDBManager.getUS(p.id);
+			}
+			um.get(p.id).send(p);
+			
+		}
+	}
+	
+	private void getFriends(Packet p) {
+		// Sends a packet containing friends information
+		if(um.isOnline(p.id)) {
+			if(p.friendsInfo.header == FHeader.getFriends) {
+				p.friendsInfo.friends = FriendsDBManager.getAll(p.id);
+				um.get(p.id).send(p);
+				
+			} else if(p.friendsInfo.header == FHeader.searchFriend) {
+				p.friendsInfo.friends = FriendsDBManager.findFriends(p.id, p.friendsInfo.search);
+				um.get(p.id).send(p);
+				
+			}
+		}
 	}
 	
 	

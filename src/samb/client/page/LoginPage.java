@@ -229,8 +229,13 @@ public class LoginPage extends Page implements ButtonListener {
 			sInvEmail.HIDDEN = false;
 			break;
 			
+		case alreadyOnline:
+			lInvDets.setText("User Already Online!");
+			lInvDets.HIDDEN = false;
+			break;
+			
 		default:
-			System.out.printf("An Error has occured!\nError Token: %s", err.toString());
+			System.out.printf("An Error has occured!   =>   Error Token: %s\n", err.toString());
 			break;
 		}
 	}

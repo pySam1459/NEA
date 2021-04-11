@@ -85,7 +85,7 @@ public class UserDBManager {
 		String query = String.format("SELECT * FROM users ORDER BY %s;", orderby);  // Gets all UserInfo ordered by argument orderby
 		List<UserInfo> arr = executeQuery(query);
 		
-		String[] columnNames = new String[] {"Username", "Email", "ID", "Password", "Online"};  // column names
+		String[] columnNames = new String[] {"Username", "Email", "ID", "Password", "Online", "In Game"};  // column names
 		int[] maxChars = new int[columnNames.length];  
 		for(int i=0; i<columnNames.length; i++) { maxChars[i] = columnNames[i].length(); };
 		
@@ -115,12 +115,10 @@ public class UserDBManager {
 										  + "username VARCHAR(20),"
 										  + "email VARCHAR(64),"
 										  + "password VARCHAR(64),"
-										  + "online BOOLEAN);";  // The passwords kept in the db will have been hashed (SHA-256) and salted
-		//return executeUpdate(update);
-		
-		// Testing purposes
-		executeUpdate(update);
-		return true;
+										  + "online BOOLEAN,"
+										  + "inGame BOOLEAN);";  
+		// The passwords kept in the db will have been hashed (SHA-256) and salted
+		return executeUpdate(update);
 	}
 	
 	public static boolean dropTable() {
@@ -139,17 +137,8 @@ public class UserDBManager {
 	}
 	
 	public static boolean addUser(UserInfo ui) {
-		String update = String.format("INSERT INTO users VALUES ('%s', '%s', '%s', '%s', FALSE);", ui.id, ui.username, ui.email, ui.password);
-		return executeUpdate(update);
-	}
-	
-	public static boolean updateUsername(UserInfo ui) {
-		String update = String.format("UPDATE users SET username='%s' WHERE id='%s';", ui.username, ui.id);
-		return executeUpdate(update);
-	}
-	
-	public static boolean updateEmail(UserInfo ui) {
-		String update = String.format("UPDATE users SET email='%s' WHERE id='%s';", ui.username, ui.id);
+		String update = String.format("INSERT INTO users VALUES ('%s', '%s', '%s', '%s', FALSE, FALSE);", 
+				ui.id, ui.username, ui.email, ui.password);
 		return executeUpdate(update);
 	}
 
@@ -169,13 +158,17 @@ public class UserDBManager {
 		return executeUpdate(update);
 	}
 	
+	public static boolean setIngame(String id, boolean inGame) {
+		String update = String.format("UPDATE users SET inGame=%b WHERE id='%s';", inGame, id);
+		return executeUpdate(update);
+	}
+	
 	public static boolean setAllOffline() {
-		return executeUpdate("UPDATE users SET online=false;");
+		return executeUpdate("UPDATE users SET online=false AND inGame=false;");
 	}
 	
 	
 	// General Methods
-	
 	public static boolean executeUpdate(String update) {
 		// This method is a general SQL Update; to be used by any other method which wants query an update
 		try {
@@ -215,7 +208,8 @@ public class UserDBManager {
 		List<UserInfo> data = new ArrayList<>();
 		UserInfo ui;
 		while(results.next()) {
-			ui = new UserInfo(results.getString(1), results.getString(2), results.getString(3), results.getString(4), results.getBoolean(5));
+			ui = new UserInfo(results.getString(1), results.getString(2), results.getString(3), 
+					results.getString(4), results.getBoolean(5), results.getBoolean(6));
 			data.add(ui);
 			
 		}
@@ -234,13 +228,13 @@ public class UserDBManager {
 	
 	
 	// Methods used in the 'display' method
-	
-	private static void _compareChars(UserInfo ui, int[] maxChars) {  // "username", "email", "id", "password"
+	private static void _compareChars(UserInfo ui, int[] maxChars) {  // "username", "email", "id", "password", online, inGame
 		if(ui.username.length() > maxChars[0]) { maxChars[0] = ui.username.length(); }
 		if(ui.email.length() > maxChars[1]) { maxChars[1] = ui.email.length(); }
 		if(ui.id.length() > maxChars[2]) { maxChars[2] = ui.id.length(); }
 		if(ui.password.length() > maxChars[3]) { maxChars[3] = ui.password.length(); }
 		if((ui.online?4:5) > maxChars[4]) {maxChars[4] = ui.online?4:5;} // {True: False}
+		if((ui.inGame?4:5) > maxChars[5]) {maxChars[5] = ui.inGame?4:5;} // {True: False}
 		
 	}
 	
@@ -261,7 +255,8 @@ public class UserDBManager {
 	}
 	
 	private static void _displayUserInfo(UserInfo ui, int[] maxChars) {
-		_displayRow(new String[] {ui.username, ui.email, ui.id, ui.password, Boolean.toString(ui.online)}, maxChars);
+		_displayRow(new String[] {ui.username, ui.email, ui.id, ui.password, 
+				Boolean.toString(ui.online), Boolean.toString(ui.inGame)}, maxChars);
 		
 	}
 	

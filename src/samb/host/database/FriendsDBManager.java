@@ -47,9 +47,19 @@ public class FriendsDBManager {
 	}
 	
 	// Query Methods
+	public static Friend get(String uId, String fId) {
+		String tName = "Friends_" + clean(uId);  // Selecting, friend id, friend username, and friend online status
+		String query = String.format("SELECT %s.id, users.username, users.online, users.inGame, TRUE "
+				+ "FROM %s "
+				+ "JOIN users ON %s.id = users.id "
+				+ "WHERE users.id = '%s';", tName, tName, tName, fId);
+		List<Friend> results = executeQuery(query);
+		return results.size() > 0 ? results.get(0) : null;
+	}
+	
 	public static List<Friend> getAll(String id) {
 		String tName = "Friends_" + clean(id);  // Selecting, friend id, friend username, and friend online status
-		String query = String.format("SELECT %s.id, users.username, users.online "
+		String query = String.format("SELECT %s.id, users.username, users.online, users.inGame, TRUE "
 				+ "FROM %s "
 				+ "JOIN users ON %s.id = users.id;", tName, tName, tName);
 		return executeQuery(query);
@@ -58,13 +68,22 @@ public class FriendsDBManager {
 	
 	public static List<Friend> getAllOnline(String id) {
 		String tName = "Friends_" + clean(id);
-		String query = String.format("SELECT %s.id, users.username, users.online "
+		String query = String.format("SELECT %s.id, users.username, users.online, users.inGame, TRUE "
 				+ "FROM %s JOIN users ON users.id = %s.id "
 				+ "WHERE users.online=TRUE;", tName, tName, tName);
 		return executeQuery(query);
 
 	}
 	
+	public static List<Friend> findFriends(String uId, String search) {
+		// This method attempts to find new friends based on a search argument
+		String tName = "Friends_" + clean(uId);
+		String query = String.format("SELECT users.id, users.username, users.online, users.inGame, FALSE "
+				+ "FROM users WHERE users.id NOT IN (SELECT id FROM %s) AND users.id != '%s' "
+				+ "AND users.username LIKE '%s' LIMIT 10;", tName, uId, "%"+search+"%");
+		return executeQuery(query);
+	}
+
 	
 	// Update Methods
 	public static boolean addUser(String id) {
@@ -156,7 +175,8 @@ public class FriendsDBManager {
 		List<Friend> data = new ArrayList<>();
 		Friend f;
 		while(results.next()) {
-			f = new Friend(results.getString(1), results.getString(2), results.getBoolean(3));
+			f = new Friend(results.getString(1), results.getString(2), 
+					results.getBoolean(3), results.getBoolean(4), results.getBoolean(5));
 			data.add(f);
 		}
 		

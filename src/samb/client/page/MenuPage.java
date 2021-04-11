@@ -11,12 +11,15 @@ import samb.client.page.widget.Button;
 import samb.client.page.widget.FriendList;
 import samb.client.page.widget.FriendProfile;
 import samb.client.page.widget.Text;
+import samb.client.page.widget.TextBox;
 import samb.client.page.widget.animations.BoxFocusAnimation;
 import samb.client.page.widget.animations.HoverShineAnimation;
+import samb.client.page.widget.animations.UnderLineAnimation;
 import samb.client.page.widget.listeners.ButtonListener;
 import samb.client.utils.Consts;
 import samb.client.utils.ImageLoader;
 import samb.com.database.UserStats;
+import samb.com.server.info.ChallengeInfo;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 
@@ -24,6 +27,9 @@ public class MenuPage extends Page implements ButtonListener {
 	/* This subclass represents the menu which the user will use to join the pool, invite a user to play, spectate a game,
 	 * or practice on a offline table. Other sub-options include: profile, settings and stats
 	 * */
+	
+	public FriendProfile fp;
+	private FriendList fl;
 	
 	public MenuPage() {
 		super("MenuPage");
@@ -64,16 +70,29 @@ public class MenuPage extends Page implements ButtonListener {
 		but.addListener(this);
 		add("pracButton", but);
 		
-		FriendProfile fp = new FriendProfile(new int[] {buffer*5, yoff+butH+buffer*4, 
+		fp = new FriendProfile(new int[] {buffer*5, yoff+butH+buffer*4, 
 				butW*2 + buffer, Window.dim.height-(yoff+butH+buffer*9 +4)}, this);
 		fp.HIDDEN = true;
-		add("friendProfile", fp);
+		
 
-		FriendList fl = new FriendList(new int[] {buffer*9+2*butW, yoff, 
+		fl = new FriendList(new int[] {buffer*9+2*butW, yoff, 
 				Window.dim.width-2*butW-13*buffer, Window.dim.height-10*buffer},
 				fp);
 		add("friendList", fl);
 		
+		int h = 64;
+		TextBox search = new TextBox(new int[] {buffer*9+2*butW+8, yoff-buffer-h, 
+				Window.dim.width-2*butW-15*buffer-h, h}, "Search...");
+		search.charLimit = 20;
+		search.round = false;
+		search.underline = true;
+		search.addAnimation(new UnderLineAnimation(search.rect));
+		search.addListener(fl);
+		add("searchBox", search);
+		
+		but = new Button(new int[] {Window.dim.width-5*buffer-h+8, yoff-buffer-h, h, h}, "R");
+		but.addListener(this);
+		add("refButton", but);
 		
 	}
 	
@@ -94,6 +113,10 @@ public class MenuPage extends Page implements ButtonListener {
 			gp.practice();
 			break;
 			
+		case "refButton":
+			fl.getFriends();
+			break;
+			
 		default:
 			System.out.println("Unknown button " + b.id);
 		
@@ -110,10 +133,17 @@ public class MenuPage extends Page implements ButtonListener {
 		((Text)get("eloTitle")).setText(Integer.toString(us.elo));
 		
 	}
+	
+	public void recvChallenge(ChallengeInfo ci) {
+		fl.recvChallenge(ci);
+		
+	}
+	
 
 	@Override
 	public void tick() {
 		tickWidgets();
+		fp.tick();
 		getRender();
 		
 	}
@@ -123,6 +153,7 @@ public class MenuPage extends Page implements ButtonListener {
 		Graphics2D g = getBlankCanvas();
 		g.drawImage(ImageLoader.getBackground(), 0, 0, Window.dim.width, Window.dim.height, null);
 		
+		fp.render(g);
 		renderWidgets(g);
 		
 		return img;

@@ -9,6 +9,7 @@ import samb.com.database.UserInfo;
 import samb.com.database.UserStats;
 import samb.com.server.info.UpdateInfo;
 import samb.com.server.info.Win;
+import samb.com.server.packet.Error;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.UHeader;
@@ -62,6 +63,8 @@ public class GameManager {
 		updateLink.put(u1, cowal);
 		updateLink.put(u2, cowal);
 		
+		UserDBManager.setIngame(u1, true);
+		UserDBManager.setIngame(u2, true);
 		
 		Packet p = new Packet(Header.newGame);
 		p.gameInfo = g;
@@ -88,7 +91,6 @@ public class GameManager {
 	
 	public void addSpectate(Packet up) {
 		// Once a player has replied, the spectate can watch the match
-		// TODO Check if gi != null
 		if(up.gameInfo == null) {
 			System.out.println("Error occured when adding spectator");
 			return;
@@ -103,6 +105,25 @@ public class GameManager {
 		Host.getHost().um.get(up.spec).waiting = false;
 		Host.getHost().um.get(up.spec).send(up);
 		
+	}
+	
+	public void challenge(Packet p) {
+		String opp = p.challengeInfo.oppId;
+		if(!Host.getHost().um.isOnline(opp)) {
+			p.challengeInfo.err = Error.notOnline;
+			Host.getHost().um.get(p.id).send(p);
+			return;
+			
+		} if(inGame(opp)) {
+			p.challengeInfo.err = Error.alreadyInGame;
+			Host.getHost().um.get(p.id).send(p);
+			return;
+		}
+		
+		p.challengeInfo.oppId = p.id;
+		p.id = opp;
+		
+		Host.getHost().um.get(p.id).send(p);
 	}
 	
 	public void update(Packet p) {
@@ -159,11 +180,12 @@ public class GameManager {
 		
 		Game g = games.get(gId);
 		if(g.winnerId != null) {
-			UserInfo win = UserDBManager.getUI(g.winnerId);
-			UserInfo lose = UserDBManager.getUI(g.getOppId(g.winnerId));
+			updateStats(g, g.winnerId, g.getOppId(g.winnerId));
 			
-			updateStats(g, win, lose);
 		}
+		
+		UserDBManager.setIngame(g.u1.id, false);
+		UserDBManager.setIngame(g.u2.id, false);
 		
 		removeGame(gId);
 	}
@@ -207,15 +229,15 @@ public class GameManager {
 		}
 	}
 	
-	private void updateStats(Game g, UserInfo win, UserInfo lose) {
+	private void updateStats(Game g, String wId, String lId) {
 		// This method updates the player's statistics after a game
 		
-		int diffelo = lose.elo - win.elo;  // if lose.elo > win.elo => delo > 0
-		int deltaElo = Maths.calculateDeltaElo(diffelo); // change in elo
-		
 		// Current statistics
-		UserStats winS = StatsDBManager.getUS(win.id); 
-		UserStats loseS = StatsDBManager.getUS(lose.id);
+		UserStats winS = StatsDBManager.getUS(wId); 
+		UserStats loseS = StatsDBManager.getUS(lId);
+		
+		int diffelo = loseS.elo - winS.elo;  // if lose.elo > win.elo => delo > 0
+		int deltaElo = Maths.calculateDeltaElo(diffelo); // change in elo
 		
 		winS.updateElo(deltaElo);
 		if(loseS.elo > winS.highestEloVictory) { winS.highestEloVictory = loseS.elo; }
@@ -230,8 +252,8 @@ public class GameManager {
 		loseS.noBallsPotted += loseS.id.equals(g.state.redID) ? g.state.red : g.state.yellow;
 		
 		// Update Database with new statistics
-		StatsDBManager.setUS(win.id, winS);
-		StatsDBManager.setUS(lose.id, loseS);
+		StatsDBManager.setUS(wId, winS);
+		StatsDBManager.setUS(lId, loseS);
 		
 		Host.getHost().um.get(winS.id).updateElo(winS.elo);
 		Host.getHost().um.get(loseS.id).updateElo(loseS.elo);
@@ -245,6 +267,7 @@ public class GameManager {
 	}
 	
 	public String getOpposition(String uid) {
+		// Returns a user's opposition's id
 		if(inGame(uid)) {
 			String gId = parts.get(uid);
 			Game g = games.get(gId);
@@ -254,6 +277,7 @@ public class GameManager {
 	}
 	
 	public void close() {
+		// Closes the Manager, clears memory, alerts users
 		pool.stop();
 		games.forEach((String gid, Game g) -> {
 			Packet p = new Packet(Header.stopGame);
@@ -261,8 +285,6 @@ public class GameManager {
 				Host.getHost().um.get(id).send(p);
 				
 			}
-			
-			removeGame(gid);
 		});
 		
 		games.clear();
