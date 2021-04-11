@@ -209,11 +209,9 @@ public class Client extends BaseProcessor implements Runnable {
 			if(pm.isId("MenuPage")) {
 				mp = (MenuPage)pm.get();
 				if(p.friendsInfo != null) {
-					mp.fp.setStats(p.userStats, true);
+					mp.prof.setStats(p.userStats, true);
 					break;
 					
-				} else {
-					mp.setStats(p.userStats);
 				}
 			}
 			

@@ -31,7 +31,7 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 	private int scroll = 0, highlight=-1, selected=-1;
 
 	private int fH = 56+buffer*2, fW;
-	private List<Friend> friends;
+	private List<Friend> friends = new ArrayList<>();
 	
 	private Font friendNameFont;
 	private final BasicStroke borderStroke = new BasicStroke(3), highlightStroke = new BasicStroke(2);
@@ -40,12 +40,12 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 	
 	private BoxFocusAnimation anim;
 	private BufferedImage img, section;
-	private FriendProfile fp;
+	private Profile prof;
 	
-	public FriendList(int[] rect, FriendProfile fp) {
+	public FriendList(int[] rect, Profile prof) {
 		super(rect);
 		this.fW = (rect[2]-buffer*8)/2;
-		this.fp = fp;
+		this.prof = prof;
 		
 		this.friendNameFont = Consts.INTER.deriveFont(Font.PLAIN, fH/1.8f);
 		getFriends();
@@ -72,7 +72,7 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 			int index = 2*(int)((scroll + xy.y - rect[1]-buffer*3) / fH);
 			if(xy.x > rect[0]+rect[2]/2) {
 				index++;
-			}if(0 <= index && index < friends.size() && buffer*3+(int)(index/2)*fH -scroll < rect[3] && highlight != index) {
+			} if(0 <= index && index < friends.size() && buffer*3+(int)(index/2)*fH -scroll < rect[3] && highlight != index) {
 				this.highlight = index;
 				setAnimRect();
 			}
@@ -86,11 +86,12 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 		if(Client.getMouse().left && Client.getMouse().forleft < 2) {
 			if(highlight != -1) {
 				this.selected = highlight;
-				fp.set(friends.get(selected));
-				fp.setHidden(false);
-			} else if((Maths.pointInRect(xy, fp.rect) && fp.HIDDEN) || !Maths.pointInRect(xy, fp.rect)) {
+				prof.set(friends.get(selected), false);
+				prof.setHidden();
+			} else if((Maths.pointInRect(xy, prof.rect) && prof.HIDDEN) || !Maths.pointInRect(xy, prof.rect)) {
 				this.selected = -1;
-				fp.setHidden(true);
+				prof.setAsSelf();
+				prof.setHidden();
 			}
 		}		
 	}
@@ -103,13 +104,11 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 	
 	public void setFriends(Packet p) { // Sets the friends list
 		// Keep challenge info for same friends
-		if(friends != null) {
-			for(Friend f: friends) {
-				for(Friend nf: p.friendsInfo.friends) {
-					if(nf.id.equals(f.id)) {
-						nf.challenged = f.challenged;
-						nf.ci = f.ci;
-					}
+		for(Friend f: friends) {
+			for(Friend nf: p.friendsInfo.friends) {
+				if(nf.id.equals(f.id)) {
+					nf.challenged = f.challenged;
+					nf.ci = f.ci;
 				}
 			}
 		}
@@ -125,9 +124,9 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 				f.challenged = true;
 				f.ci = ci;
 				
-				if(!fp.HIDDEN && ci.oppId.equals(fp.f.id)) {
-					fp.setBools(f);
-					fp.setHidden(false);
+				if(!prof.HIDDEN && ci.oppId.equals(prof.f.id)) {
+					prof.setBools(f);
+					prof.setHidden();
 				}
 				break;
 			}

@@ -5,3 +5,4 @@
 /res/misc/sqlCredentials.cred
 /res/rules.txt
 /*.jar
+*.log

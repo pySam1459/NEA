@@ -22,7 +22,7 @@ import samb.com.server.packet.FHeader;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 
-public class FriendProfile extends Widget implements ButtonListener {
+public class Profile extends Widget implements ButtonListener {
 	/* This Widget subclass displays information about a selected friend, 
 	 *   from the friendsList widget on the MenuPage
 	 * From this widget, a user will be able to challenge or spectate their friend
@@ -42,8 +42,9 @@ public class FriendProfile extends Widget implements ButtonListener {
 	public Friend f;
 	public ChallengeInfo ci;
 	private UserStats stats;
+	public boolean self = false;
 
-	public FriendProfile(int[] rect, MenuPage mp) {
+	public Profile(int[] rect, MenuPage mp) {
 		super(rect);
 		this.mp = mp;
 		
@@ -53,14 +54,23 @@ public class FriendProfile extends Widget implements ButtonListener {
 		this.statsCache = new HashMap<>();
 		
 		initWidgets();
+		setAsSelf();
+		
 	}
 	
-	public void set(Friend f) {
+	public void set(Friend f, boolean self) {
 		// Sets the profile to Friend f
+		this.self = self;
 		this.f = f;
 		setBools(f);
 		getStats(f.id);
 		createImage();
+	}
+	
+	public void setAsSelf() {
+		this.f = new Friend(Client.getClient().udata.id, Client.getClient().udata.userInfo.username);
+		set(f, true);
+		
 	}
 	
 	private void getStats(String id) {
@@ -93,13 +103,17 @@ public class FriendProfile extends Widget implements ButtonListener {
 	}
 	
 	public void setBools(Friend f) {
-		challBut.active = f.online && !f.inGame;
-		specBut.active = f.inGame;
-		
+		if(!self) {
+			challBut.active = f.online && !f.inGame;
+			specBut.active = f.inGame;
+		} else {
+			challBut.active = false;
+			specBut.active = false;
+		}
 	}
 	
-	public void setHidden(boolean hidden) {
-		if(hidden) { // hide all
+	public void setHidden() {
+		if(self) { // hide all
 			challBut.HIDDEN = true;
 			acChallBut.HIDDEN = true;
 			specBut.HIDDEN = true;
@@ -128,7 +142,6 @@ public class FriendProfile extends Widget implements ButtonListener {
 			}
 		}
 		challInfo.HIDDEN = true;
-		this.HIDDEN = hidden;
 	}
 	
 	
@@ -213,7 +226,7 @@ public class FriendProfile extends Widget implements ButtonListener {
 			p.friendsInfo = new FriendsInfo(FHeader.addFriend, f.id);
 			Client.getClient().server.send(p);
 			f.isFriend = true;
-			setHidden(false);
+			setHidden();
 			break;
 			
 		default:
