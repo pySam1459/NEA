@@ -75,13 +75,18 @@ public class Button extends Widget {
 		if(hover && active) {
 			if(Client.getMouse().left) {
 				if(!held) {
-					for(ButtonListener bl: bls) {
-						bl.onClick(this);
-						
+					if(!Client.getMouse().justButton) {
+						for(ButtonListener bl: bls) {
+							bl.onClick(this);
+							
+						}
+						Client.getMouse().justButton = true;
 					}
 				}
 				held = true;
 				return;
+			} else {
+				Client.getMouse().justButton = false;
 			}
 		}
 		held = false;

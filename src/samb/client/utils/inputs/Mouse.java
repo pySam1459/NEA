@@ -13,7 +13,7 @@ public class Mouse implements MouseListener {
 	 * The Window object will call either the mousePressed or mouseReleased methods when relevant
 	 * */
 	
-	public boolean left=false, right=false, prevLeft=false, prevRight=false;
+	public boolean left=false, right=false, prevLeft=false, prevRight=false, justButton=false;
 	public int forleft=0, forright=0;
 	private Point p1, p2;
 	
