@@ -11,6 +11,7 @@ public enum Header {
 	stopGame,
 	
 	joinPool,
+	leavePool,
 	spectate,
 	challenge,
 	

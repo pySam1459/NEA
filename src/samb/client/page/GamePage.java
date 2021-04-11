@@ -32,6 +32,7 @@ public class GamePage extends Page implements ButtonListener {
 
 	public GameInfo info;
 	public GameState state;
+	public boolean pooling = false;
 	
 	private Table table;
 	private GameMenu menu;
@@ -54,10 +55,10 @@ public class GamePage extends Page implements ButtonListener {
 		
 		int buffer = 8;
 		this.menu = new GameMenu(new int[] {3*Window.dim.width/4+buffer, buffer, 
-				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
+				Window.dim.width/4-buffer*4, Window.dim.height/3-buffer*4}, this);
 
-		this.chat = new ChatBox(new int[] {3*Window.dim.width/4+buffer, Window.dim.height/2-buffer*2, 
-				Window.dim.width/4-buffer*4, Window.dim.height/2-buffer*4}, this);
+		this.chat = new ChatBox(new int[] {3*Window.dim.width/4+buffer, Window.dim.height/3-buffer*2, 
+				Window.dim.width/4-buffer*4, 2*Window.dim.height/3-buffer*4}, this);
 		add("chat", chat);
 		
 		// Shown after a win/loss
@@ -95,6 +96,7 @@ public class GamePage extends Page implements ButtonListener {
 	// Start methods
 	public void start(GameInfo gi, GameState state) {
 		// This method starts a new game
+		this.pooling = false;
 		menu.unshowLoading();
 		
 		setGame(gi, state);
@@ -122,7 +124,15 @@ public class GamePage extends Page implements ButtonListener {
 		menu.unshowPlayers();
 		menu.showPlayer1AsUsername();
 		menu.showLoading();
+		pooling = true;
 		
+	}
+	
+	public void unPool() {
+		// Packet is sent to leave the match-making pool
+		Packet p = new Packet(Header.leavePool);
+		Client.getClient().server.send(p);
+		pooling = false;
 	}
 	
 	public void practice() {
@@ -212,7 +222,12 @@ public class GamePage extends Page implements ButtonListener {
 			
 		} else if(b.id.equals("forbut")) { // Forfeit button on gameMenu Widget
 			if(table.tuc == TableUseCase.playing) {
-				table.win(getNotTurnID(), Win.forfeit);
+				if(pooling) {
+					unPool();
+					Client.getClient().pm.changePage(new MenuPage());
+				} else {
+					table.win(getNotTurnID(), Win.forfeit);
+				}
 				
 			} else { // if you are spectating/practicing, return to menu
 				Client.getClient().pm.changePage(new MenuPage());

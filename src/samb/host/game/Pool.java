@@ -98,12 +98,13 @@ public class Pool implements Runnable {
 		
 		if(um.isOnline(id) && um.isOnline(opId)) {
 			gm.newGame(id, opId); // create new game
+			
+			remove(id);
+			remove(opId); // remove from queue and bands
+			return true;
 		}
 		
-		remove(id);
-		remove(opId); // remove from queue and bands
-		
-		return true;
+		return false;
 	}
 	
 	public void add(String id) {

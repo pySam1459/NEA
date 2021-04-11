@@ -52,9 +52,7 @@ public class Host extends BaseProcessor implements Runnable {
 		
 		addShutdownHook();
 		start();
-		
-		// TODO REMOVE DEV PURPOSES
-		// FriendsDBManager.addFriend("3620cebf-29ef-4494-b783-b6dd24feb072", "3bc0c334-ed00-403a-884f-45ba4dd14886");
+
 	}
 	
 	@Override
@@ -474,6 +472,10 @@ public class Host extends BaseProcessor implements Runnable {
 		case joinPool:
 			// This case adds the user to the game pool, for matchmaking
 			gm.pool.add(p.id);
+			break;
+		
+		case leavePool:
+			gm.pool.remove(p.id);
 			break;
 			
 		case spectate:

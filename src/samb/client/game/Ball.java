@@ -54,7 +54,7 @@ public class Ball extends Circle {
 		// This method checks whether the ball has collided with a cushion
 		// If it has, then the ball will bounce off
 		
-		if(!Maths.ballInRect(this, NON_CUSHION_RECT) || true) {
+		if(!Maths.ballInRect(this, NON_CUSHION_RECT)) {
 			for(Line l: Table.cushions) {
 				if(Maths.lineInBall(this, l)) {
 					if(l.x1 == l.x2) {

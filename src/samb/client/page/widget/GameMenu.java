@@ -76,9 +76,9 @@ public class GameMenu extends Widget {
 		loading.addAnimation(new LoadingDotsAnimation(loading.rect));
 		gp.add("loading", loading);
 		
-		Button forbut = new Button(new int[] {rect[0]+buffer*6, (int)(rect[1]+titleSize*4+buffer*22+Ball.DEFAULT_BALL_RADIUS*1.6), 
-				rect[2]-buffer*16, titleSize*2}, "");
-		forbut.HIDDEN = true;
+		Button forbut = new Button(new int[] {rect[0]+buffer*8, (int)(rect[1]+titleSize*4+buffer*22+Ball.DEFAULT_BALL_RADIUS*1.6), 
+				rect[2]-buffer*16, titleSize*2}, "Return to Menu");
+		forbut.HIDDEN = false;
 		forbut.addListener(gp);
 		forbut.addAnimation(new UnderLineAnimation(forbut.rect));
 		gp.add("forbut", forbut);

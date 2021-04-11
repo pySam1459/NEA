@@ -22,8 +22,10 @@ import samb.com.utils.Config;
 import samb.com.utils.Func;
 
 public class Client extends BaseProcessor implements Runnable {
-	/* This is the main Client class, when the program is executed the main method will be called and the Client will start.
-	 * This is where all incoming DatagramPackets from the Host will be handled and directed to their respective area.
+	/* This is the main Client class, when the program is run the main method will be called and the Client will start.
+	 * This is where all incoming DatagramPackets from the Host will be handled and directed to their respective "area".
+	 * Other classes can call Client.getClient() to use the client's non-static objects{server, window, mouse, 
+	 *                                                                     keyboard, userData, pageManager, etc}
 	 * */
 	
 	public static final double TPS = 120.0;
@@ -61,7 +63,7 @@ public class Client extends BaseProcessor implements Runnable {
 	
 	private void tick() {
 		// This method is called $TPS per second
-		// Any objects which require 'updating', ie balls moving, widget animations, etc
+		// Any objects which requires 'updating', ie balls moving, widget animations, etc
 		//    will be called in this method
 
 		pm.tick();
@@ -73,7 +75,8 @@ public class Client extends BaseProcessor implements Runnable {
 	
 	private void render() {
 		// When rendering, the Window class creates a 'Graphics2D' object, which acts as a canvas to draw onto
-		// Any object which requires rendering will render onto this Graphics2D object, which will then be rendered onto the window frame (ie the screen)
+		// Any object which requires rendering will render onto this Graphics2D object, 
+		//   which will then be rendered onto the window frame (ie the screen)
 		// Order of rendering is very important as objects which are rendered first will be drawn over by later objects
 		
 		Graphics2D g = window.getGraphics();  // Get 'canvas' to draw on
@@ -90,7 +93,7 @@ public class Client extends BaseProcessor implements Runnable {
 		// This methods handles incoming DatagramPackets from the Host Server
 		// The data of a DatagramPacket is a serialized Packet object
 		// Each Packet has a header which is used to identify the purpose of the packet, 
-		//     ie login, signup, gameupadate, etc
+		//     ie login, sign-Up, gameUpadate, etc
 		// the switch/case statement will direct each packet (using the header) to wherever it is needed
 		
 		LoginPage lp;
@@ -104,11 +107,11 @@ public class Client extends BaseProcessor implements Runnable {
 			if(p.loginInfo.authorized) {
 				udata.id = p.id;
 				udata.userInfo = new UserInfo(p.id, p.loginInfo.username);
-				pm.changePage(new MenuPage());
+				pm.changePage(new MenuPage()); // continues to menu page
 				
 			} else {
 				lp = (LoginPage) pm.get();
-				lp.setError(p.loginInfo.err);
+				lp.setError(p.loginInfo.err); // displays an error
 			}
 			break;
 			
@@ -117,23 +120,23 @@ public class Client extends BaseProcessor implements Runnable {
 			if(p.loginInfo.authorized) {
 				udata.id = p.id;
 				udata.userInfo = new UserInfo(p.id, p.loginInfo.username);
-				pm.changePage(new MenuPage());
+				pm.changePage(new MenuPage()); // continues to menu page
 				
 			} else {
 				lp = (LoginPage) pm.get();
-				lp.setError(p.loginInfo.err);
+				lp.setError(p.loginInfo.err); // displays an error
 			}
 			break;
 			
 			
 		case newGame:
 			// This case starts a new game 
-			if(!pm.isId("GamePage") ) {
-				pm.changePage(new GamePage());
+			if(!pm.isId("GamePage") ) { // checks that the current page is NOT the Game Page
+				pm.changePage(new GamePage()); // if it isn't, switch to the Game Page
 			}
 
 			gp = (GamePage) pm.get();
-			gp.start(p.gameInfo, p.gameState);
+			gp.start(p.gameInfo, p.gameState); // starts a new game
 			
 			break;
 			
@@ -149,6 +152,7 @@ public class Client extends BaseProcessor implements Runnable {
 			
 		case getUpdateGame:
 			// This case sends the current state of the table to the server (used for new spectators)
+			//   since the host doesn't store the current table state, a player has to inform a spectator
 			if(pm.isId("GamePage") ) {
 				gp = (GamePage) pm.get();
 				p.gameInfo = gp.getUpdate().gameInfo;
@@ -163,7 +167,7 @@ public class Client extends BaseProcessor implements Runnable {
 			break;
 			
 		case stopGame:
-			// This case returns from a gamepage to the menupage
+			// This case returns from a gamePage to the menuPage
 			if(pm.isId("GamePage")) {
 				pm.changePage(new MenuPage());
 				
@@ -171,7 +175,7 @@ public class Client extends BaseProcessor implements Runnable {
 			break;
 		
 		case spectate:
-			// This case informs the table of the current position of the spectated table
+			// This case set the table to the current position of the spectated table
 			if(!pm.isId("GamePage")) {
 				pm.changePage(new GamePage());
 			}
@@ -181,10 +185,10 @@ public class Client extends BaseProcessor implements Runnable {
 			break;
 			
 		case challenge:
+			// This case receives a challenge from the host
 			if(pm.isId("MenuPage")) {
 				mp = (MenuPage) pm.get();
 				mp.recvChallenge(p.challengeInfo);
-				
 			}
 			break;
 			
@@ -199,7 +203,8 @@ public class Client extends BaseProcessor implements Runnable {
 			
 			
 		case getStats:
-			// This case updates the udata of the user's stats
+			// This case updates the userData of the user's stats
+			//   or the stats of a friend/to-be-friend
 			if(p.userStats == null) { break; }
 			if(pm.isId("MenuPage")) {
 				mp = (MenuPage)pm.get();

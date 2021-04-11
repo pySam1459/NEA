@@ -1,6 +1,5 @@
 package samb.client.game;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -106,7 +105,7 @@ public class Table extends Widget {
 				doCheck = true;
 				break;
 				
-			case placement:
+			case placement: // cue has been placed
 				Ball b = new Ball(new Circle(updateInfo.xy.x, updateInfo.xy.y, Circle.DEFAULT_BALL_RADIUS, 0), balls);
 				balls.add(b);
 				cueBall = b;
@@ -135,20 +134,20 @@ public class Table extends Widget {
 					cue.angle = Maths.getAngle(new Pointf(cueBall.x, cueBall.y), xy);
 					cue.start = xy;
 	
-					// If the user wants this angle
+					// User sets cue angle
 					if(Client.getMouse().left && Client.getMouse().forleft < 2) { // if single left click
 						cue.set = true;
 						cue.startDist = Maths.getDis(xy.x, xy.y, cueBall.x, cueBall.y);
 					}
 					
-				} else if(Client.getMouse().left) {
+				} else if(Client.getMouse().left) { // adjusting power
 					Pointf xy = getMouseOnTable();
 					cue.power = Maths.getDis(cue.start.x, cue.start.y, xy.x, xy.y);
 					
-				} else if(!Client.getMouse().left && cue.power > 5) {
+				} else if(!Client.getMouse().left && cue.power > 5) { // user let go of mouse left
 					shoot();
 					
-				} else {
+				} else { // half reset cue, keep showing
 					cue.halfReset();
 				}
 				
@@ -157,16 +156,10 @@ public class Table extends Widget {
 				cueBallPlacement = getMouseOnTable();
 				allowPlacement = checkAllowPlacement();
 				
-				if(Client.getMouse().left && Client.getMouse().forleft < 2 && allowPlacement) {
+				if(Client.getMouse().left && Client.getMouse().forleft < 2 && allowPlacement) { // if user has placed
 					Packet p = new Packet(Header.updateGame);
 					p.updateInfo = new UpdateInfo(UHeader.placement, cueBallPlacement);
-					
-					if(tuc == TableUseCase.playing) {
-						Client.getClient().server.send(p);
-						
-					} else if(tuc == TableUseCase.practicing) {
-						updateInfo = p.updateInfo;
-					}
+					sendUpdate(p);
 					
 					cuePlacement = false;
 				}
@@ -179,22 +172,16 @@ public class Table extends Widget {
 		
 		double[] vel = Maths.getVelocity(cue.angle, cue.power);
 		Packet p = createUpdate(vel);
-		
-		if(tuc == TableUseCase.playing) {
-			Client.getClient().server.send(p);
-			
-		} else if(tuc == TableUseCase.practicing) {
-			updateInfo = p.updateInfo;
-		}
-		
+		sendUpdate(p);
+
 		cue.reset();
 	}
 	
 	
 	private void simulate() {
 		// Balls tick and update separately as collision equations use un-updated values
-		// The for loop is used to reduce the distance travelled by the balls per 'move method'
-		//   so that the collisions are more realistic and tha balls don't 'teleport' past a boundary or another ball
+		// The for FINE_TUNE loop is used to reduce the distance travelled by the balls per 'move method'
+		//   so that the collisions are more realistic and that balls don't 'teleport' past a boundary or another ball
 		for(int i=0; i<Consts.FINE_TUNE_ITERS; i++) {
 			for(Ball b: balls) {
 				b.tick();
@@ -212,7 +199,7 @@ public class Table extends Widget {
 	
 	private void checkNewAim() {
 		// This method checks whether the player is allowed to aim or whether to wait
-		//   ie when the balls are still moving = invalid
+		//   ie when the balls are still moving = wait
 		
 		if(tuc != TableUseCase.spectating && doCheck) {
 			boolean newAim = true;
@@ -245,7 +232,7 @@ public class Table extends Widget {
 			}
 		}
 		
-		if(foul != null) {
+		if(foul != null) { // if a foul has occured
 			dealWithFoul(this.foul, turn);
 		}
 		
@@ -259,6 +246,7 @@ public class Table extends Widget {
 			}
 		}
 
+		// reset foul flags
 		hasCollided = false;
 		wrongFirstCollision = false;
 		potted = false;
@@ -267,6 +255,7 @@ public class Table extends Widget {
 	}
 	
 	public void endGame(Win win, String winner) {
+		// Called when a player has won
 		simulate = false;
 		gp.endGame(win, winner);
 		
@@ -278,16 +267,15 @@ public class Table extends Widget {
 		double r = Ball.DEFAULT_BALL_RADIUS+1;
 		Circle c = new Circle(p.x, p.y, r, 0);
 		
-		if(p.x < r || p.x > tdim.width-r || p.y < r || p.y > tdim.height-r) {
+		if(p.x < r || p.x > tdim.width-r || p.y < r || p.y > tdim.height-r) { // on table
 			return false;
 		}
-		for(Ball b: balls) {
+		for(Ball b: balls) { // not overlapping another ball
 			if(Maths.circle2(b, c)) {
 				return false;
 				
 			}
 		}
-		
 		return true;
 	}
 	
@@ -431,16 +419,25 @@ public class Table extends Widget {
 	
 	public Packet createUpdate(double[] vel) {
 		// This method creates an update Packet, sends the velocity of the cue ball
-		
 		Packet p = new Packet(Header.updateGame);
 		p.updateInfo = new UpdateInfo(UHeader.velocity, vel[0], vel[1]);
 		
 		return p;
 	}
 	
+	private void sendUpdate(Packet p) {
+		// This method sends an update packet to the host (or back to itself if practising)
+		if(tuc == TableUseCase.playing) {
+			Client.getClient().server.send(p);
+			
+		} else if(tuc == TableUseCase.practicing) {
+			updateInfo = p.updateInfo;
+		}
+	}
+	
 	
 	private void warnMessage(String msg) {
-		if(simulate) {
+		if(simulate) { // sends a bold message to the chat
 			gp.addChat(new Message(msg, "$BOLD$"));
 		
 		}
@@ -471,7 +468,7 @@ public class Table extends Widget {
 		
 	}
 	
-	private int getTurnScore() {
+	private int getTurnScore() { // returns the current player's score
 		return state.turnCol == 1 ? gp.state.red : gp.state.yellow;
 	}
 	
@@ -509,25 +506,20 @@ public class Table extends Widget {
 		
 		BufferedImage img = new BufferedImage(tdim.width + scaledBuffer*2, tdim.height + scaledBuffer*2, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
-//		
-		g.setColor(Color.ORANGE);
-		g.setStroke(new BasicStroke(2));
-		for(Line l: cushions) {
-			g.drawLine((int)l.x1+scaledBuffer, (int)l.y1+scaledBuffer, 
-					(int)l.x2+scaledBuffer, (int)l.y2+scaledBuffer);
-		}
 
+		// Renders balls
 		for(Ball b: balls) {
 			b.render(g, scaledBuffer);
 		}
 		
+		// Renders the cue "in hand"
 		if(cuePlacement && cueBallPlacement != null && simulate) {
 			g.setColor(Ball.colours[0]);
 			g.fillOval((int)(cueBallPlacement.x-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
 					(int)(cueBallPlacement.y-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
 					(int)Circle.DEFAULT_BALL_RADIUS*2, (int)Circle.DEFAULT_BALL_RADIUS*2);
 			
-			if(!allowPlacement) {
+			if(!allowPlacement) { // if the cue is in an invalid spot, display with red tint
 				g.setColor(new Color(255, 0, 0, 127));
 				g.fillOval((int)(cueBallPlacement.x-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
 						(int)(cueBallPlacement.y-Circle.DEFAULT_BALL_RADIUS+scaledBuffer), 
@@ -626,6 +618,7 @@ public class Table extends Widget {
 	}
 	
 	public void setState(GameState state) {
+		// Sets the state of the table (used by spectators)
 		gp.state = state;
 		this.state = state;
 		

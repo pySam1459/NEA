@@ -21,6 +21,7 @@ public class Cue {
 	}
 	
 	public void reset() {
+		// Resets cue info
 		show = false;
 		set = false;
 		start = null;
@@ -32,6 +33,7 @@ public class Cue {
 	}
 	
 	public void halfReset() {
+		// Used when aiming
 		power = 0.0;
 		startDist = 0.0;
 		set = false;
