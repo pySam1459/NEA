@@ -9,7 +9,7 @@ public class Friend implements Serializable {
 	
 	private static final long serialVersionUID = 8937817757063002987L;
 	public String id, username;
-	public boolean online = false;
+	public boolean online = false, inGame=false;
 	
 	public Friend(String id) {
 		this.id = id;

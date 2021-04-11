@@ -627,6 +627,7 @@ public class Table extends Widget {
 	}
 	
 	public void setState(GameState state) {
+		gp.state = state;
 		this.state = state;
 		
 		if(state.turnCol != 0) {

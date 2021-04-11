@@ -10,7 +10,9 @@ import java.awt.image.BufferedImage;
 
 import samb.client.main.Client;
 import samb.client.utils.Consts;
+import samb.com.database.UserInfo;
 import samb.com.server.info.Win;
+import samb.com.utils.enums.TableUseCase;
 
 public class EndScreen extends Widget {
 	/* This widget is shown at the end of a game, showing the results of the game
@@ -21,7 +23,10 @@ public class EndScreen extends Widget {
 	private long timer = 0, revealPeriod = 8;
 	private int deltaElo = 0;
 	
-	private Font titleFont, byWhatFont, eloDeltaFont;
+	public TableUseCase tuc = TableUseCase.playing;
+	private UserInfo winner, loser;
+	
+	private Font titleFont, smallTitleFont, byWhatFont, eloDeltaFont;
 	private Button retoBut;
 
 	public EndScreen(int[] rect, Button retoBut) {
@@ -29,6 +34,7 @@ public class EndScreen extends Widget {
 		this.retoBut = retoBut;
 	
 		this.titleFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/7);
+		this.smallTitleFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/10);
 		this.byWhatFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/12);
 		this.eloDeltaFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/12);
 	}
@@ -56,6 +62,15 @@ public class EndScreen extends Widget {
 		timer = System.currentTimeMillis();
 	}
 	
+	public void reveal(Win win, UserInfo u1, UserInfo u2, String wId) {
+		this.winner = u1.id.equals(wId) ? u1 : u2;
+		this.loser = u1.id.equals(wId) ? u2 : u1;
+		
+		createImg(win, false);
+		HIDDEN = false;
+		timer = System.currentTimeMillis();
+	}
+	
 	private void createImg(Win win, boolean amWinner) {
 		// This method creates the endScreen widget image, called only once
 		
@@ -72,7 +87,7 @@ public class EndScreen extends Widget {
 		g.drawRoundRect(2, 2, rect[2]-4, rect[3]-4, arc, arc);
 		
 		// Render title ("You Won!", "You Lost")
-		TextInfo ti = new TextInfo(amWinner ? "You Won!" : "You Lost", titleFont, amWinner ? Color.GREEN : Color.RED);
+		TextInfo ti = getTitleTextInfo(amWinner);
 		int yoff = rect[3]/4+ti.dim.height/2;
 		Point xy = new Point(rect[2]/2 - ti.dim.width/2, yoff);
 		ti.render(g, xy);
@@ -84,20 +99,47 @@ public class EndScreen extends Widget {
 		yoff += ti.dim.height+8;
 		
 		// Delta Elo
-		ti = getEloDeltaTextInfo();
-		xy = new Point(rect[2]/2 - ti.dim.width/2, yoff + ti.dim.height+32);
-		ti.render(g, xy);
+		if(tuc != TableUseCase.spectating) {
+			ti = getEloDeltaTextInfo(Client.getClient().udata.userStats.elo, deltaElo);
+			xy = new Point(rect[2]/2 - ti.dim.width/2, yoff + ti.dim.height+32);
+			ti.render(g, xy);
+			
+		} else {
+			ti = getEloDeltaTextInfo(winner.elo, deltaElo);
+			xy = new Point(rect[2]/2 - ti.dim.width-4, yoff + ti.dim.height+32);
+			ti.render(g, xy);
+			
+			ti = getEloDeltaTextInfo(loser.elo, -deltaElo);
+			xy = new Point(rect[2]/2+4, yoff + ti.dim.height+32);
+			ti.render(g, xy);
+		}
 	}
 	
-	private TextInfo getEloDeltaTextInfo() {
+	private TextInfo getTitleTextInfo(boolean amWinner) {
+		switch(tuc) {
+		case playing:
+			return new TextInfo(amWinner ? "You Won!" : "You Lost", 
+					titleFont, amWinner ? Color.GREEN : Color.RED);
+		case practicing:
+			return new TextInfo("Practice Finished", smallTitleFont, Consts.PALE);
+		case spectating:
+			return new TextInfo(winner.username + " Won!", titleFont, Color.GREEN);
+		}
+		return null;
+	}
+	
+	private TextInfo getEloDeltaTextInfo(int cElo, int dElo) {
 		String text;
 		Color col;
-		if(deltaElo > 0) {
-			text = Integer.toString(Client.getClient().udata.userStats.elo) + " +" + Integer.toString(deltaElo);
+		if(dElo > 0) {
+			text = Integer.toString(cElo) + " +" + Integer.toString(dElo);
 			col = Color.GREEN;
-		} else {
-			text = Integer.toString(Client.getClient().udata.userStats.elo) + " " + Integer.toString(deltaElo);
+		} else if(dElo < 0) {
+			text = Integer.toString(cElo) + " " + Integer.toString(dElo);
 			col = Color.RED;
+		} else {
+			text = Integer.toString(cElo);
+			col = Consts.PALE;
 		}
 		return new TextInfo(text, eloDeltaFont, col);
 	}

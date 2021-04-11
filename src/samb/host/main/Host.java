@@ -42,6 +42,8 @@ public class Host extends BaseProcessor implements Runnable {
 	
 	public Host() {
 		Host.thisHost = this;
+		adminLogin();
+		
 		LoginCredentials.loadCredentials();
 		UserDBManager.start();
 		StatsDBManager.start();
@@ -51,6 +53,8 @@ public class Host extends BaseProcessor implements Runnable {
 		addShutdownHook();
 		start();
 		
+		// TODO REMOVE DEV PURPOSES
+		// FriendsDBManager.addFriend("3620cebf-29ef-4494-b783-b6dd24feb072", "3bc0c334-ed00-403a-884f-45ba4dd14886");
 	}
 	
 	@Override
@@ -62,13 +66,10 @@ public class Host extends BaseProcessor implements Runnable {
 		 * The command would then be handled and in turn the server would start listening on port 2001
 		 * */
 		
-		this.input = new Scanner(System.in);
-		String adminUser = adminLogin();
-		
 		String command;
 		String[] args;
 		while(commanding) {
-			System.out.printf("%s@Server0:~# ", adminUser);
+			System.out.printf("console@Server0:~# ");
 			command = input.nextLine();
 			args = command.split(" ");
 			
@@ -98,6 +99,7 @@ public class Host extends BaseProcessor implements Runnable {
 	private String adminLogin() {
 		// For demonstation purposes, admin credentials are {"admin", "password"}
 
+		this.input = new Scanner(System.in);
 		String username, password;
 		while(true) {
 			System.out.print("Username >> ");
@@ -171,7 +173,7 @@ public class Host extends BaseProcessor implements Runnable {
 	// Command Line Group: Database
 	private void handleDatabaseCommand(String[] args) {
 		// This method handles all database commands
-		if(args.length < 3) {
+		if(args.length < 3 && !"setup".equals(args[1])) {
 			System.out.println("Invalid Arguments");
 			return;
 		} else if(online) {
@@ -179,7 +181,6 @@ public class Host extends BaseProcessor implements Runnable {
 			switch(args[1]) {
 			case "create":
 			case "delete":
-			case "reset":
 				System.out.printf("Cannot perform command '%s' as the Host is currently Online!\n", args[1]);
 				return;
 			}
@@ -195,10 +196,6 @@ public class Host extends BaseProcessor implements Runnable {
 			dbDeleteCommand(args);
 			break;
 			
-		case "reset":
-			dbResetCommand(args);
-			break;
-			
 		case "remove":
 			dbRemoveCommand(args);
 			break;
@@ -209,6 +206,10 @@ public class Host extends BaseProcessor implements Runnable {
 		
 		case "details":
 			dbDetailsCommand(args);
+			break;
+			
+		case "setup":
+			dbSetup();
 			break;
 			
 		default:
@@ -266,26 +267,6 @@ public class Host extends BaseProcessor implements Runnable {
 		}
 	}
 	
-	private void dbResetCommand(String[] args) {
-		// Resets the table specified in 3rd argument
-		
-		if("users".equals(args[2])) {
-			if(UserDBManager.resetTable()) {
-				System.out.println("Users table has been reset");
-				
-			} else { System.out.println("Users table has NOT been successfully reset!"); }
-			
-		} else if("stats".equals(args[2])) {
-			if(StatsDBManager.resetTable()) {
-				System.out.println("Stats table has been reset");
-				
-			} else { System.out.println("Stats table has NOT been successfully reset!"); }
-			
-		} else { 
-			System.out.printf("Invalid Table Name '%s'\n", args[2]); 
-		}
-	}
-	
 	private void dbRemoveCommand(String[] args) {
 		// Removes a specified user from all tables
 		
@@ -338,6 +319,19 @@ public class Host extends BaseProcessor implements Runnable {
 		} else {
 			System.out.printf("Unknown User '%s'\n", args[2]);
 		}
+	}
+	
+	private void dbSetup() {
+		// Drops all tables, and creates them afterwards
+		
+		FriendsDBManager.dropAll();
+		StatsDBManager.dropTable();
+		UserDBManager.dropTable();
+		
+		UserDBManager.createTable();
+		StatsDBManager.createTable();
+		FriendsDBManager.createAll();
+		
 	}
 	
 	
@@ -487,6 +481,11 @@ public class Host extends BaseProcessor implements Runnable {
 			gm.update(p);
 			break;
 			
+		case spectate:
+			// This case is called by a user wanting to spectate another user
+			gm.queueSpectate(p.spec, p.id);
+			break;
+			
 		case getUpdateGame:
 			// This case adds a spectator to a game with the gameInfo received from a player of that game
 			if(um.isOnline(p.spec)) {
@@ -507,8 +506,15 @@ public class Host extends BaseProcessor implements Runnable {
 		case getStats:
 			// This case sends back the stats of a specific user
 			if(um.isOnline(p.id)) {
-				p.userStats = StatsDBManager.getUS(p.id);
+				if(p.friendsInfo != null) {
+					p.userStats = StatsDBManager.getUS(p.friendsInfo.friendId);
+					p.friendsInfo.online = um.isOnline(p.friendsInfo.friendId);
+					p.friendsInfo.inGame = gm.inGame(p.friendsInfo.friendId);
+				} else {
+					p.userStats = StatsDBManager.getUS(p.id);
+				}
 				um.get(p.id).send(p);
+				
 			}
 			break;
 			

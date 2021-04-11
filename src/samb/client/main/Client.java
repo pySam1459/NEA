@@ -8,6 +8,7 @@ import samb.client.page.LoginPage;
 import samb.client.page.MenuPage;
 import samb.client.page.PageManager;
 import samb.client.page.widget.FriendList;
+import samb.client.page.widget.FriendProfile;
 import samb.client.server.Server;
 import samb.client.utils.Consts;
 import samb.client.utils.UserData;
@@ -191,15 +192,28 @@ public class Client extends BaseProcessor implements Runnable {
 			
 		case getStats:
 			// This case updates the udata of the user's stats
+			if(p.userStats == null) { break; }
+			if(pm.isId("MenuPage")) {
+				MenuPage mp = (MenuPage)pm.get();
+				if(p.friendsInfo != null) {
+					((FriendProfile) mp.get("friendProfile")).setBools(p.friendsInfo);
+					((FriendProfile) mp.get("friendProfile")).setStats(p.userStats, true);
+					break;
+					
+				} else {
+					mp.setStats(p.userStats);
+				}
+			}
+			
 			udata.userStats = p.userStats;
 			break;
 			
 		case getFriends:
 			// This case updates the udata of the user's friends
 			if(pm.isId("MenuPage")) {
-				((FriendList)((MenuPage) pm.get()).get("friendList")).setFriends(p);
+				MenuPage mp = (MenuPage)pm.get();
+				((FriendList) mp.get("friendList")).setFriends(p);
 			}
-			udata.friends = p.friendsInfo;
 			break;
 		
 		default:

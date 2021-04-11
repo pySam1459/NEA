@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import samb.client.main.Client;
-import samb.client.page.widget.animations.BoxFocusAnimation;
 import samb.client.page.widget.listeners.ButtonListener;
 
 public class Button extends Widget {
@@ -25,7 +24,7 @@ public class Button extends Widget {
 	public final Color HOLD_COLOR = new Color(48, 244, 232, 156);
 	public final Color FONT_COLOR = new Color(217, 241, 237, 225);
 	
-	public boolean hover=false, held=false;
+	public boolean hover=false, held=false, active=true;
 	private List<ButtonListener> bls;
 	
 	private TextInfo ti;
@@ -56,7 +55,7 @@ public class Button extends Widget {
 
 	@Override
 	public void tick() {
-		if(!HIDDEN) {
+		if(!HIDDEN && active) {
 			checkHover();
 			checkRelease();
 			checkPress();
@@ -73,7 +72,7 @@ public class Button extends Widget {
 	private void checkPress() {
 		// This method checks whether the user has pressed the button, if so it called the onClick method for each ButtonListener
 		
-		if(hover) {
+		if(hover && active) {
 			if(Client.getMouse().left) {
 				if(!held) {
 					for(ButtonListener bl: bls) {
@@ -92,7 +91,7 @@ public class Button extends Widget {
 		// This method checks whether the user has released the button,
 		// if so it called the onRelease method for each ButtonListener
 		
-		if(hover && held) {
+		if(hover && held && active) {
 			if(!Client.getMouse().left && Client.getMouse().prevLeft) {
 				held = false;
 				for(ButtonListener bl: bls) {
@@ -121,11 +120,16 @@ public class Button extends Widget {
 			if(ti != null) {
 				ti.render(g, new Point(rect[2]/2-tiDim.width/2, rect[3]/2+tiDim.height/2));
 				
+			} if(!active) {
+				g.setColor(new Color(127, 127, 127, 127));
+				g.fillRect(0, 0, rect[2], rect[3]);
 			}
 			
 			graph.drawImage(img, rect[0], rect[1], rect[2], rect[3], null);
 			
-			super.animRender(graph);
+			if(active) {
+				super.animRender(graph);
+			}
 		}
 	}
 	

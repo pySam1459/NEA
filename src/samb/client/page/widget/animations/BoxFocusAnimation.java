@@ -65,7 +65,11 @@ public class BoxFocusAnimation extends WidgetAnimation {
 				g.drawRect(rect[0]-(int)off, rect[1]-(int)off, (int)(rect[2]+off*2), (int)(rect[3]+off*2));
 			}
 		}
-
+	}
+	
+	public void setRect(int[] rect) {
+		this.rect = rect;
+		this.focus = 100;
 	}
 
 }

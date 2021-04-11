@@ -54,6 +54,18 @@ public class Text extends Widget {
 		}
 	}
 	
+	public int getRight() {
+		if(CENTERED) {
+			return rect[0]+rect[2]/2+ti.dim.width/2;
+		} else if(align.equals("right")) {
+			return rect[0]+rect[2];
+		} else if(align.equals("left")) {
+			return rect[0] + ti.dim.width;
+		} else {
+			return rect[0] + rect[2];
+		}
+	}
+	
 	public void setColour(Color colour) {
 		ti.setColour(colour);
 		

@@ -50,6 +50,7 @@ public class GamePage extends Page implements ButtonListener {
 	
 	// Inits
 	private void initWidgets() {
+		// This method initializes the widgets displayed 
 		this.table = new Table(this);
 		add("table", table);
 		
@@ -76,7 +77,6 @@ public class GamePage extends Page implements ButtonListener {
 		endScreen.id = "endScreen";
 		endScreen.HIDDEN = true;
 		
-		
 	}
 	
 	
@@ -100,7 +100,7 @@ public class GamePage extends Page implements ButtonListener {
 		menu.unshowLoading();
 		
 		setGame(gi, state);
-		table.rack(gi);
+		table.rack(gi); // table setup
 		table.setUseCase(gi, Client.getClient().udata.id);
 		table.setState(state);
 		chat.setUseCase(gi.tuc);
@@ -117,6 +117,7 @@ public class GamePage extends Page implements ButtonListener {
 	
 	
 	public void pooling() {
+		// Packet is sent to join the match-making pool
 		Packet p = new Packet(Header.joinPool);
 		Client.getClient().server.send(p);
 		
@@ -127,6 +128,7 @@ public class GamePage extends Page implements ButtonListener {
 	}
 	
 	public void practice() {
+		// Setup table for practicing
 		GameInfo gi = new GameInfo("practice", null, null);
 		gi.tuc = TableUseCase.practicing;
 		gi.balls = Func.createDefaultBalls(gi.tDim);
@@ -166,10 +168,31 @@ public class GamePage extends Page implements ButtonListener {
 	
 	public void endGame(Win win, String winnerId) {
 		// This method starts to reveal the endScreen
-		endScreen.setDeltaElo(getEloDelta(winnerId));
-		endScreen.reveal(win, Client.getClient().udata.id.equals(winnerId));
-		retobut.HIDDEN = false;
+		endScreen.tuc = table.tuc;
+		switch(table.tuc) {
+		case playing:
+			endScreen.setDeltaElo(getEloDelta(winnerId));
+			endScreen.reveal(win, Client.getClient().udata.id.equals(winnerId));
+			break;
+			
+		case practicing:
+			endScreen.setDeltaElo(0);
+			endScreen.reveal(win, true);
+			break;
+			
+		case spectating:
+			endScreen.setDeltaElo(getRawEloDelta(winnerId));
+			endScreen.reveal(win, info.u1, info.u2, winnerId);
+			break;
+		}
 		
+		retobut.HIDDEN = false;
+	}
+	
+	private int getRawEloDelta(String wId) {
+		UserInfo loser = wId.equals(info.u1.id) ? info.u2 : info.u1;
+		int diffelo = loser.elo - getUI(wId).elo;
+		return Maths.calculateDeltaElo(diffelo);
 	}
 	
 	private int getEloDelta(String wId) {

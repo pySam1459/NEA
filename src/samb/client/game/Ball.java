@@ -111,11 +111,6 @@ public class Ball extends Circle {
 	
 	public void render(Graphics2D g, int off) {		
 		// Renders the ball
-		
-		if(-5 < x && x < 5 && -5 < y && y < 5) {
-			System.out.println(x + " " + y + " " + vx + " " + vy + " " + col);
-		}
-		
 		g.setColor(colours[col]);
 		g.fillOval((int)(x-r)+off, (int)(y-r)+off, (int)(r*2), (int)(r*2));
 

@@ -43,6 +43,7 @@ public class Pool implements Runnable {
 	
 	@Override
 	public void run() {
+		// The main loop which constantly tries to make matches
 		String id;
 		while(running) {
 			id = queue.poll();
@@ -58,6 +59,7 @@ public class Pool implements Runnable {
 	
 	private boolean match(String id) {
 		// This method matches an opponent for the user with specified id
+		
 		if(!um.isOnline(id)) {
 			return false;
 		}
@@ -118,6 +120,7 @@ public class Pool implements Runnable {
 	}
 	
 	public void remove(String id) {
+		// This method removes a user from the user and their band list
 		queue.remove(id);
 		
 		if(um.isOnline(id)) {
@@ -156,6 +159,7 @@ public class Pool implements Runnable {
 	}
 	
 	public void showBands() {
+		// Displays the users in each bands
 		bands.forEach((Integer index, CopyOnWriteArrayList<String> arr) -> {
 			System.out.print(index + " ");
 			for(String obj: arr) {
