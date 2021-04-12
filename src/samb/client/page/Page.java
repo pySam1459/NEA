@@ -8,8 +8,8 @@ import samb.client.main.Window;
 import samb.client.page.widget.Widget;
 
 public abstract class Page {
-	/* This abstract class will be used as a basis for all other pages in the program
-	 * A HashMap contains all of the widgets which will be on the page
+	/* This abstract class is used as a basis for all other pages in the program
+	 * A HashMap contains all(most) of the widgets which will be on the page
 	 * */
 	
 	public String id;
@@ -31,6 +31,7 @@ public abstract class Page {
 	}
 	
 	public Widget get(String id) {
+		// The returned Widget object will have to be cast to a subclass to be used
 		return widgets.get(id);
 		
 	}

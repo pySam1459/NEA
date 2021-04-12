@@ -65,6 +65,12 @@ public class TextInfo {
 		
 	}
 	
+	public void setMaxWidth(int w) {
+		while(dim.width > w) { // adjusts the size of the font
+			setSize(getSize()-1);
+		}
+	}
+	
 	
 	public Dimension calculateDims(int i) {
 		// This method calculates the dimensions of the rendered text

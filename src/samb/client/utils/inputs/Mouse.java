@@ -22,6 +22,7 @@ public class Mouse implements MouseListener {
 		
 	}
 
+	// Interface methods
 	@Override
 	public void mousePressed(MouseEvent m) {
 		if(m.getButton() == MouseEvent.BUTTON1) {
@@ -40,8 +41,9 @@ public class Mouse implements MouseListener {
 		}
 	}
 	
+	// Returns a point on the screen
 	public Point getXY() {
-		// This method returns the current (x, y) co-ords of the mouse in the window 
+		// This method returns the current (x, y) coords of the mouse in the window 
 		try {
 			p1 = Client.getWindow().getLocationOnScreen();
 			p2 = MouseInfo.getPointerInfo().getLocation();
@@ -62,12 +64,12 @@ public class Mouse implements MouseListener {
 			forleft++;
 		} else {
 			forleft = 0;
+			
 		} if(right) {
 			forright++;
 		} else {
 			forright = 0;
 		}
-		
 	}
 
 	

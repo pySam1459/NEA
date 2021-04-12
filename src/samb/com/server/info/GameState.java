@@ -3,6 +3,8 @@ package samb.com.server.info;
 import java.io.Serializable;
 
 public class GameState implements Serializable {
+	/* This class contains information about the state of the game, who's what colour, etc
+	 * */
 	
 	private static final long serialVersionUID = 9041019111536124031L;
 	
@@ -11,4 +13,6 @@ public class GameState implements Serializable {
 	public boolean redBlack=false, yellowBlack=false;
 	public Win win;
 
+	public GameState() {}
+	
 }

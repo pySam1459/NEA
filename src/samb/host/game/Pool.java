@@ -11,10 +11,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import samb.host.main.Host;
 
 public class Pool implements Runnable {
-	/* This class handles the matching of players based on their elo
-	 * A separate Thead is used as a concurrent loop is required to constantly check for a match
-	 * A Queue is used rotate through anyone who is looking for a match, so no one is not left out
-	 * A 
+	/* This class handles the matching of players based on their elo (a rating system, high elo == better player)
+	 * A separate Thread is used, as a concurrent loop is required to constantly check for a match
+	 * A Queue is used to iterate through anyone who is looking for a match, so no one is left out
+	 * A user can only be paired with another user of similar elo, (elo +- ELO_BUFFER)
+	 * Therefore a "Band" system is used, band index = user.elo / ELO_BUFFER, 
+	 *   and the pool only has to check opponent users in bands +1,0, -1 to the index of the user
+	 * A list of possible opponents are made, picked randomly from to pair the user off with
 	 * */
 	
 	private volatile boolean running = false;
@@ -48,8 +51,9 @@ public class Pool implements Runnable {
 		while(running) {
 			id = queue.poll();
 			
-			if(id != null) {
+			if(id != null) { // Queue is not empty
 				if(!match(id)) {
+					// If the user did not match, add to the back of the queue
 					queue.add(id);
 					
 				}
@@ -69,7 +73,7 @@ public class Pool implements Runnable {
 		List<String> ids = new ArrayList<>(); // good matches
 		
 		int opElo;
-		for(int di=-1; di<2; di++) { // check through 3 bands, -1 +0 +1
+		for(int di=-1; di<2; di++) { // check through 3 bands, index -1, +0, +1
 			if(bands.get(index+di) != null) {
 				for(String opId: bands.get(index+di)) {
 					if(!opId.equals(id)) {
@@ -96,7 +100,7 @@ public class Pool implements Runnable {
 		int i = r.nextInt(ids.size()); // get a random player from good matches
 		String opId = ids.get(i);
 		
-		if(um.isOnline(id) && um.isOnline(opId)) {
+		if(um.isOnline(id) && um.isOnline(opId) && !gm.inGame(id) && !gm.inGame(opId)) {
 			gm.newGame(id, opId); // create new game
 			
 			remove(id);

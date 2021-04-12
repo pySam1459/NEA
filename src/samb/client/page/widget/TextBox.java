@@ -22,7 +22,7 @@ public class TextBox extends Widget implements KeyListener {
 	 * This class functions as a text box for the user to input data(text) into and the program to get data(text) from
 	 * This class has been designed to be versatile and easily modifiable so that multiple TextBox objects can exhibit different behaviours
 	 * Some of the features include: hide characters, only accept characters which match a regex, animations, cursor animation & character selection,
-	 *     variable colours, character limits, auto-scrolling textbox
+	 *     variable colours, character limits, auto-scrolling textbox, and more
 	 * */
 	
 	private int buffer;
@@ -59,23 +59,12 @@ public class TextBox extends Widget implements KeyListener {
 		this.listeners = new ArrayList<>();
 		
 	}
-	
-	public String getText() {
-		return ti.getText();	
-	}
-	
-	public void setText(String txt) {
-		ti.setText(txt);
-		cursorPos = txt.length();
-		if(txt.equals("")) {
-			textOff = 0;
-		}
-	}
 
 	@Override
 	public void tick() {
 		if(!HIDDEN) {
 			if(selected) {
+				// animates cursor flash
 				cursorRot = (cursorRot+1) % (int)(Client.TPS*((double)cursorDelay/1000.0)*2);
 	
 			}
@@ -98,13 +87,14 @@ public class TextBox extends Widget implements KeyListener {
 		}
 	}
 	
+	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// This method is called by the Canvas object (Window) and receives KeyEvents when the user types on their keyboard
 		
 		if(selected) {
 			String str = ti.getText();
-			switch(e.getKeyCode()) {
+			switch(e.getKeyCode()) { // switch case statement on key begin pressed
 			case KeyEvent.VK_BACK_SPACE:
 				if(str.length() > 0 && cursorPos != 0) {
 					ti.setText(str.substring(0, cursorPos-1) + str.substring(cursorPos));
@@ -119,7 +109,7 @@ public class TextBox extends Widget implements KeyListener {
 				break;
 				
 			case KeyEvent.VK_ENTER:
-				selected = false;
+				selected = false; // call all listeners
 				for(TextBoxListener tbl: listeners) {
 					tbl.onEnter(this);
 				}
@@ -160,14 +150,16 @@ public class TextBox extends Widget implements KeyListener {
 		}
 	}
 	
+	
 	private void updateHideTi() {
-		if(HIDE_CHARS) {
+		if(HIDE_CHARS) { // for passwords, updates shown testInfo with more/less *
 			hideTi.setText(Func.copyChar('*', ti.getText().length()));
 			
 		}
 	}
 	
 	private void updateTextOff() {
+		// Updates the textOffSet
 		int coff, txoff;
 		TextInfo text = getRdTi();
 		
@@ -182,6 +174,7 @@ public class TextBox extends Widget implements KeyListener {
 		}
 	}
 	
+	
 	@Override
 	public void render(Graphics2D graph) {
 		// Renders the text Box, this is a complicated method as the variability offered increases the complexity of the rendering process
@@ -191,7 +184,7 @@ public class TextBox extends Widget implements KeyListener {
 			
 			TextInfo text = getRdTi(); // gets displayed textInfo
 			
-			// Render
+			// Render background
 			g.setColor(BACKGROUND_COLOUR);
 			if(round) {
 				int s = Math.min(rect[2], rect[3]);
@@ -200,6 +193,7 @@ public class TextBox extends Widget implements KeyListener {
 				g.fillRect(0, 0, rect[2], rect[3]);
 			}
 			
+			// Underline
 			if(underline) {
 				g.setColor(UNDERLINE_COLOUR);
 				g.drawLine(buffer, rect[3]-buffer, rect[2]-buffer, rect[3]-buffer);
@@ -208,18 +202,20 @@ public class TextBox extends Widget implements KeyListener {
 			Point xy;
 			int woff=0, adjust=0;
 			
+			// prompt text
 			if(ti.getText() == null || "".equals(ti.getText())) {
 				xy = new Point(buffer*4, promptTi.dim.height/2 + rect[3]/2);
 				g.setColor(Color.GRAY);
 				promptTi.render(g, xy);  // Draws prompt text
 				
-			} else {
+			} else { // actual text
 				woff = text.calculateDims(textOff).width;
 				adjust = HIDE_CHARS ? text.font.getSize()/4: 0;
 				xy = new Point(buffer*4-woff, text.dim.height/2 + rect[3]/2 +adjust);
 				text.render(g, xy);  // Draws the to-be-rendered text
 			}
 			
+			// renders cursor
 			if(selected && cursorRot < Client.TPS * cursorDelay/1000) { // Draws the cursor
 				g.setColor(Consts.PALE);
 				Dimension coff = text.calculateDims(cursorPos);
@@ -236,8 +232,15 @@ public class TextBox extends Widget implements KeyListener {
 		}
 	}
 	
+	
+	// Getters and Setter
+	public String getText() {
+		return ti.getText();	
+	}
+	
 	private int getCursorPos(Point xy) {
-		// each character is a different length and the text maybe offset by the auto-scrolling feature, to get the cursor is not trivial
+		// each character is a different length and the text maybe offset by 
+		//   the auto-scrolling feature, to get the cursor is not trivial
 		xy = new Point(xy.x-rect[0]-buffer*3, xy.y-rect[1]);
 		TextInfo text = getRdTi();
 		
@@ -259,8 +262,18 @@ public class TextBox extends Widget implements KeyListener {
 		}
 	}
 
-	private TextInfo getRdTi() { // If the characters are hidden, the hideTi TextInfo object should be rendered instead of ti
+	private TextInfo getRdTi() { 
+		// If the characters are hidden, the hideTi TextInfo object should be rendered instead of ti
 		return HIDE_CHARS ? hideTi : ti;
+	}
+	
+	public void setText(String txt) {
+		// Sets the text of the textInfo
+		ti.setText(txt);
+		cursorPos = txt.length();
+		if(txt.equals("")) {
+			textOff = 0;
+		}
 	}
 	
 	
@@ -268,7 +281,7 @@ public class TextBox extends Widget implements KeyListener {
 		listeners.add(tbl);
 	}
 	
-	
+	// Unused interface methods
 	@Override
 	public void keyReleased(KeyEvent e) {}
 	@Override

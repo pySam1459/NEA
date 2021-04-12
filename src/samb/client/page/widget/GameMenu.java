@@ -16,6 +16,9 @@ import samb.com.server.info.GameInfo;
 import samb.com.utils.enums.TableUseCase;
 
 public class GameMenu extends Widget {
+	/* This Widget subclass displays the gameInfo and gameState graphically,
+	 *   title colours are colours to pot and shows number of pots so far
+	 * */
 
 	private final BasicStroke SCORE_OUTLINE = new BasicStroke(3);
 	
@@ -37,6 +40,7 @@ public class GameMenu extends Widget {
 	private void initMenuWidgets() {
 		// This method initialises menu widgets
 		
+		// Title Widgets
 		int titleSize = 28, eloSize=16;
 		Text title1 = new Text("???", new int[] {rect[0]+buffer*6, rect[1]+buffer*2, rect[2]-buffer*8, titleSize},
 				Consts.INTER.deriveFont(Font.PLAIN, titleSize), Consts.PAL1);
@@ -71,12 +75,15 @@ public class GameMenu extends Widget {
 		pracTitle.SHADOW = true;
 		gp.add("pracTitle", pracTitle);
 		
+		// Loading animation when waiting for match-making
 		BlankWidget loading = new BlankWidget(new int[] {rect[0]+buffer*6, rect[1]+titleSize+buffer*4,
 														rect[2]/4, titleSize});
 		loading.addAnimation(new LoadingDotsAnimation(loading.rect));
 		gp.add("loading", loading);
 		
-		Button forbut = new Button(new int[] {rect[0]+buffer*8, (int)(rect[1]+titleSize*4+buffer*22+Ball.DEFAULT_BALL_RADIUS*1.6), 
+		// Forfeit button
+		Button forbut = new Button(new int[] {rect[0]+buffer*8, 
+				(int)(rect[1]+titleSize*4+buffer*22+Ball.DEFAULT_BALL_RADIUS*1.6), 
 				rect[2]-buffer*16, titleSize*2}, "Return to Menu");
 		forbut.HIDDEN = false;
 		forbut.addListener(gp);
@@ -107,6 +114,7 @@ public class GameMenu extends Widget {
 				titleIDs = new String[] {"title2", "title1", "elo2", "elo1"};
 			}
 			// NOTE, no break here as using the next case's code
+			//  a polarizing way to reduce duplicate code
 			
 		case spectating:
 			t = (Text) gp.get(titleIDs[0]);
@@ -243,7 +251,7 @@ public class GameMenu extends Widget {
 	private void _renderIndividualScore(Graphics2D g, int score, boolean black, int r, int y, int buffer, Color colour) {
 		// Renders a player's score with given params
 		
-		g.setColor(colour);
+		g.setColor(colour); // pots
 		for(int i=0; i<7; i++) {
 			if(i < score) {
 				g.fillOval(buffer*2 + i*(r+buffer)*2, y-r, r*2, r*2);
@@ -253,7 +261,7 @@ public class GameMenu extends Widget {
 			}
 		}
 		
-		g.setColor(new Color(16, 16, 16, 192));
+		g.setColor(new Color(16, 16, 16, 192)); // 8 ball
 		if(black) {
 			g.fillOval(buffer*2 + 7*(r+buffer)*2, y-r, r*2, r*2);
 		} else {

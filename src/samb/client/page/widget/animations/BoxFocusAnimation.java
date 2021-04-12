@@ -8,7 +8,8 @@ import samb.client.main.Client;
 import samb.client.utils.Consts;
 
 public class BoxFocusAnimation extends WidgetAnimation {
-	/* This class allows widgets to exhibit an animation where a box around the widget fades and focuses in and out when mouse is hovering over
+	/* This class allows widgets to exhibit an animation where a box around 
+	 *   the widget fades and focuses in and out when mouse is hovering over
 	 * This class is a subclass of the WidgetAnimation class
 	 * */
 	
@@ -52,8 +53,9 @@ public class BoxFocusAnimation extends WidgetAnimation {
 
 	@Override
 	public void render(Graphics2D g) {
+		// Renders the animation
 		if(focus != 100) {
-			int alpha = 255*(100-focus)/100;
+			int alpha = 255*(100-focus)/100; // fades in/out
 			g.setColor(new Color(COLOUR.getRed(), COLOUR.getGreen(), COLOUR.getBlue(), alpha));
 			g.setStroke(new BasicStroke(WIDTH));
 			

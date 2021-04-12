@@ -8,7 +8,8 @@ import java.util.List;
 import samb.client.page.widget.animations.WidgetAnimation;
 
 public abstract class Widget {
-	/* This abstract class acts as a base for all widgets, so common attributes ("id", "rect", etc) can be stored here
+	/* This abstract class acts as a base for all widgets, so common attributes ("id", "rect", "HIDDEN", etc) can be stored here
+	 *   along with common and necessary methods: tick, render, animTick, animRender, addAnimation, inRect
 	 * This reduces complexity and code in the subclasses and allows for subclasses to be stored under 1 type "Widget"
 	 * */
 	

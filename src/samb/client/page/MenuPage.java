@@ -42,6 +42,7 @@ public class MenuPage extends Page implements ButtonListener {
 		int butW = 384, butH = 129, yoff=156;
 		Color backColor = new Color(24, 231, 204, 128);
 
+		// Profile and FriendList
 		prof = new Profile(new int[] {buffer*5, yoff, 
 				butW*2 + buffer, Window.dim.height-(yoff+butH+buffer*9 +4)}, this);
 		prof.HIDDEN = false;
@@ -52,7 +53,7 @@ public class MenuPage extends Page implements ButtonListener {
 				prof);
 		add("friendList", fl);
 		
-		
+		// join Pool and Practice buttons
 		Button but = new Button(new int[] {buffer*5, Window.dim.height-(butH+buffer*7), butW, butH}, "Join Pool");
 		but.addAnimation(new HoverShineAnimation(but.rect));
 		but.addAnimation(new BoxFocusAnimation(but.rect));
@@ -67,6 +68,7 @@ public class MenuPage extends Page implements ButtonListener {
 		but.addListener(this);
 		add("pracButton", but);
 		
+		// Search Bar, and Refresh button
 		int h = 64;
 		TextBox search = new TextBox(new int[] {buffer*9+2*butW+8, yoff-buffer-h, 
 				Window.dim.width-2*butW-15*buffer-h, h}, "Search...");

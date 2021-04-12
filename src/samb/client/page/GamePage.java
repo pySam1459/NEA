@@ -28,6 +28,7 @@ import samb.com.utils.enums.TableUseCase;
 public class GamePage extends Page implements ButtonListener {
 	/* This page is where the user will play/spectate/practice their games
 	 * The main 3 widgets are the Table, GameMenu and ChatBox
+	 * The endScreen widget will fade into existence at the end of a game
 	 * */
 
 	public GameInfo info;
@@ -177,19 +178,25 @@ public class GamePage extends Page implements ButtonListener {
 	public void endGame(Win win, String winnerId) {
 		// This method starts to reveal the endScreen
 		endScreen.tuc = table.tuc;
+		if(table == null) { 
+			// a null pointer exception occurred here, cannot re-create, so just add this to catch just in case
+			Client.getClient().pm.changePage(new MenuPage());
+			return;
+		}
+		
 		switch(table.tuc) {
 		case playing:
-			endScreen.setDeltaElo(getEloDelta(winnerId));
+			endScreen.setDeltaElo(getEloDelta(winnerId)); // user's elo Delta
 			endScreen.reveal(win, Client.getClient().udata.id.equals(winnerId));
 			break;
 			
 		case practicing:
-			endScreen.setDeltaElo(0);
+			endScreen.setDeltaElo(0); // eloDelta = 0
 			endScreen.reveal(win, true);
 			break;
 			
 		case spectating:
-			endScreen.setDeltaElo(getRawEloDelta(winnerId));
+			endScreen.setDeltaElo(getRawEloDelta(winnerId)); // raw eloDelta
 			endScreen.reveal(win, info.u1, info.u2, winnerId);
 			break;
 		}
@@ -198,18 +205,20 @@ public class GamePage extends Page implements ButtonListener {
 	}
 	
 	private int getRawEloDelta(String wId) {
+		// Returns the delta Elo 
 		UserInfo loser = wId.equals(info.u1.id) ? info.u2 : info.u1;
 		int diffelo = loser.elo - getUI(wId).elo;
 		return Maths.calculateDeltaElo(diffelo);
 	}
 	
 	private int getEloDelta(String wId) {
+		// Returns the delta elo for the user
 		UserInfo loser = wId.equals(info.u1.id) ? info.u2 : info.u1;
 		int diffelo = loser.elo - getUI(wId).elo;
 		if(Client.getClient().udata.id.equals(wId)) {
 			return Maths.calculateDeltaElo(diffelo); 
 		} else {
-			return -Maths.calculateDeltaElo(diffelo);
+			return -Maths.calculateDeltaElo(diffelo); // negative if loss
 		}
 	}
 	
@@ -235,11 +244,11 @@ public class GamePage extends Page implements ButtonListener {
 		}
 	}
 
-	@Override
+	@Override // not used
 	public void onRelease(Button b) {}
 	
 	
-	// Chat Methods
+	// Chat Method
 	public void addChat(Message msg) {
 		chat.addMessage(msg);
 		
@@ -311,6 +320,7 @@ public class GamePage extends Page implements ButtonListener {
 		menu.render(g);
 		renderWidgets(g);
 		
+		// rendered after widgets, so doesn't accidentally render under table
 		endScreen.render(g);
 		
 		return img;

@@ -3,7 +3,7 @@ package samb.com.utils.data;
 import java.io.Serializable;
 
 public class Pointf implements Serializable {
-	// This class represents a Point object which can handle float values
+	// This class represents a Point object which can handle real values
 	
 	private static final long serialVersionUID = 7275992100716149913L;
 	public double x, y;
@@ -16,12 +16,6 @@ public class Pointf implements Serializable {
 	public Pointf(double x, double y) {
 		this.x = x;
 		this.y = y;
-	}
-	
-	@Override
-	public String toString() {
-		return String.format("Pointf{x=%f, y=%f}", this.x, this.y);
-		
 	}
 
 }

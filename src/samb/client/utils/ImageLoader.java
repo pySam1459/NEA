@@ -31,13 +31,16 @@ public class ImageLoader {
 	
 	
 	public static BufferedImage getBackground() {
+		// The animated background is simply image i out of 256
+		//   made by a colouring 2D slices of 3D simplexNoise
 		String file = String.format("background/%d.png", (int)Window.bgImgCounter);
 		return get(file);
 		
 	}
 	
 	
-	public void clearCache() {
+	public static void clearCache() {
+		// Clears memory
 		images.clear();
 		
 	}

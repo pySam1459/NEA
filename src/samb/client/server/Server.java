@@ -16,7 +16,8 @@ import samb.com.utils.Config;
 
 public class Server extends BaseServer {
 	/* This class is a subclass of the abstract BaseServer class
-	 * Since this is the client Server, the port number does not need to be specific, so it can be random (but not in use)
+	 * Since this is the client Server, the port number does not need to be specific, 
+	 *   so it can be random (but not in use, thus I chose the range 5000->65535)
 	 * */
 	
 	private DatagramPacket sendPacket;
@@ -37,7 +38,8 @@ public class Server extends BaseServer {
 				this.HOST_IP = InetAddress.getByName((String)Config.get("HOST_IP"));
 				this.HOST_PORT = 5303;
 				
-				this.PORT = new Random().nextInt(60535)+5000;  // +5000 so only ports 5000 < PORT < 65535 are chosen, since most ports below 5000 are more commonly used
+				// +5000 so only ports 5000 < PORT < 65535 are chosen, since most ports below 5000 are more commonly used
+				this.PORT = new Random().nextInt(60535)+5000;  
 				this.socket = new DatagramSocket(PORT);
 				allow = true;
 				
@@ -50,8 +52,7 @@ public class Server extends BaseServer {
 	
 	public void send(Packet p) {
 		// This method sends Packets to the Host Server
-		// Since the client only sends packets to the host, 1 method is required for any packet to be sent
-		// The client id is also added so that the host knows who the packet was sent by
+		// The client id is added so that the host knows who the packet was sent by
 		
 		p.id = Client.getClient().udata.id;
 		byte[] data = PacketFactory.getBytes(p);

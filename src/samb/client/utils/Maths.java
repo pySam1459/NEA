@@ -34,7 +34,7 @@ public class Maths {
 	}
 	
 	public static void ballCollisionLine(Ball b, Line l) {
-		// refects the incoming ball on the line
+		// reflects the incoming ball on the line
 		double theta = Math.atan((l.y2-l.y1) / (l.x2-l.x1));
 		double nx = b.vx*Math.cos(2*theta) + b.vy*Math.sin(2*theta);
 		double ny = b.vx*Math.sin(2*theta) - b.vy*Math.cos(2*theta);

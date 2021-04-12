@@ -10,6 +10,7 @@ import samb.client.page.PageManager;
 import samb.client.page.widget.FriendList;
 import samb.client.server.Server;
 import samb.client.utils.Consts;
+import samb.client.utils.ImageLoader;
 import samb.client.utils.UserData;
 import samb.client.utils.inputs.Keyboard;
 import samb.client.utils.inputs.Mouse;
@@ -275,11 +276,12 @@ public class Client extends BaseProcessor implements Runnable {
 		
 		window.stop();
 		server.stop();
+		ImageLoader.clearCache();
 		
 	}
 	
 	private void informHost() {
-		if(udata.id != null) {
+		if(udata.id != null) { // informs host the user is leaving
 			Packet p = new Packet(Header.leave);
 			server.send(p);
 		}

@@ -59,7 +59,7 @@ public class Profile extends Widget implements ButtonListener {
 	}
 	
 	public void set(Friend f, boolean self) {
-		// Sets the profile to Friend f
+		// Sets the profile to Friend f or self
 		this.self = self;
 		this.f = f;
 		setBools(f);
@@ -68,6 +68,7 @@ public class Profile extends Widget implements ButtonListener {
 	}
 	
 	public void setAsSelf() {
+		// Pretends the user is a 'friend'
 		this.f = new Friend(Client.getClient().udata.id, Client.getClient().udata.userInfo.username);
 		set(f, true);
 		
@@ -103,6 +104,7 @@ public class Profile extends Widget implements ButtonListener {
 	}
 	
 	public void setBools(Friend f) {
+		// Sets the activity of the challenge and spectate buttons
 		if(!self) {
 			challBut.active = f.online && !f.inGame;
 			specBut.active = f.inGame;
@@ -112,7 +114,9 @@ public class Profile extends Widget implements ButtonListener {
 		}
 	}
 	
-	public void setHidden() {
+	public void setHiddens() {
+		// Sets the HIDDEN attributes for the buttons based on conditions...
+		
 		if(self) { // hide all
 			challBut.HIDDEN = true;
 			acChallBut.HIDDEN = true;
@@ -152,8 +156,9 @@ public class Profile extends Widget implements ButtonListener {
 	}
 	
 	private void initWidgets() {
-		int w = rect[2]/3, h = rect[3]/8;
+		// Initializes profile widgets
 		
+		int w = rect[2]/3, h = rect[3]/8;
 		challBut = new Button(new int[] {rect[0]+rect[2]/2-buffer-w, 
 				rect[1]+rect[3]-buffer*3-h, w, h}, "Challenge");
 		challBut.HIDDEN = true;
@@ -193,11 +198,12 @@ public class Profile extends Widget implements ButtonListener {
 		
 	}
 	
+	// Button listeners called by a button
 	@Override
 	public void onClick(Button b) {
 		Packet p;
 		switch(b.id) {
-		case "challBut":
+		case "challBut": // Send a challenge request
 			p = new Packet(Header.challenge);
 			p.challengeInfo = new ChallengeInfo(f.id);
 			Client.getClient().server.send(p);
@@ -207,7 +213,7 @@ public class Profile extends Widget implements ButtonListener {
 			challInfo.HIDDEN = false;
 			break;
 			
-		case "acChallBut":
+		case "acChallBut": // accept a challenge request
 			p = new Packet(Header.challenge);
 			f.ci.accepted = true;
 			p.challengeInfo = f.ci;
@@ -215,18 +221,18 @@ public class Profile extends Widget implements ButtonListener {
 			f.challenged = false;
 			break;
 			
-		case "specBut":
+		case "specBut": // spectate a friend
 			p = new Packet(Header.spectate);
 			p.spec = f.id;
 			Client.getClient().server.send(p);
 			break;
 			
-		case "addBut":
+		case "addBut": // add a friend
 			p = new Packet(Header.addFriend);
 			p.friendsInfo = new FriendsInfo(FHeader.addFriend, f.id);
 			Client.getClient().server.send(p);
 			f.isFriend = true;
-			setHidden();
+			setHiddens();
 			break;
 			
 		default:
@@ -237,7 +243,9 @@ public class Profile extends Widget implements ButtonListener {
 	@Override
 	public void onRelease(Button b) {}
 	
+	
 	public void challengeError(Error err) {
+		// If the challenge request produced an error{userInGame, notOnline}
 		challInfo.setText("Error: " + err.toString());
 		challInfo.setColour(Color.RED);
 		challInfo.HIDDEN = false;
@@ -269,6 +277,7 @@ public class Profile extends Widget implements ButtonListener {
 		
 		// Username
 		TextInfo ti = new TextInfo(f.username, usernameFont, Consts.PALE);
+		ti.setMaxWidth(rect[2]-buffer*8);
 		Point xy = new Point(buffer*5, buffer*2+usernameH);
 		ti.render(g, xy);
 		
@@ -283,7 +292,7 @@ public class Profile extends Widget implements ButtonListener {
 		int x = buffer*5;
 		int y = buffer*6 + usernameH+h;
 		ti.setSize(h);
-		for(int i=0; i<2; i++) {
+		for(int i=0; i<2; i++) { // columns first
 			for(int j=0; j<3; j++) {
 				// Title
 				ti.setColour(Consts.GREY_PALE);

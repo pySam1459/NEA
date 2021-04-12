@@ -10,7 +10,8 @@ import samb.com.utils.enums.TableUseCase;
 
 public class GameInfo implements Serializable {
 	/* This class contains game information which is to be sent between a client and the host
-	 * Importantly, this class contains the Balls information, their positions and velocities
+	 * Importantly, this class contains the Balls' information, their positions and velocities
+	 * This info is sent at the start of a game, or when a spectator joins
 	 * */
 	
 	private static final long serialVersionUID = -340833768267080142L;

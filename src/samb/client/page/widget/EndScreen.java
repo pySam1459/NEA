@@ -16,6 +16,7 @@ import samb.com.utils.enums.TableUseCase;
 
 public class EndScreen extends Widget {
 	/* This widget is shown at the end of a game, showing the results of the game
+	 *   and giving the option to return to the menu
 	 * */
 	
 	private BufferedImage img;
@@ -33,6 +34,7 @@ public class EndScreen extends Widget {
 		super(rect);
 		this.retoBut = retoBut;
 	
+		// All fonts derive from INTER
 		this.titleFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/7);
 		this.smallTitleFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/10);
 		this.byWhatFont = Consts.INTER.deriveFont(Font.PLAIN, rect[3]/12);
@@ -43,7 +45,8 @@ public class EndScreen extends Widget {
 	@Override
 	public void tick() {
 		if(!HIDDEN && opacity < maxOpacity) {
-			// This widget will appear at the end of the match, by revealing itself as its opacity increases
+			// This widget will appear at the end of the match, 
+			//   by revealing itself as its opacity increases
 			if(System.currentTimeMillis() - timer >= revealPeriod) {
 				opacity += 0.02f;
 				timer = System.currentTimeMillis();
@@ -63,6 +66,8 @@ public class EndScreen extends Widget {
 	}
 	
 	public void reveal(Win win, UserInfo u1, UserInfo u2, String wId) {
+		// This method starts the reveal process for a spectator, 
+		//   shows change in elo for both players
 		this.winner = u1.id.equals(wId) ? u1 : u2;
 		this.loser = u1.id.equals(wId) ? u2 : u1;
 		
@@ -72,7 +77,7 @@ public class EndScreen extends Widget {
 	}
 	
 	private void createImg(Win win, boolean amWinner) {
-		// This method creates the endScreen widget image, called only once
+		// This method creates the endScreen widget image, called a few times as possible
 		
 		img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = (Graphics2D) img.getGraphics();
@@ -116,6 +121,7 @@ public class EndScreen extends Widget {
 	}
 	
 	private TextInfo getTitleTextInfo(boolean amWinner) {
+		// Return the Title of the endScreen, dependent on tuc
 		switch(tuc) {
 		case playing:
 			return new TextInfo(amWinner ? "You Won!" : "You Lost", 
@@ -129,6 +135,7 @@ public class EndScreen extends Widget {
 	}
 	
 	private TextInfo getEloDeltaTextInfo(int cElo, int dElo) {
+		// Return the change in elo textInfo
 		String text;
 		Color col;
 		if(dElo > 0) {
@@ -137,7 +144,7 @@ public class EndScreen extends Widget {
 		} else if(dElo < 0) {
 			text = Integer.toString(cElo) + " " + Integer.toString(dElo);
 			col = Color.RED;
-		} else {
+		} else { // practice
 			text = Integer.toString(cElo);
 			col = Consts.PALE;
 		}
@@ -163,7 +170,7 @@ public class EndScreen extends Widget {
 		// Renders the endScreen
 		if(!HIDDEN) {
 			if(img != null) {
-				// Sets the transparency of the endScreen to 'opacity'
+				// Sets the transparency of the endScreen to $opacity 0f->1f
 				g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
 				
 				g.drawImage(img, rect[0], rect[1], null);

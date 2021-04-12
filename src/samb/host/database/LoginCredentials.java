@@ -22,6 +22,7 @@ public class LoginCredentials {
 	}
 	
 	public static void loadCredentials() {
+		// Loads the MySql credentials from res/misc/sqlCredentials.cred
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File("res/misc/sqlCredentials.cred")));
 			String line;
@@ -34,7 +35,7 @@ public class LoginCredentials {
 					return;
 				}
 			}
-		} catch(IOException e) {
+		} catch(IOException e) { // if sqlCredentials.cred does not exist
 			System.out.println("Error loading SQL Database Credentials");
 			System.exit(-1);
 		}

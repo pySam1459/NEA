@@ -24,6 +24,7 @@ public class Keyboard extends ArrayList<Boolean> implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent k) {
+		// Benefit of being a subclass of a list, can add to this
 		if(k.getKeyCode() > size()) {
 			for(int i=size(); i<k.getKeyCode()+1; i++) {
 				add(false);

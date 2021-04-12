@@ -9,6 +9,9 @@ import samb.host.database.StatsDBManager;
 import samb.host.main.Host;
 
 public class User {
+	/* This class contains information about a user
+	 * The Host can send a Packet to this user, by calling 'user.send(p)'
+	 * */
 
 	private InetAddress addr;
 	private int port;
@@ -26,7 +29,7 @@ public class User {
 		
 		this.id = p.id;
 		this.username = p.loginInfo.username;
-		this.elo = StatsDBManager.getElo(id);
+		updateElo();
 		
 		this.h = h;
 	}

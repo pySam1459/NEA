@@ -21,10 +21,10 @@ import samb.com.server.packet.Packet;
 import samb.com.utils.Func;
 
 public class LoginPage extends Page implements ButtonListener {
-	/* This class is a subclass of Page class, which handles everything to do with the login Page
+	/* This class is a subclass of Page class, which handles everything to do with the login in / sign up
 	 * It initializes all widgets seen on the login page and ticks/renders them
-	 * It also handles the login and sign up processes, when the buttons are pressed, a packet is sent to the host,
-	 * either to authorize or signup to the host.
+	 * It also handles the login and sign up processes, when the buttons are pressed, 
+	 * a packet is sent to the host, either to authorize or sign-up to the host.
 	 * */
 	
 	private TextBox lUsername, lPassword;
@@ -47,7 +47,8 @@ public class LoginPage extends Page implements ButtonListener {
 	private void initLogin() {
 		// This method initializes all of the widgets for Login In side
 		// A widget object is instantiated and any extra attributes are assigned
-		// The widgets object will then be added to the page and the ticking/rendering will be handled by the Page super class
+		// The widgets object will then be added to the page and the ticking/rendering 
+		//   will be handled by the Page super class
 		
 		add("LoginTitle", new Text("Login In", new int[] {Window.dim.width/4, 64, Window.dim.width/4, 128}, 
 				Consts.INTER.deriveFont(Font.PLAIN, 72), Consts.PAL1));
@@ -55,12 +56,16 @@ public class LoginPage extends Page implements ButtonListener {
 		int buffer = 16;
 		int w=512, h=72;
 		int xoff = Window.dim.width/2-w-buffer*3, yoff=256;
-		lUsername = new TextBox(new int[] {xoff, yoff, w, h}, "Username");   // Specific TextBox widget is created and parameters are passed
-		lUsername.addAnimation(new BoxFocusAnimation(lUsername.rect, true)); // BoxFocusAnimation is applied to the widget
-		add("LoginUsername", lUsername);                                     // Widget is added to the page
+		
+		// 1. TextBox widget is created and parameters are passed (rectangle{x, y, w, h}, Displayed text)
+		// 2. BoxFocusAnimation is added to the widget
+		// 3. Widget is added to the page
+		lUsername = new TextBox(new int[] {xoff, yoff, w, h}, "Username");   
+		lUsername.addAnimation(new BoxFocusAnimation(lUsername.rect, true)); 
+		add("LoginUsername", lUsername);                                     
 		
 		lPassword = new TextBox(new int[] {xoff, yoff+h+buffer*2, w, h}, "Password");
-		lPassword.HIDE_CHARS = true;                                                    // The password shouldn't be seen, so chars are hidden
+		lPassword.HIDE_CHARS = true;  // The password shouldn't be seen, so chars are hidden
 		lPassword.addAnimation(new BoxFocusAnimation(lPassword.rect, true));
 		add("LoginPassword", lPassword);
 		
@@ -69,8 +74,10 @@ public class LoginPage extends Page implements ButtonListener {
 		lButton.addAnimation(new BoxFocusAnimation(lButton.rect));
 		add("LoginInBut", lButton);
 		
-		lInvDets = new Text("Invalid Details", new int[] {xoff+w/2-w/3, yoff+h*4+buffer*17+4, (int)(w/1.5), 24}, new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
-		lInvDets.HIDDEN = true;                                               // Only shown if the details are invalid
+		// Only shown if the details are invalid
+		lInvDets = new Text("Invalid Details", new int[] {xoff+w/2-w/3, yoff+h*4+buffer*17+4, (int)(w/1.5), 24}, 
+				new Font("Bahnschrift Light", Font.BOLD, 18), Consts.INVALID_COLOUR);
+		lInvDets.HIDDEN = true;                                               
 		add("LoginInvalidDets", lInvDets);
 		
 	}
@@ -170,14 +177,15 @@ public class LoginPage extends Page implements ButtonListener {
 	}
 	
 	private void signup() {
-		// Before signing up, we validate the details provided, checking password is re-typed corrects, email is formatted correctly, all fields are filled in
+		// Before signing up, we validate the details provided, checking password is re-typed corrects, 
+		//   email is formatted correctly, all fields are filled in
 		
 		sInvUsername.HIDDEN = true;
 		sInvEmail.HIDDEN = true;
 		sInvPassword.HIDDEN = true;
 		sInvDets.HIDDEN = true;
 		
-		boolean valid = true;
+		boolean valid = true;        // valid email regex, slightly disgusting
 		if(!sEmail.getText().matches("\\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\\b")) {
 			sInvEmail.setText("Invalid Email");
 			sInvEmail.HIDDEN = false;
@@ -185,6 +193,7 @@ public class LoginPage extends Page implements ButtonListener {
 		} else {
 			sInvEmail.HIDDEN = true;
 		}
+		
 		if(!sPassword.getText().equals(sRePassword.getText()) ) {
 			sInvPassword.setText("Passwords are different");
 			sInvPassword.HIDDEN = false;
@@ -192,6 +201,7 @@ public class LoginPage extends Page implements ButtonListener {
 		} else {
 			sInvPassword.HIDDEN = true;
 		}
+		
 		if(sUsername.getText().length() == 0 || sEmail.getText().length() == 0 ||
 				sPassword.getText().length() == 0 || sRePassword.getText().length() == 0) {
 			sInvDets.setText("Invalid Details");
@@ -202,7 +212,7 @@ public class LoginPage extends Page implements ButtonListener {
 		}
 		
 		if(valid) {
-			// Here we send a packet to the host server with our sign up details
+			// Sends packet to Host with our sign up details
 			Packet p = new Packet(Header.signup);
 			p.loginInfo = new LoginInfo(sUsername.getText(), 
 					sEmail.getText(), Func.hashPassword(sUsername.getText(), sPassword.getText()));
@@ -213,6 +223,7 @@ public class LoginPage extends Page implements ButtonListener {
 	}
 	
 	public void setError(Error err) {
+		// This method sets the error messages based on Error err
 		switch(err) {
 		case invalidDetails:
 			lInvDets.setText("Invalid Details");

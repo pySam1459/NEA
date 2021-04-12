@@ -1,7 +1,7 @@
 package samb.com.utils.data;
 
 public class Dimf {
-	// This class represents a Dimension object which can handle float values
+	// This class represents a Dimension object which can handle real values
 	
 	public double width, height;
 	
@@ -13,12 +13,6 @@ public class Dimf {
 	public Dimf(double w, double h) {
 		this.width = w;
 		this.height = h;
-		
-	}
-	
-	@Override
-	public String toString() {
-		return String.format("Dimf{width=%f, height=%f}", this.width, this.height);
 		
 	}
 

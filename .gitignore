@@ -5,4 +5,5 @@
 /res/misc/sqlCredentials.cred
 /res/rules.txt
 /*.jar
-*.log
+/*.log
+/README_OLD.md

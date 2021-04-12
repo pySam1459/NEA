@@ -66,7 +66,8 @@ public class ChatBox extends Widget implements TextBoxListener {
 	
 	@Override
 	public void onEnter(TextBox tb) {
-		// This method is called by a TextBox Widget when the enter key is pressed, ie when the player wants to send the message
+		// This method is called by a TextBox Widget when the enter key is pressed, 
+		//   ie when the player wants to send the message
 		
 		if(tb.id.equals("enterText")) {
 			Message m = new Message(tb.getText(), Client.getClient().udata.userInfo.username);
@@ -78,7 +79,8 @@ public class ChatBox extends Widget implements TextBoxListener {
 	}
 	
 	public void setUseCase(TableUseCase tuc) {
-		// This method tells the class what to render, depended on whether the user is: playing, practicing or spectating
+		// This method tells the class what to render, 
+		//   depended on whether the user is: playing, practicing or spectating
 		String msg;
 		et.HIDDEN = true;
 		switch(tuc) {
@@ -182,7 +184,8 @@ public class ChatBox extends Widget implements TextBoxListener {
 				y += chatSize;
 			}
 			
-			// render message, each word is separated to check is the sentence will be longer than the chat box, if so wrap around
+			// render message, each word is separated to check if the sentence 
+			//   will be longer than the chat box, if so wrap around
 			g.setFont(chatFont);
 			parts = m.text.split(" ");
 			
@@ -223,6 +226,7 @@ public class ChatBox extends Widget implements TextBoxListener {
 	}
 	
 	private void renderDoFlag(Graphics2D g, String flag) {
+		// If the 'from' is a flag, do that flag
 		switch(flag) {
 		case "$PLAIN$":
 			g.setFont(chatFont);

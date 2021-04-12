@@ -8,6 +8,9 @@ import samb.client.main.Client;
 import samb.client.utils.Consts;
 
 public class UnderLineAnimation extends WidgetAnimation {
+	/* This animation shows a highlighting underline to a widget 
+	 *   (normally a button or textBox)
+	 * */
 	
 	private boolean hover = false;
 	private int prog = 0;
@@ -23,6 +26,7 @@ public class UnderLineAnimation extends WidgetAnimation {
 
 	@Override
 	public void tick() {
+		// either increases or decreases the alpha of the line, if hover or not
 		hover = inRect(Client.getMouse().getXY());
 		if(hover) {
 			if(prog < 100) {
@@ -45,6 +49,7 @@ public class UnderLineAnimation extends WidgetAnimation {
 
 	@Override
 	public void render(Graphics2D g) {
+		// renders the line
 		if(prog > 0) {
 			g.setColor(new Color(COLOUR.getRed(), COLOUR.getGreen(), COLOUR.getBlue(), (int)(255.0*(prog/100.0))));
 			g.setStroke(new BasicStroke(WIDTH));

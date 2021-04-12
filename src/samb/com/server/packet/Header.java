@@ -7,19 +7,18 @@ public enum Header {
 	login,
 	leave,
 	
-	newGame,
-	stopGame,
-	
 	joinPool,
 	leavePool,
 	spectate,
 	challenge,
 	
-	updateGame,
-	getUpdateGame,
+	newGame,
+	stopGame,
 	
+	updateGame,
 	chat,
 	
+	getUpdateGame,
 	getStats,
 	getFriends,
 	addFriend;

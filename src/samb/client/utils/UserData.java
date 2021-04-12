@@ -6,7 +6,7 @@ import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
 
 public class UserData {
-	/* This class contains the user's data which is to be used in menus, settings, rendering, etc
+	/* This class contains the user's data which is to be used in throughout the program
 	 * */
 	
 	public String id;
@@ -14,5 +14,7 @@ public class UserData {
 	public UserStats userStats;
 	public GameInfo gameInfo;
 	public GameState gameState;
+	
+	public UserData() {}
 
 }

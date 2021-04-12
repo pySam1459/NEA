@@ -60,6 +60,7 @@ public class GameManager {
 		updators.get(id).add(u1);
 		updators.get(id).add(u2);
 		
+		// Which updator cowal does a updator belong to
 		updateLink.put(u1, cowal);
 		updateLink.put(u2, cowal);
 		
@@ -90,12 +91,13 @@ public class GameManager {
 	}
 	
 	public void addSpectate(Packet up) {
-		// Once a player has replied, the spectate can watch the match
+		// Once a player has replied, the spectator can watch the match
 		if(up.gameInfo == null) {
 			System.out.println("Error occured when adding spectator");
 			return;
 		}
 		
+		// Add spectator to updator maps
 		updators.get(up.gameInfo.id).add(up.spec);
 		updateLink.put(up.spec, updators.get(up.gameInfo.id));
 		
@@ -108,6 +110,9 @@ public class GameManager {
 	}
 	
 	public void challenge(Packet p) {
+		// This method sends a challenge request to the challenged user,
+		
+		// First check if opponent is online and not already in a game
 		String opp = p.challengeInfo.oppId;
 		if(!Host.getHost().um.isOnline(opp)) {
 			p.challengeInfo.err = Error.notOnline;
@@ -139,6 +144,7 @@ public class GameManager {
 		
 		g.update(p);
 		
+		// This is the relay, update Packet p is sent to all updators (including the user who sent the packet)
 		for(String uid: updators.get(gId)) {
 			if(Host.getHost().um.isOnline(uid)) {
 				Host.getHost().um.get(uid).send(p);
@@ -213,7 +219,7 @@ public class GameManager {
 			updateLink.get(id).remove(id);
 		}
 		
-		if(inGame(id)) {
+		if(inGame(id)) { // if they are in a game, game must be stopped first
 			String gId = parts.get(id);
 			Game g = games.get(gId);
 			
@@ -239,6 +245,7 @@ public class GameManager {
 		int diffelo = loseS.elo - winS.elo;  // if lose.elo > win.elo => delo > 0
 		int deltaElo = Maths.calculateDeltaElo(diffelo); // change in elo
 		
+		// change stats
 		winS.updateElo(deltaElo);
 		if(loseS.elo > winS.highestEloVictory) { winS.highestEloVictory = loseS.elo; }
 		winS.noGames++;
@@ -287,6 +294,7 @@ public class GameManager {
 			}
 		});
 		
+		// clear memory
 		games.clear();
 		parts.clear();
 		updators.clear();

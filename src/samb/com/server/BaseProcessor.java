@@ -6,10 +6,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public abstract class BaseProcessor {
 	/* This abstract class handles the received DatagramPackets
-	 * When the BaseServer passes a received DatagramPacket, it will be added to the Queue
-	 * The Processor may receive many DatagramPackets in a short space of time, so the queue holds the DatagramPackets until they can be processed.
-	 * When the process method is called, the DatagramPackets in the queue (at that instants) will be handled by the subclass
-	 * Both the Client and the Host will use inherit from this class and define their own handle method
+	 * When the BaseServer calls the add method, the received DatagramPacket will be added to the Queue
+	 * The Processor may receive many DatagramPackets in a short space of time, 
+	 *   so the queue holds the DatagramPackets in order until they can be processed.
+	 * When the process method is called, the DatagramPackets in the queue will be handled by the subclass
+	 * Both the Client and the Host subclasses inherit from this class, defining their own handle methods
 	 * */
 	
 	private volatile boolean processing = false;
@@ -28,7 +29,8 @@ public abstract class BaseProcessor {
 	}
 	
 	public void process() {
-		for(int i=0; i<queue.size(); i++) {  // Polls the number of DatagramPacket at that instants, so no concurrency errors arise.
+		// Polls the number of DatagramPacket at that instants, so no concurrency errors arise.
+		for(int i=0; i<queue.size(); i++) {
 			handle(queue.poll());
 			
 		}
@@ -39,7 +41,7 @@ public abstract class BaseProcessor {
 
 	
 	public void startThread() {
-		// Starts the Thread, the process Thread is defined as a lambda function
+		// Starts the Thread, the process Thread is defined as a lambda function,
 		//   since the Runnable interface causes issues between subclasses and this abstract super class
 		
 		processing = true;

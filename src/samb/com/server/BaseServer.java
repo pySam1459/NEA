@@ -9,11 +9,13 @@ import java.net.SocketException;
 public abstract class BaseServer implements Runnable {
 	/* This abstract class handles events regarding the receiving of incoming DatagramPackets from the Internet.
 	 * The subclasses of BaseServer will handle the sending of DatagramPackets (and the instantiation of the DatagramSocket)
-	 * This class is designed to be used by both Client and Host servers (to reduce code complexity)
-	 * This class is an example of polymorphism, composition, association and overriding.
+	 * This class is designed to be inherited by both Client and Host servers (to reduce code complexity and duplication)
+	 * This class is an example of polymorphism, composition, association, overriding and interfacing, to name a few.
 	 * 
-	 * This Class creates a seperate 'Listen' Thread to listen for incoming DatagramPackets which have been sent to the DatagramSocket
-	 * Once a DatagramPacket has been received, it is then handled by the Processor object (passed into the constructor as the BaseProcessor argument)
+	 * This Class creates a separate 'Listening' Thread to listen for incoming DatagramPackets 
+	 *   which have been sent to the DatagramSocket
+	 * Once a DatagramPacket has been received, it is then handled by the Processor object 
+	 *   (passed into the constructor as the BaseProcessor argument)
 	 * */
 	
 	protected DatagramSocket socket;
@@ -32,7 +34,8 @@ public abstract class BaseServer implements Runnable {
 		
 	}
 	
-	// This abstract method will be overriden by the subclasses when defining the DatagramSocket and the listening PORT number
+	// This abstract method will be overridden by the subclasses 
+	//   when defining the DatagramSocket and the listening PORT number
 	protected abstract void createSocket();
 	
 	@Override
@@ -46,8 +49,11 @@ public abstract class BaseServer implements Runnable {
 			recvPacket = new DatagramPacket(buffer, buffer.length, IP, PORT);
 			
 			try {
-				socket.receive(recvPacket);     // The code will wait here until a packet is received (which is why a separate Thread is necessary)
-				processor.add(recvPacket);      // The newly received DatagramPacket is handed of to the Processor object
+				// The socket will block here until a packet is received (which is why a separate Thread is necessary)
+				socket.receive(recvPacket);
+				
+				// The newly received DatagramPacket is handed of to the Processor object
+				processor.add(recvPacket);      
 				buffer = new byte[BUFFER_LENGTH];
 				
 			} catch (SocketException e) {}

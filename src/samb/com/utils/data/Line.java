@@ -1,6 +1,7 @@
 package samb.com.utils.data;
 
 public class Line {
+	// This class contains 2 point, defining a line
 
 	public double x1, y1;
 	public double x2, y2;

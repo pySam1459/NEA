@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import samb.com.database.UserInfo;
+import samb.com.utils.Func;
 
 public class UserDBManager {
 	/* This class contains static methods which are used to query and update the 'users' table in 'OnlinePoolGame' mysql database which is hosted locally
@@ -17,7 +18,8 @@ public class UserDBManager {
 	 * */
 	
 	private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame?"
+			+ "useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	
 	public static final int[] MAX_UI_LENGTHS = new int[] {36, 20, 64, 64};
 	
@@ -44,6 +46,7 @@ public class UserDBManager {
 		// This method creates the connection to the database using the credentials specified.
 
 		try {
+			// uses credentials from file 'misc/res/sqlCredentials.cred'
 			conn = DriverManager.getConnection(connectionURL, LoginCredentials.getUsername(), LoginCredentials.getPassword());
 		
 		} catch(Exception e) {
@@ -55,10 +58,11 @@ public class UserDBManager {
 	
 	// Query Methods
 	public static UserInfo getUI(String id) {
+		// Returns a UserInfo object of a user with users.id = id;
+		
 		String query = String.format("SELECT * FROM users WHERE id='%s';", id);
 		List<UserInfo> results = executeQuery(query);
 		return results.size() == 0 ? null : results.get(0); // returns null if there is no user with id=$id in the table
-		
 	}
 	
 	public static UserInfo getUIFromName(String name) {
@@ -74,27 +78,30 @@ public class UserDBManager {
 	}
 	
 	public static boolean getOnline(String id) {
-		String query = String.format("SELECT * FROM users WHERE id='%s';", id);
-		List<UserInfo> arr = executeQuery(query);
-		return arr.size() > 0 ? arr.get(0).online : null;
+		// Returns if a user is online or not
+		UserInfo ui = getUI(id);
+		return ui != null ? ui.online : null;
 	}
 	
 	public static void display(String orderby) {
-		// This method displays 
+		// This method displays the all rows in the users table
 		
-		String query = String.format("SELECT * FROM users ORDER BY %s;", orderby);  // Gets all UserInfo ordered by argument orderby
+		// Gets all UserInfo ordered by argument orderby
+		String query = String.format("SELECT * FROM users ORDER BY %s;", orderby);  
 		List<UserInfo> arr = executeQuery(query);
 		
-		String[] columnNames = new String[] {"Username", "Email", "ID", "Password", "Online", "In Game"};  // column names
-		int[] maxChars = new int[columnNames.length];  
+		String[] columnNames = new String[] {"Username", "Email", "ID", "Password", "Online", "In Game"};
+		int[] maxChars = new int[columnNames.length]; // max size of each column
 		for(int i=0; i<columnNames.length; i++) { maxChars[i] = columnNames[i].length(); };
 		
-		for(UserInfo ui: arr) { _compareChars(ui, maxChars); } // get largest lengths for each column, so can space table nicely
-		String border = _createBorders(maxChars);              // top and bottom edges of displayed table
+		// get largest lengths for each column, so can space table nicely
+		for(UserInfo ui: arr) { _compareChars(ui, maxChars); } 
+		String border = _createBorders(maxChars); // top and bottom edges of displayed table
 		
 		System.out.println(border);
 		_displayRow(columnNames, maxChars);
 		System.out.println(border);
+		
 		for(UserInfo ui: arr) {
 			_displayUserInfo(ui, maxChars);
 		}
@@ -117,7 +124,7 @@ public class UserDBManager {
 										  + "password VARCHAR(64),"
 										  + "online BOOLEAN,"
 										  + "inGame BOOLEAN);";  
-		// The passwords kept in the db will have been hashed (SHA-256) and salted
+		// The passwords kept in the database are hashed (SHA-256) and salted
 		return executeUpdate(update);
 	}
 	
@@ -127,16 +134,8 @@ public class UserDBManager {
 		
 	}
 	
-	public static boolean resetTable() {
-		// This method is mainly used for testing purposes
-		
-		if(dropTable()) {
-			return createTable();
-		} 
-		return false;
-	}
-	
 	public static boolean addUser(UserInfo ui) {
+		// This method adds a UserInfo object to the table
 		String update = String.format("INSERT INTO users VALUES ('%s', '%s', '%s', '%s', FALSE, FALSE);", 
 				ui.id, ui.username, ui.email, ui.password);
 		return executeUpdate(update);
@@ -153,6 +152,7 @@ public class UserDBManager {
 		
 	}
 	
+	// Setters
 	public static boolean setOnline(String id, boolean online) {
 		String update = String.format("UPDATE users SET online=%b WHERE id='%s';", online, id);
 		return executeUpdate(update);
@@ -205,13 +205,13 @@ public class UserDBManager {
 		/* A java SQL Query returns a ResultSet object, which contains the data from that query
 		 * To parse this data, you must loop through the set and create a UserInfo object for each row in the set
 		 * To Note, SQL indexing starts at 1 */
+		
 		List<UserInfo> data = new ArrayList<>();
 		UserInfo ui;
 		while(results.next()) {
 			ui = new UserInfo(results.getString(1), results.getString(2), results.getString(3), 
 					results.getString(4), results.getBoolean(5), results.getBoolean(6));
-			data.add(ui);
-			
+			data.add(ui);	
 		}
 		
 		return data;
@@ -219,6 +219,7 @@ public class UserDBManager {
 	
 	public static void close() {
 		try {
+			// Attempts (normally successful) to close the database connection
 			conn.close();
 			
 		} catch(SQLException e) {
@@ -228,7 +229,10 @@ public class UserDBManager {
 	
 	
 	// Methods used in the 'display' method
-	private static void _compareChars(UserInfo ui, int[] maxChars) {  // "username", "email", "id", "password", online, inGame
+	private static void _compareChars(UserInfo ui, int[] maxChars) {
+		// Compares the lengths of each attribute in the UserInfo object to the current maximum char length
+		// attributes: username, email, id, password, online, inGame
+		
 		if(ui.username.length() > maxChars[0]) { maxChars[0] = ui.username.length(); }
 		if(ui.email.length() > maxChars[1]) { maxChars[1] = ui.email.length(); }
 		if(ui.id.length() > maxChars[2]) { maxChars[2] = ui.id.length(); }
@@ -241,7 +245,7 @@ public class UserDBManager {
 	private static String _createBorders(int[] maxChars) {
 		String border = "+";
 		for(int n: maxChars) {
-			border += _copyChar('-', n+1) + "+";
+			border += Func.copyChar('-', n+1) + "+";
 		}
 		return border;
 	}
@@ -249,7 +253,7 @@ public class UserDBManager {
 	private static void _displayRow(String[] row, int[] maxChars) {
 		String str = "|";
 		for(int i=0; i<row.length; i++) {
-			str += row[i] + _copyChar(' ', maxChars[i] - row[i].length() +1) + "|";
+			str += row[i] + Func.copyChar(' ', maxChars[i] - row[i].length() +1) + "|";
 		}
 		System.out.println(str);
 	}
@@ -258,12 +262,6 @@ public class UserDBManager {
 		_displayRow(new String[] {ui.username, ui.email, ui.id, ui.password, 
 				Boolean.toString(ui.online), Boolean.toString(ui.inGame)}, maxChars);
 		
-	}
-	
-	private static String _copyChar(char c, int n) {
-		String str = "";
-		for(int i=0; i<n; i++) { str += c; }
-		return str;
 	}
 	
 }

@@ -11,15 +11,16 @@ import java.util.List;
 import samb.com.database.Friend;
 import samb.com.database.UserInfo;
 
-
 public class FriendsDBManager {
-	/* This class contains static methods which are used to query and update the Friends Tables in 'OnlinePoolGame' mysql database which is hosted locally
-	 * This class allows the Host to interact with the database, create and drop tables, add and remove friends from each table, and get friends of a user
-	 * A User has a 'Friends_$ID$' table where each row is the id of a friend
+	/* This class contains static methods which are used to query and update the Friend Tables 
+	 *   in 'OnlinePoolGame' mysql database
+	 * This class allows the Host to query and update the database and its tables
+	 * A User has a 'Friends_$ID' table where each row is the id of a friend
 	 * */
 	
 	private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
-	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame?"
+			+ "useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 
 	private static Connection conn;
 	
@@ -48,31 +49,24 @@ public class FriendsDBManager {
 	
 	// Query Methods
 	public static Friend get(String uId, String fId) {
-		String tName = "Friends_" + clean(uId);  // Selecting, friend id, friend username, and friend online status
-		String query = String.format("SELECT %s.id, users.username, users.online, users.inGame, TRUE "
-				+ "FROM %s "
-				+ "JOIN users ON %s.id = users.id "
-				+ "WHERE users.id = '%s';", tName, tName, tName, fId);
+		// Returns a Friend object of a user with id=fId, if they are a friend
+		String tName = "Friends_" + clean(uId);  // Selecting, friend id, username, online and inGame status
+		String query = String.format("SELECT id, username, online, inGame FROM users "
+								   + "WHERE users.id = '%s' AND users.id IN "
+								   + "(SELECT id FROM %s);", fId, tName);
+
 		List<Friend> results = executeQuery(query);
 		return results.size() > 0 ? results.get(0) : null;
 	}
 	
 	public static List<Friend> getAll(String id) {
+		// Returns a list containing all a user's friends
 		String tName = "Friends_" + clean(id);  // Selecting, friend id, friend username, and friend online status
 		String query = String.format("SELECT %s.id, users.username, users.online, users.inGame, TRUE "
-				+ "FROM %s "
-				+ "JOIN users ON %s.id = users.id;", tName, tName, tName);
+								   + "FROM %s "
+								   + "JOIN users ON %s.id = users.id;", tName, tName, tName);
 		return executeQuery(query);
 		
-	}
-	
-	public static List<Friend> getAllOnline(String id) {
-		String tName = "Friends_" + clean(id);
-		String query = String.format("SELECT %s.id, users.username, users.online, users.inGame, TRUE "
-				+ "FROM %s JOIN users ON users.id = %s.id "
-				+ "WHERE users.online=TRUE;", tName, tName, tName);
-		return executeQuery(query);
-
 	}
 	
 	public static List<Friend> findFriends(String uId, String search) {
@@ -107,6 +101,7 @@ public class FriendsDBManager {
 	}
 	
 	public static boolean createAll() {
+		// Used by console commands: db create friends, db setup
 		List<UserInfo> uis = UserDBManager.getAll();
 		for(UserInfo ui: uis) {
 			if(!addUser(ui.id)) {
@@ -119,7 +114,8 @@ public class FriendsDBManager {
 	public static boolean dropAll() {
 		try {
 			// This statement gathers all tables from information_schema.tables with the prefix = 'friends_'
-			String query = "SELECT table_name FROM information_schema.tables WHERE table_schema='OnlinePoolGame' AND table_name LIKE 'friends_%';";
+			String query = "SELECT table_name FROM information_schema.tables "
+						 + "WHERE table_schema='OnlinePoolGame' AND table_name LIKE 'friends_%';";
 			Statement stmt = conn.createStatement();
 			ResultSet results = stmt.executeQuery(query);
 			
@@ -153,7 +149,7 @@ public class FriendsDBManager {
 
 	public static List<Friend> executeQuery(String query) {
 		// This method returns the results from a SQL query to the database
-		// The results must be parsed into usable data, ie a list of UserInfo objects
+		// The results must be parsed into usable data, ie a list of Friend objects
 		try {
 			Statement stmt = conn.createStatement();
 			
@@ -185,6 +181,7 @@ public class FriendsDBManager {
 	
 	
 	public static void close() {
+		// Closes database connection
 		try {
 			conn.close();
 			

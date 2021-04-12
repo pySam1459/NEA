@@ -27,6 +27,7 @@ public class HoverShineAnimation extends WidgetAnimation {
 
 	@Override
 	public void tick() {
+		// If the mouse is over the widget, do animation
 		hover = inRect(Client.getMouse().getXY());
 		
 		if((hover && progress < progmax) || (!hover && progress > 0)) {
@@ -40,6 +41,7 @@ public class HoverShineAnimation extends WidgetAnimation {
 
 	@Override
 	public void render(Graphics2D graph) {
+		// Render animation
 		if(progress > 0 && progress < progmax) {
 			img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g = (Graphics2D) img.getGraphics();

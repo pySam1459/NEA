@@ -7,8 +7,9 @@ import samb.com.utils.data.Pointf;
 
 public class UpdateInfo implements Serializable {
 	/* This packet info class contains information which is used to synchronize the games
-	 * The cue ball velocity after a shoot is sent, then the rest is simulated on the other user's client
+	 * The cue ball velocity after a shoot is sent, then the rest is simulated client-side 
 	 * When a cue has been placed, the Pointf is sent, instead of all of the balls.
+	 * When a user has won, type of win and winner id is sent to host
 	 * */
 	
 	private static final long serialVersionUID = -2831208102218250201L;

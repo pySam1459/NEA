@@ -16,7 +16,6 @@ public class Button extends Widget {
 	/* This class is a subclass of the Widget class
 	 * This class functions as a button, displaying a button and 
 	 *  interfacing with the ButtonListeners when the user clicks and releases the button
-	 * 
 	 * */
 	
 	public Color BACKGROUND_COLOR = new Color(24, 231, 204, 64);
@@ -75,7 +74,7 @@ public class Button extends Widget {
 		if(hover && active) {
 			if(Client.getMouse().left) {
 				if(!held) {
-					if(!Client.getMouse().justButton) {
+					if(!Client.getMouse().justButton) { // if a button appears underneath, don't click that one
 						for(ButtonListener bl: bls) {
 							bl.onClick(this);
 							
@@ -115,6 +114,7 @@ public class Button extends Widget {
 			BufferedImage img = new BufferedImage(rect[2], rect[3], BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g = (Graphics2D) img.getGraphics();
 			
+			// background
 			g.setColor(!held ? BACKGROUND_COLOR : HOLD_COLOR);
 			g.fillRect(0, 0, rect[2], rect[3]);
 			
@@ -122,10 +122,11 @@ public class Button extends Widget {
 			g.setColor(SHADOW_COLOUR);
 			g.fillRect(0, rect[3]-thickness, rect[2], rect[3]);
 	
+			// text
 			if(ti != null) {
 				ti.render(g, new Point(rect[2]/2-tiDim.width/2, rect[3]/2+tiDim.height/2));
 				
-			} if(!active) {
+			} if(!active) { // put gray mask on top if not active
 				g.setColor(new Color(127, 127, 127, 127));
 				g.fillRect(0, 0, rect[2], rect[3]);
 			}
@@ -144,6 +145,7 @@ public class Button extends Widget {
 	}
 	
 	public void setText(String txt) {
+		// Same button, different text
 		this.ti.setText(txt);
 		this.tiDim = ti.calculateDims(-1);
 		resizeText();

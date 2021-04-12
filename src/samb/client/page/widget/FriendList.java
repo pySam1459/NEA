@@ -24,7 +24,7 @@ import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 
 public class FriendList extends Widget implements MouseWheelListener, TextBoxListener {
-	/* This widget displays a list of all your friends
+	/* This widget displays a list of all your friends / search results
 	 * */
 	
 	private final int scrollSpeed=16, buffer=8;
@@ -47,9 +47,10 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 		this.fW = (rect[2]-buffer*8)/2;
 		this.prof = prof;
 		
-		this.friendNameFont = Consts.INTER.deriveFont(Font.PLAIN, fH/1.8f);
+		this.friendNameFont = Consts.INTER.deriveFont(Font.PLAIN, fH/2.2f);
 		getFriends();
 		
+		// can be used for any element in the list
 		this.anim = new BoxFocusAnimation(new int[] {-100,-100,1,1}, true);
 		addAnimation(anim);
 		
@@ -70,7 +71,7 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 		xy = Client.getMouse().getXY();
 		if(Maths.pointInRect(xy, rect)) {
 			int index = 2*(int)((scroll + xy.y - rect[1]-buffer*3) / fH);
-			if(xy.x > rect[0]+rect[2]/2) {
+			if(xy.x > rect[0]+rect[2]/2) { // right hand side, +1
 				index++;
 			} if(0 <= index && index < friends.size() && buffer*3+(int)(index/2)*fH -scroll < rect[3] && highlight != index) {
 				this.highlight = index;
@@ -83,27 +84,31 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 	}
 	
 	private void select() {
+		// This method selects an element in the list and sets the profile to that user
+		
 		if(Client.getMouse().left && Client.getMouse().forleft < 2) {
 			if(highlight != -1) {
 				this.selected = highlight;
 				prof.set(friends.get(selected), false);
-				prof.setHidden();
+				prof.setHiddens();
+				
 			} else if((Maths.pointInRect(xy, prof.rect) && prof.HIDDEN) || !Maths.pointInRect(xy, prof.rect)) {
 				this.selected = -1;
 				prof.setAsSelf();
-				prof.setHidden();
+				prof.setHiddens();
 			}
 		}		
 	}
 	
-	public void getFriends() { // Requests the friends list
+	public void getFriends() { 
+		// Requests the friends list
 		Packet p = new Packet(Header.getFriends);
 		p.friendsInfo = new FriendsInfo(FHeader.getFriends, new ArrayList<>());
 		Client.getClient().server.send(p);
 	}
 	
-	public void setFriends(Packet p) { // Sets the friends list
-		// Keep challenge info for same friends
+	public void setFriends(Packet p) { 
+		// Sets the friends list and keeps the challenge infos for same friends
 		for(Friend f: friends) {
 			for(Friend nf: p.friendsInfo.friends) {
 				if(nf.id.equals(f.id)) {
@@ -119,14 +124,16 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 	}
 	
 	public void recvChallenge(ChallengeInfo ci) {
+		// Receives the challenge from a friend with id ci.oppId
 		for(Friend f: friends) {
 			if(f.id.equals(ci.oppId)) {
 				f.challenged = true;
 				f.ci = ci;
 				
-				if(!prof.HIDDEN && ci.oppId.equals(prof.f.id)) {
+				if(!prof.HIDDEN && ci.oppId.equals(prof.f.id)) { 
+					// sets challenge button active
 					prof.setBools(f);
-					prof.setHidden();
+					prof.setHiddens();
 				}
 				break;
 			}
@@ -134,8 +141,10 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 	}
 	
 	
+	// Interface methods
 	@Override
 	public void onEnter(TextBox tb) {
+		// Asks Host to search for $tb.getText()
 		if("searchBox".equals(tb.id)) {
 			Packet p = new Packet(Header.getFriends);
 			p.friendsInfo = new FriendsInfo(FHeader.searchFriend, tb.getText().trim());
@@ -146,6 +155,7 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent m) {
 		// This method is called by an interface when the mouse wheel is scrolled
+		
 		Point xy = Client.getMouse().getXY();
 		if(Maths.pointInRect(xy, rect)) {
 			int maxS = (int)(friends.size()/2)*fH + buffer*3;
@@ -200,21 +210,16 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 			section = img.getSubimage(0, scroll, rect[2], rect[3]-buffer*2);
 			g.drawImage(section, 0, buffer, null);
 			
-//			if(highlight != -1 && selected != highlight) {
-//				highlightIndex(g, highlight, Consts.PALE);
-//			} 
 			if(selected != -1) {
-				highlightIndex(g, selected, new Color(245, 245, 245, 64));
+				// mask with colour RGBA{245, 245, 245, 64}
+				g.setColor(new Color(245, 245, 245, 64));
+				g.setStroke(highlightStroke);
+				g.fillRoundRect(buffer*3+(fW+buffer*2)*(selected%2), 
+						buffer*3+(int)(selected/2)*fH-scroll, fW, fH-buffer*2, buffer*2, buffer*2);
 			}
 		}
 	}
-	
-	private void highlightIndex(Graphics2D g, int index, Color colour) {
-		g.setColor(colour);
-		g.setStroke(highlightStroke);
-		g.fillRoundRect(buffer*3+(fW+buffer*2)*(index%2), 
-				buffer*3+(int)(index/2)*fH-scroll, fW, fH-buffer*2, buffer*2, buffer*2);
-	}
+
 	
 	private void renderFriends() {
 		// Creates an image of the friendsList widget, only called once
@@ -231,8 +236,12 @@ public class FriendList extends Widget implements MouseWheelListener, TextBoxLis
 					buffer*2+(int)(i/2)*fH, fW, fH-buffer*2, buffer*2, buffer*2);
 			
 			g.setColor(Consts.PALE);
-			g.drawString(f.username, buffer*7+(fW+buffer*2)*(i%2), 
-					buffer*2+(int)(i/2)*fH+(int)(0.6*fH));
+			String username = f.username;
+			if(username.length() > 16) { // fits in element
+				username = username.substring(0,13) + "...";
+			}
+			g.drawString(username, buffer*5+(fW+buffer*2)*(i%2), 
+					buffer*2+(int)(i/2)*fH+(int)(0.56*fH));
 			
 			i++;
 		}

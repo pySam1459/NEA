@@ -10,16 +10,20 @@ import java.util.List;
 
 import samb.com.database.UserInfo;
 import samb.com.database.UserStats;
+import samb.com.utils.Func;
 
 public class StatsDBManager {
-	/* This class is contains static methods which are used to query and update the 'stats' table in 'OnlinePoolGame' mysql database which is hosted locally
+	/* This class is contains static methods which are used to query and update the 'stats' table 
+	 *   in 'OnlinePoolGame' mysql database which is hosted locally
 	 * This class allows the Host to interact with the database and add, remove, select data to/from the database
-	 * Each user has a row containing their unique id, Elo, # Games, # Games Won, # Games Lost, # balls potted, highestElo, highestEloVictory
+	 * Each user has a row containing their unique id, Elo, # Games, 
+	 *   # Games Won, # Games Lost, # balls potted, highestElo, highestEloVictory
 	 * */
 	
 	
 	private static final String DRIVER = "com.mysql.cj.jdbc.Driver";	
-	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame?useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+	private static final String connectionURL = "jdbc:mysql://localhost:3306/OnlinePoolGame?"
+			+ "useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	
 	public static final int[] MAX_UI_LENGTHS = new int[] {};
 	
@@ -50,9 +54,14 @@ public class StatsDBManager {
 	
 	// Query Methods
 	public static UserStats getUS(String id) {
+		// Returns a UserStats object of the user with stats.id=id;
 		String query = String.format("SELECT * FROM stats WHERE id='%s';", id);
 		List<UserStats> results = executeQuery(query);
 		return results.size() == 0 ? null : results.get(0); // returns null if there is no user with id=$id in the table
+	}
+	
+	public static int getElo(String id) {
+		return getUS(id).elo;
 	}
 	
 	public static List<UserStats> getAll() {
@@ -69,41 +78,42 @@ public class StatsDBManager {
 			return;
 		}
 		
-		String query = String.format("SELECT stats.* FROM stats JOIN users ON users.id = stats.id ORDER BY %s;", orderby);  // Gets all UserStats ordered by argument orderby
+		// Queries data to be displayed
+		// Gets all UserStats ordered by argument orderby
+		String query = String.format("SELECT stats.* FROM stats JOIN users ON users.id = stats.id ORDER BY %s;", orderby);  
 		List<UserStats> arrUS = executeQuery(query);
 		
 		String query2 = String.format("SELECT users.* FROM users JOIN stats ON stats.id = users.id ORDER BY %s", orderby);
 		List<UserInfo> arrUI = UserDBManager.executeQuery(query2);
 		
-		String[] columnNames = new String[] {"Username", "Elo", "# Games", "# Games Won", "# Games Lost", "# Balls Potted", "Highest Elo", "Highest Elo Victory"};  // column names
+		// Creates a list of max column lengths
+		String[] columnNames = new String[] {"Username", "Elo", "# Games", "# Games Won", "# Games Lost", 
+											 "# Balls Potted", "Highest Elo", "Highest Elo Victory"};  // column names
 		int[] maxChars = new int[columnNames.length];  
 		for(int i=0; i<columnNames.length; i++) { maxChars[i] = columnNames[i].length(); };
 		
-		for(int i=0; i<arrUS.size(); i++) { _compareChars(arrUS.get(i), arrUI.get(i), maxChars); } // get largest lengths for each column, so can space table nicely
+		// get largest lengths for each column, so can space table nicely
+		for(int i=0; i<arrUS.size(); i++) { _compareChars(arrUS.get(i), arrUI.get(i), maxChars); } 
 		String border = _createBorders(maxChars);  // top and bottom edges of displayed table
 		
+		// Outputs Table
 		System.out.println(border);
 		_displayRow(columnNames, maxChars);
 		System.out.println(border);
+		
 		for(int i=0; i<arrUS.size(); i++) {
 			_displayUserStats(arrUS.get(i), arrUI.get(i), maxChars);
 		}
 		
 		System.out.println(border);
-		
 	}
-	
-	public static int getElo(String id) {
-		return getUS(id).elo;
-		
-	}
-	
 	
 	
 	// Update Methods
 	public static boolean createTable() {
 		// This method creates the table in the 'online pool game' database
-		String update = "CREATE TABLE stats (id VARCHAR(36), elo INT, noGames INT, noGamesWon INT, noGamesLost INT, noBallsPotted INT, highestElo INT, highestEloVictory INT)";
+		String update = "CREATE TABLE stats (id VARCHAR(36), elo INT, noGames INT, noGamesWon INT, "
+				+ "noGamesLost INT, noBallsPotted INT, highestElo INT, highestEloVictory INT)";
 		executeUpdate(update);
 		
 		for(UserInfo ui: UserDBManager.getAll()) {
@@ -117,15 +127,6 @@ public class StatsDBManager {
 		String update = "DROP TABLE stats;";
 		return executeUpdate(update);
 		
-	}
-	
-	public static boolean resetTable() {
-		// This method is mainly used for testing purposes
-		
-		if(dropTable()) {
-			return createTable();
-		} 
-		return false;
 	}
 	
 	public static boolean addUser(UserStats us) {
@@ -148,7 +149,6 @@ public class StatsDBManager {
 	
 	
 	// General Methods
-	
 	public static boolean executeUpdate(String update) {
 		// This method is a general SQL Update; to be used by any other method which wants query an update
 		try {
@@ -188,7 +188,8 @@ public class StatsDBManager {
 		List<UserStats> data = new ArrayList<>();
 		UserStats ui;
 		while(results.next()) {
-			ui = new UserStats(results.getString(1), results.getInt(2), results.getInt(3), results.getInt(4), results.getInt(5), results.getInt(6), results.getInt(7), results.getInt(8));
+			ui = new UserStats(results.getString(1), results.getInt(2), results.getInt(3), results.getInt(4), 
+							   results.getInt(5), results.getInt(6), results.getInt(7), results.getInt(8));
 			data.add(ui);
 			
 		}
@@ -207,8 +208,8 @@ public class StatsDBManager {
 	
 	
 	// Methods used in the 'display' method
-	
-	private static void _compareChars(UserStats us, UserInfo ui, int[] maxChars) {  // "username", "email", "id", "password"
+	// These methods format the table layout and data
+	private static void _compareChars(UserStats us, UserInfo ui, int[] maxChars) {
 		if(ui.username.length() > maxChars[0]) { maxChars[0] = ui.username.length(); }
 		
 		int[] iUs = us.toArray();
@@ -217,6 +218,7 @@ public class StatsDBManager {
 			l = getIntLength(iUs[i]);
 			if(l > maxChars[i+1]) {
 				maxChars[i+1] = l;
+				
 			}
 		}
 	}
@@ -243,7 +245,7 @@ public class StatsDBManager {
 	private static String _createBorders(int[] maxChars) {
 		String border = "+";
 		for(int n: maxChars) {
-			border += _copyChar('-', n+1) + "+";
+			border += Func.copyChar('-', n+1) + "+";
 		}
 		return border;
 	}
@@ -251,7 +253,7 @@ public class StatsDBManager {
 	private static void _displayRow(String[] row, int[] maxChars) {
 		String str = "|";
 		for(int i=0; i<row.length; i++) {
-			str += row[i] + _copyChar(' ', maxChars[i] - row[i].length() +1) + "|";
+			str += row[i] + Func.copyChar(' ', maxChars[i] - row[i].length() +1) + "|";
 		}
 		System.out.println(str);
 	}
@@ -265,12 +267,6 @@ public class StatsDBManager {
 		
 		_displayRow(new String[] {ui.username, sUs[0], sUs[1], sUs[2], sUs[3], sUs[4], sUs[5], sUs[6]}, maxChars);
 		
-	}
-	
-	private static String _copyChar(char c, int n) {
-		String str = "";
-		for(int i=0; i<n; i++) { str += c; }
-		return str;
 	}
 	
 }

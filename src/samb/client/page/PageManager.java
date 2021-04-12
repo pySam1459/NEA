@@ -6,9 +6,8 @@ import java.awt.image.BufferedImage;
 import samb.client.main.Window;
 
 public class PageManager {
-	/* This class is used to manage the pages, 
-	 *   acts as an interface for the page being displayed
-	 *   abstracts the specifics of each page
+	/* This class is used to manage the pages, acts as an interface for the page being displayed
+	 *   abstracts the specifics of each page and handles the transition between pages
 	 * */
 	
 	private Page curPage;
@@ -22,6 +21,7 @@ public class PageManager {
 	}
 	
 	public Page get() {
+		// Returned page will have to be cast to a subclass to be used
 		return curPage;
 		
 	}

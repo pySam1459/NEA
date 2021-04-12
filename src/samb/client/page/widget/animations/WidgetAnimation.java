@@ -8,7 +8,8 @@ import samb.client.page.widget.Widget;
 public abstract class WidgetAnimation {
 	/* This abstract class is the base for any widget animation
 	 * A Widget will contain a list of WidgetAnimation objects
-	 * The abstract methods allows a Widget object to interface with an animation without having to know which animation it is
+	 * The abstract methods allows a Widget object to interface with an animation 
+	 *    without having to know which animation it is
 	 * */
 	
 	protected int[] rect;

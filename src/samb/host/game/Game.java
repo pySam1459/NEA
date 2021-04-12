@@ -10,8 +10,8 @@ import samb.host.database.UserDBManager;
 
 public class Game extends GameInfo {
 	/* This subclass contains data about a singular game between 2 users
-	 * This class is used to synchronise data between clients (either players or spectators),
-	 *   and to keep a record of the game state
+	 * This class is used to synchronise data between clients (either players or spectators)
+	 *   by acting as a relay between users (based around the star topology)
 	 * */
 	
 	private static final long serialVersionUID = -2660503939136758429L;
@@ -35,6 +35,7 @@ public class Game extends GameInfo {
 	}
 	
 	public void update(Packet p) {
+		// Updates the game object base on the info provided by the Packet p
 		if(p.gameState != null) {
 			this.state = p.gameState;
 			
@@ -44,6 +45,7 @@ public class Game extends GameInfo {
 		} if(p.updateInfo != null) {
 			if(p.updateInfo.header == UHeader.win) {
 				winnerId = p.updateInfo.winner;
+				
 			}
 		}
 	}

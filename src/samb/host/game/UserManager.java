@@ -5,6 +5,8 @@ import java.util.HashMap;
 import samb.host.database.UserDBManager;
 
 public class UserManager {
+	/* This class contains a HashMap{id: User} of all the users currently online
+	 * */
 	
 	private HashMap<String, User> users;
 	

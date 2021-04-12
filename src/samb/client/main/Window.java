@@ -47,6 +47,7 @@ public class Window extends Canvas {
 	}
 	
 	public static void updateBackground() {
+		// animates background
 		bgImgCounter += bgImgDir;
 		if(bgImgCounter >= 255 || bgImgCounter <= 1) {
 			bgImgDir *= -1;

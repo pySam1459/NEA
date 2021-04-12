@@ -54,7 +54,14 @@ public class Text extends Widget {
 		}
 	}
 	
+	public void setColour(Color colour) {
+		ti.setColour(colour);
+		
+	}
+	
+	// Getter
 	public int getRight() {
+		// Returns the x coordinate of the right-hand side of the text
 		if(CENTERED) {
 			return rect[0]+rect[2]/2+ti.dim.width/2;
 		} else if(align.equals("right")) {
@@ -65,12 +72,6 @@ public class Text extends Widget {
 			return rect[0] + rect[2];
 		}
 	}
-	
-	public void setColour(Color colour) {
-		ti.setColour(colour);
-		
-	}
-
 	
 	// Render Method
 	@Override
@@ -89,7 +90,8 @@ public class Text extends Widget {
 				}
 			}
 			
-			if(SHADOW) {
+			if(SHADOW) { 
+				// render the same text, moved slightly to the bottom right, looks like a shadow
 				ti.render(g, new Point(xy.x + 3, xy.y + 3), Consts.SHADOW_COLOUR);
 			}
 			

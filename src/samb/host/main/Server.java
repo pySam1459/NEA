@@ -53,6 +53,8 @@ public class Server extends BaseServer {
 	}
 	
 	public void start(int port) {
+		// The server is started here on port=$port
+		
 		this.PORT = port;
 		processor.startThread();
 		super.start();
