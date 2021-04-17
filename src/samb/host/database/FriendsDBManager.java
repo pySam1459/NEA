@@ -51,7 +51,7 @@ public class FriendsDBManager {
 	public static Friend get(String uId, String fId) {
 		// Returns a Friend object of a user with id=fId, if they are a friend
 		String tName = "Friends_" + clean(uId);  // Selecting, friend id, username, online and inGame status
-		String query = String.format("SELECT id, username, online, inGame FROM users "
+		String query = String.format("SELECT id, username, online, inGame, TRUE FROM users "
 								   + "WHERE users.id = '%s' AND users.id IN "
 								   + "(SELECT id FROM %s);", fId, tName);
 

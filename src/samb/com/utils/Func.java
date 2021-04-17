@@ -77,8 +77,8 @@ public class Func {
 		double y;
 		int count = 0;
 		for(int j=0; j<5; j++) {
-			x += Math.sqrt(3)/2 * (r*2+1);
-			y = dim.height/2 - j*(r*2+1)/2;
+			x += Math.sqrt(3)/2 * (r*2+2);
+			y = dim.height/2 - j*(r*2+2)/2;
 			for(int i=0; i<j+1; i++) { // i<(j+1 -> 1, 2, 3, 4, 5)
 				arr.add(new Circle(x, y, r, cols[count]));
 				y += r*2 +1;
