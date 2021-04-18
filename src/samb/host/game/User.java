@@ -20,23 +20,20 @@ public class User {
 	public int elo;
 	
 	public boolean waiting;
-	
-	private Host h;
 
-	public User(Host h, Packet p, DatagramPacket packet) {
+	public User(Packet p, DatagramPacket packet) {
 		this.addr = packet.getAddress();
 		this.port = packet.getPort();
 		
 		this.id = p.id;
 		this.username = p.loginInfo.username;
 		updateElo();
-		
-		this.h = h;
+
 	}
 	
 	public void send(Packet p) {
 		byte[] data = PacketFactory.getBytes(p);
-		h.server.send(new DatagramPacket(data, data.length, addr, port));
+		Host.getHost().server.send(new DatagramPacket(data, data.length, addr, port));
 		
 	}
 	

@@ -14,7 +14,6 @@ import samb.client.page.widget.Text;
 import samb.client.page.widget.animations.BoxFocusAnimation;
 import samb.client.page.widget.listeners.ButtonListener;
 import samb.client.utils.ImageLoader;
-import samb.client.utils.Maths;
 import samb.com.database.UserInfo;
 import samb.com.server.info.GameInfo;
 import samb.com.server.info.GameState;
@@ -208,7 +207,7 @@ public class GamePage extends Page implements ButtonListener {
 		// Returns the delta Elo 
 		UserInfo loser = wId.equals(info.u1.id) ? info.u2 : info.u1;
 		int diffelo = loser.elo - getUI(wId).elo;
-		return Maths.calculateDeltaElo(diffelo);
+		return Func.calculateDeltaElo(diffelo);
 	}
 	
 	private int getEloDelta(String wId) {
@@ -216,9 +215,9 @@ public class GamePage extends Page implements ButtonListener {
 		UserInfo loser = wId.equals(info.u1.id) ? info.u2 : info.u1;
 		int diffelo = loser.elo - getUI(wId).elo;
 		if(Client.getClient().udata.id.equals(wId)) {
-			return Maths.calculateDeltaElo(diffelo); 
+			return Func.calculateDeltaElo(diffelo); 
 		} else {
-			return -Maths.calculateDeltaElo(diffelo); // negative if loss
+			return -Func.calculateDeltaElo(diffelo); // negative if loss
 		}
 	}
 	

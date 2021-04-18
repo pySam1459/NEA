@@ -585,7 +585,7 @@ public class Host extends BaseProcessor implements Runnable {
 		// This method is called by the "case login", 
 		//   which creates a user object and authorizes the user to join
 		
-		User u = new User(this, p, packet);
+		User u = new User(p, packet);
 		um.add(u);
 		
 		p.loginInfo.authorized = true;
@@ -623,7 +623,7 @@ public class Host extends BaseProcessor implements Runnable {
 		StatsDBManager.addUser(new UserStats(p.id));
 		FriendsDBManager.addUser(p.id);
 		
-		User u = new User(this, p, packet);
+		User u = new User(p, packet);
 		um.add(u);
 		
 		// logins in user

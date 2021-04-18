@@ -99,4 +99,14 @@ public class Func {
 		} return false;
 	}
 	
+	
+	public static int calculateDeltaElo(int diff) {
+		// Returns the change in elo dependent on the difference in elo between 2 players
+		if(diff >= 0) {
+			return (int)(30.0*Math.tanh((double)diff/180.0)+20.0); // max 50, min 20
+		} else {
+			return (int)(15.0*Math.tanh((double)diff/150.0)+20.0); // max 20, min 5
+		}
+	}
+	
 }

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import samb.client.utils.Maths;
 import samb.com.database.UserInfo;
 import samb.com.database.UserStats;
 import samb.com.server.info.UpdateInfo;
@@ -13,6 +12,7 @@ import samb.com.server.packet.Error;
 import samb.com.server.packet.Header;
 import samb.com.server.packet.Packet;
 import samb.com.server.packet.UHeader;
+import samb.com.utils.Func;
 import samb.com.utils.enums.TableUseCase;
 import samb.host.database.StatsDBManager;
 import samb.host.database.UserDBManager;
@@ -243,7 +243,7 @@ public class GameManager {
 		UserStats loseS = StatsDBManager.getUS(lId);
 		
 		int diffelo = loseS.elo - winS.elo;  // if lose.elo > win.elo => delo > 0
-		int deltaElo = Maths.calculateDeltaElo(diffelo); // change in elo
+		int deltaElo = Func.calculateDeltaElo(diffelo); // change in elo
 		
 		// change stats
 		winS.updateElo(deltaElo);
