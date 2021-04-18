@@ -2,6 +2,7 @@
 
 My NEA Project is an Online Pool Game, a Java application with a custom everything library.
 The Project is based around a Client-Server Architecture, contains 2 programs: the **Host** and the **Client**.
+Visit the jars/README.md to learn how to setup and use both the Host and Client programs.
 
 
 ## Host
@@ -78,3 +79,5 @@ Or if they are already in a game, you can spectate their game.
 A User's ELO is a rating system for their ability at Pool.
 This value will increase after a win and decrease after a loss.
 This magnitude of this increase is based of the tanh(x) function, where x is the difference in the players' elo
+
+#### to be continued...
