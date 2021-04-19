@@ -155,7 +155,7 @@ public class EndScreen extends Widget {
 		// Returns the 'by What' text based on the 'win'
 		switch(win) {
 		case pottedBlack: 
-			return "By Potting The Black Early";
+			return "By Potting The 8 Ball";
 		case pottedAll: 
 			return "By Potting All Balls";
 		case forfeit: 

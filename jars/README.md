@@ -34,6 +34,16 @@ password
 Otherwise, "Error loading SQL Database Credentials" will be displayed.
 **NOTE: if the password is left as 'password', mysql will not allow the user to be made as password requirements must be met.**
 
+
+### configuration
+The file 'res/misc/config.cfg' currently contains the IP address of the Host server. The default IP is the localhost:
+```
+HOST_IP = 127.0.0.1
+```
+but this can be changed to any IP address.
+If the Host is run on a LAN network, the local IP address of the host machine should be used.
+
+
 ### firewall
 Host.jar uses the port 5303.
 For linux, this command should be run:
